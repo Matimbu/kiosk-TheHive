@@ -1,0 +1,142 @@
+﻿namespace kiosk.options.Rice
+{
+    partial class beefTapa
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(beefTapa));
+            this.button1 = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.productName1 = new System.Windows.Forms.Label();
+            this.numericUpDownQuantity = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.labelTotalPrice = new System.Windows.Forms.Label();
+            this.buttonPlaceOrder = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownQuantity)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(268, 357);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(123, 23);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "Close";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(196, 74);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(100, 100);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 38;
+            this.pictureBox1.TabStop = false;
+            // 
+            // productName1
+            // 
+            this.productName1.AutoSize = true;
+            this.productName1.Location = new System.Drawing.Point(221, 188);
+            this.productName1.Name = "productName1";
+            this.productName1.Size = new System.Drawing.Size(57, 13);
+            this.productName1.TabIndex = 37;
+            this.productName1.Text = "Americano";
+            // 
+            // numericUpDownQuantity
+            // 
+            this.numericUpDownQuantity.Location = new System.Drawing.Point(224, 226);
+            this.numericUpDownQuantity.Name = "numericUpDownQuantity";
+            this.numericUpDownQuantity.ReadOnly = true;
+            this.numericUpDownQuantity.Size = new System.Drawing.Size(32, 20);
+            this.numericUpDownQuantity.TabIndex = 36;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(140, 233);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(46, 13);
+            this.label1.TabIndex = 35;
+            this.label1.Text = "Quantity";
+            // 
+            // labelTotalPrice
+            // 
+            this.labelTotalPrice.AutoSize = true;
+            this.labelTotalPrice.Location = new System.Drawing.Point(133, 318);
+            this.labelTotalPrice.Name = "labelTotalPrice";
+            this.labelTotalPrice.Size = new System.Drawing.Size(65, 13);
+            this.labelTotalPrice.TabIndex = 41;
+            this.labelTotalPrice.Text = "Price: ₱0.00";
+            // 
+            // buttonPlaceOrder
+            // 
+            this.buttonPlaceOrder.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonPlaceOrder.Location = new System.Drawing.Point(133, 357);
+            this.buttonPlaceOrder.Name = "buttonPlaceOrder";
+            this.buttonPlaceOrder.Size = new System.Drawing.Size(123, 23);
+            this.buttonPlaceOrder.TabIndex = 40;
+            this.buttonPlaceOrder.Text = "Place Order";
+            this.buttonPlaceOrder.UseVisualStyleBackColor = true;
+            this.buttonPlaceOrder.Click += new System.EventHandler(this.buttonPlaceOrder_Click);
+            // 
+            // beefTapa
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(480, 720);
+            this.Controls.Add(this.labelTotalPrice);
+            this.Controls.Add(this.buttonPlaceOrder);
+            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.productName1);
+            this.Controls.Add(this.numericUpDownQuantity);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.button1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Name = "beefTapa";
+            this.Text = "beefTapa";
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownQuantity)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Label productName1;
+        private System.Windows.Forms.NumericUpDown numericUpDownQuantity;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelTotalPrice;
+        private System.Windows.Forms.Button buttonPlaceOrder;
+    }
+}

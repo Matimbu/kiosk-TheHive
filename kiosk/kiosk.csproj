@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BA765032-521A-4EE7-82E9-136F6DC8A939}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>kiosk</RootNamespace>
+    <AssemblyName>kiosk</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=2.0.3.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.2.0.3\lib\net471\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OrderForms\EditOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrderForms\EditOrderForm.Designer.cs">
+      <DependentUpon>EditOrderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\bestSeller.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\bestSeller.Designer.cs">
+      <DependentUpon>bestSeller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\option4.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\option4.Designer.cs">
+      <DependentUpon>option4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\option3.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\option3.Designer.cs">
+      <DependentUpon>option3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\option2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\option2.Designer.cs">
+      <DependentUpon>option2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\rice.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\rice.Designer.cs">
+      <DependentUpon>rice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\Coffee.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\Coffee.Designer.cs">
+      <DependentUpon>Coffee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\cafeLatte.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\cafeLatte.Designer.cs">
+      <DependentUpon>cafeLatte.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\americano.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\americano.Designer.cs">
+      <DependentUpon>americano.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\hazelnutAmericano.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\hazelnutAmericano.Designer.cs">
+      <DependentUpon>hazelnutAmericano.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Rice\beefTapa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\beefTapa.Designer.cs">
+      <DependentUpon>beefTapa.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OrderForms\Order.cs" />
+    <Compile Include="OrderForms\OrderStorage.cs" />
+    <Compile Include="Payments\CardPaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\CardPaymentForm.Designer.cs">
+      <DependentUpon>CardPaymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payments\CashPaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\CashPaymentForm.Designer.cs">
+      <DependentUpon>CashPaymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payments\EWalletPaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\EWalletPaymentForm.Designer.cs">
+      <DependentUpon>EWalletPaymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OrderForms\PriceTable.cs" />
+    <Compile Include="Payments\PaymentSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\PaymentSelectionForm.Designer.cs">
+      <DependentUpon>PaymentSelectionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payments\ReceiptForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\ReceiptForm.Designer.cs">
+      <DependentUpon>ReceiptForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuPage.Designer.cs">
+      <DependentUpon>menuPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="OrderForms\viewOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrderForms\viewOrder.Designer.cs">
+      <DependentUpon>viewOrder.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="options\Rice\beefTapa.resx">
+      <DependentUpon>beefTapa.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrderForms\EditOrderForm.resx">
+      <DependentUpon>EditOrderForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\bestSeller.resx">
+      <DependentUpon>bestSeller.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\option4.resx">
+      <DependentUpon>option4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\option3.resx">
+      <DependentUpon>option3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\option2.resx">
+      <DependentUpon>option2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\rice.resx">
+      <DependentUpon>rice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\Coffee.resx">
+      <DependentUpon>Coffee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\cafeLatte.resx">
+      <DependentUpon>cafeLatte.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuPage.resx">
+      <DependentUpon>menuPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\americano.resx">
+      <DependentUpon>americano.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\hazelnutAmericano.resx">
+      <DependentUpon>hazelnutAmericano.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\CardPaymentForm.resx">
+      <DependentUpon>CardPaymentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\CashPaymentForm.resx">
+      <DependentUpon>CashPaymentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\EWalletPaymentForm.resx">
+      <DependentUpon>EWalletPaymentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\PaymentSelectionForm.resx">
+      <DependentUpon>PaymentSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\ReceiptForm.resx">
+      <DependentUpon>ReceiptForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrderForms\viewOrder.resx">
+      <DependentUpon>viewOrder.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ICON1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon2.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\header.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Cafe Latte.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pictureBoxCoffee.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cafeLatte.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\keisuke.jpg" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

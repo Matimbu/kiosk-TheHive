@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BA765032-521A-4EE7-82E9-136F6DC8A939}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>kiosk</RootNamespace>
+    <AssemblyName>kiosk</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <!-- ── Standard framework references ───────────────────────────────── -->
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.118.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\lib\net46\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.118.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.118.0\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.118.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.118.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <!-- ── SQLite (added via NuGet: Install-Package System.Data.SQLite) ── -->
+  <!-- After you run Install-Package, Visual Studio will fill this in    -->
+  <!-- automatically. If it's already installed, these lines are enough. -->
+  <!-- ── Source files ─────────────────────────────────────────────────── -->
+  <ItemGroup>
+    <!-- Root -->
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuPage.Designer.cs">
+      <DependentUpon>menuPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <!-- NEW helpers -->
+    <Compile Include="ThemeManager.cs" />
+    <Compile Include="DatabaseManager.cs" />
+    <!-- menuBar -->
+    <Compile Include="menuBar\bestSeller.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\bestSeller.Designer.cs">
+      <DependentUpon>bestSeller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\Coffee.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\Coffee.Designer.cs">
+      <DependentUpon>Coffee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\rice.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\rice.Designer.cs">
+      <DependentUpon>rice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\option2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\option2.Designer.cs">
+      <DependentUpon>option2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\option3.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\option3.Designer.cs">
+      <DependentUpon>option3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="menuBar\option4.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="menuBar\option4.Designer.cs">
+      <DependentUpon>option4.cs</DependentUpon>
+    </Compile>
+    <!-- options\Coffee -->
+    <Compile Include="options\Coffee\americano.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\americano.Designer.cs">
+      <DependentUpon>americano.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\cafeLatte.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\cafeLatte.Designer.cs">
+      <DependentUpon>cafeLatte.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\caramelMacchiato.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\caramelMacchiato.Designer.cs">
+      <DependentUpon>caramelMacchiato.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\cafeTiramisu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\cafeTiramisu.Designer.cs">
+      <DependentUpon>cafeTiramisu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\creamCafeMocha.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\creamCafeMocha.Designer.cs">
+      <DependentUpon>creamCafeMocha.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\biscoffLatte.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\biscoffLatte.Designer.cs">
+      <DependentUpon>biscoffLatte.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Coffee\hazelnutAmericano.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Coffee\hazelnutAmericano.Designer.cs">
+      <DependentUpon>hazelnutAmericano.cs</DependentUpon>
+    </Compile>
+    <!-- options\Rice -->
+    <Compile Include="options\Rice\caramelizedChicken.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\caramelizedChicken.Designer.cs">
+      <DependentUpon>caramelizedChicken.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Rice\hamEgg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\hamEgg.Designer.cs">
+      <DependentUpon>hamEgg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Rice\hungarian.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\hungarian.Designer.cs">
+      <DependentUpon>hungarian.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Rice\bakedBangus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\bakedBangus.Designer.cs">
+      <DependentUpon>bakedBangus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Rice\giantPorkTonkatsu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\giantPorkTonkatsu.Designer.cs">
+      <DependentUpon>giantPorkTonkatsu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Rice\garlicLonganisa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\garlicLonganisa.Designer.cs">
+      <DependentUpon>garlicLonganisa.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Rice\waffle.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\waffle.Designer.cs">
+      <DependentUpon>waffle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="options\Rice\beefTapa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="options\Rice\beefTapa.Designer.cs">
+      <DependentUpon>beefTapa.cs</DependentUpon>
+    </Compile>
+    <!-- OrderForms -->
+    <Compile Include="OrderForms\Order.cs" />
+    <Compile Include="OrderForms\OrderStorage.cs" />
+    <Compile Include="OrderForms\PriceTable.cs" />
+    <Compile Include="OrderForms\EditOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrderForms\EditOrderForm.Designer.cs">
+      <DependentUpon>EditOrderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OrderForms\viewOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrderForms\viewOrder.Designer.cs">
+      <DependentUpon>viewOrder.cs</DependentUpon>
+    </Compile>
+    <!-- Payments -->
+    <Compile Include="Payments\PaymentSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\PaymentSelectionForm.Designer.cs">
+      <DependentUpon>PaymentSelectionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payments\CashPaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\CashPaymentForm.Designer.cs">
+      <DependentUpon>CashPaymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payments\CardPaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\CardPaymentForm.Designer.cs">
+      <DependentUpon>CardPaymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payments\EWalletPaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\EWalletPaymentForm.Designer.cs">
+      <DependentUpon>EWalletPaymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payments\ReceiptForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\ReceiptForm.Designer.cs">
+      <DependentUpon>ReceiptForm.cs</DependentUpon>
+    </Compile>
+    <!-- Properties -->
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <!-- ── Embedded resources ────────────────────────────────────────────── -->
+  <ItemGroup>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuPage.resx">
+      <DependentUpon>menuPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\bestSeller.resx">
+      <DependentUpon>bestSeller.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\Coffee.resx">
+      <DependentUpon>Coffee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\rice.resx">
+      <DependentUpon>rice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\option2.resx">
+      <DependentUpon>option2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\option3.resx">
+      <DependentUpon>option3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="menuBar\option4.resx">
+      <DependentUpon>option4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\caramelMacchiato.resx">
+      <DependentUpon>caramelMacchiato.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\cafeTiramisu.resx">
+      <DependentUpon>cafeTiramisu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\creamCafeMocha.resx">
+      <DependentUpon>creamCafeMocha.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\biscoffLatte.resx">
+      <DependentUpon>biscoffLatte.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\americano.resx">
+      <DependentUpon>americano.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\cafeLatte.resx">
+      <DependentUpon>cafeLatte.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Coffee\hazelnutAmericano.resx">
+      <DependentUpon>hazelnutAmericano.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Rice\caramelizedChicken.resx">
+      <DependentUpon>caramelizedChicken.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Rice\hamEgg.resx">
+      <DependentUpon>hamEgg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Rice\hungarian.resx">
+      <DependentUpon>hungarian.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Rice\bakedBangus.resx">
+      <DependentUpon>bakedBangus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Rice\giantPorkTonkatsu.resx">
+      <DependentUpon>giantPorkTonkatsu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Rice\garlicLonganisa.resx">
+      <DependentUpon>garlicLonganisa.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Rice\waffle.resx">
+      <DependentUpon>waffle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="options\Rice\beefTapa.resx">
+      <DependentUpon>beefTapa.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrderForms\EditOrderForm.resx">
+      <DependentUpon>EditOrderForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrderForms\viewOrder.resx">
+      <DependentUpon>viewOrder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\PaymentSelectionForm.resx">
+      <DependentUpon>PaymentSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\CashPaymentForm.resx">
+      <DependentUpon>CashPaymentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\CardPaymentForm.resx">
+      <DependentUpon>CardPaymentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\EWalletPaymentForm.resx">
+      <DependentUpon>EWalletPaymentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\ReceiptForm.resx">
+      <DependentUpon>ReceiptForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <!-- ── Non-compiled content ──────────────────────────────────────────── -->
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <!-- ── Resource images ───────────────────────────────────────────────── -->
+  <ItemGroup>
+    <None Include="Resources\ICON.jpg" />
+    <None Include="Resources\ICON1.jpg" />
+    <None Include="Resources\icon2.jpg" />
+    <None Include="Resources\header.jpg" />
+    <None Include="Resources\cafeLatte.png" />
+    <None Include="Resources\Cafe Latte.png" />
+    <None Include="Resources\pictureBoxCoffee.jpg" />
+    <None Include="Resources\keisuke.jpg" />
+    <None Include="Resources\americano.jpg" />
+    <None Include="Resources\hazelnutAmericano.jpg" />
+    <None Include="Resources\beefTapa.jpg" />
+    <None Include="Resources\bakedBangus.png" />
+    <None Include="Resources\caramelizedChicken.jpg" />
+    <None Include="Resources\giantPorkTonkatsu.jpg" />
+    <None Include="Resources\hamEgg.jpg" />
+    <None Include="Resources\hungarian.jpg" />
+    <None Include="Resources\qrCode_Gcash.jpg" />
+    <None Include="Resources\kosangJared.jpeg" />
+  </ItemGroup>
+  <!-- ── NuGet targets (auto-added by NuGet restore) ──────────────────── -->
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\System.Data.SQLite.Core.1.0.118.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.118.0\build\net46\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\System.Data.SQLite.Core.1.0.118.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\System.Data.SQLite.Core.1.0.118.0\build\net46\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
+  </Target>
+  <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
+</Project>
