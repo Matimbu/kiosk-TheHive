@@ -290,6 +290,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\keisuke.jpg" />
+    <None Include="Resources\omHokkaido.jpg" />
+    <None Include="Resources\omMacadamia.jpg" />
+    <None Include="Resources\omMatchaMT.jpg" />
+    <None Include="Resources\omPomegranate.jpg" />
     <None Include="Resources\fpAmericano.jpg" />
     <None Include="Resources\fpAppleade.jpg" />
     <None Include="Resources\fpBananaMalt.jpg" />

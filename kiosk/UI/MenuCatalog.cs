@@ -175,7 +175,7 @@ namespace kiosk.UI
             },
             new MenuProduct
             {
-                Name = "Macadamia Nut Cafe Latte", Category = "Coffee",
+                Name = "Macadamia Nut Cafe Latte", Category = "Coffee", ImageKey = "omMacadamia",
                 Description = "Cafe latte with buttery macadamia.",
                 Sizes = Cups(55m, 85m), HasTemperature = true
             },
@@ -303,7 +303,7 @@ namespace kiosk.UI
             },
             new MenuProduct
             {
-                Name = "Matcha Milk Tea", Category = "Classics",
+                Name = "Matcha Milk Tea", Category = "Classics", ImageKey = "omMatchaMT",
                 Description = "Matcha blended into milk tea.", BasePrice = 75m
             },
             new MenuProduct
@@ -318,7 +318,7 @@ namespace kiosk.UI
             },
             new MenuProduct
             {
-                Name = "Hokkaido Milk Tea", Category = "Classics",
+                Name = "Hokkaido Milk Tea", Category = "Classics", ImageKey = "omHokkaido",
                 Description = "Hokkaido-style creamy milk tea.", BasePrice = 75m
             },
             new MenuProduct
@@ -382,7 +382,7 @@ namespace kiosk.UI
             },
             new MenuProduct
             {
-                Name = "Pomegranate Bliss", Category = "GentleTea",
+                Name = "Pomegranate Bliss", Category = "GentleTea", ImageKey = "omPomegranate",
                 Description = "Pomegranate fruit tea.", BasePrice = 75m
             },
 

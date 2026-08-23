@@ -256,4 +256,16 @@
   <data name="fpWinterMelon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\fpWinterMelon.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="omHokkaido" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\omHokkaido.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="omMacadamia" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\omMacadamia.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="omMatchaMT" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\omMatchaMT.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="omPomegranate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\omPomegranate.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
