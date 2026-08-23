@@ -2,15 +2,8 @@
 {
     partial class viewOrder
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,106 +15,75 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            this.listBoxOrders = new System.Windows.Forms.ListView();
-            this.button_menu = new System.Windows.Forms.Button();
-            this.btn_paymentMethod = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.labelTotal = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.header = new kiosk.UI.AppHeader();
+            this.list = new kiosk.UI.ScrollHost();
+            this.footer = new System.Windows.Forms.Panel();
+            this.btn_menu = new kiosk.UI.HiveButton();
+            this.btn_paymentMethod = new kiosk.UI.HiveButton();
+            this.footer.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // listBoxOrders
-            // 
-            this.listBoxOrders.HideSelection = false;
-            this.listBoxOrders.Location = new System.Drawing.Point(56, 125);
-            this.listBoxOrders.Name = "listBoxOrders";
-            this.listBoxOrders.Size = new System.Drawing.Size(370, 348);
-            this.listBoxOrders.TabIndex = 1;
-            this.listBoxOrders.UseCompatibleStateImageBehavior = false;
-            // 
-            // button_menu
-            // 
-            this.button_menu.Location = new System.Drawing.Point(203, 547);
-            this.button_menu.Name = "button_menu";
-            this.button_menu.Size = new System.Drawing.Size(75, 23);
-            this.button_menu.TabIndex = 2;
-            this.button_menu.Text = "Order More";
-            this.button_menu.UseVisualStyleBackColor = true;
-            this.button_menu.Click += new System.EventHandler(this.button_menu_Click);
-            // 
+            //
+            // list
+            //
+            this.list.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.list.Name = "list";
+            //
+            // btn_menu
+            //
+            this.btn_menu.Location = new System.Drawing.Point(16, 100);
+            this.btn_menu.Name = "btn_menu";
+            this.btn_menu.Size = new System.Drawing.Size(168, 54);
+            this.btn_menu.Style = kiosk.UI.HiveStyle.Outline;
+            this.btn_menu.Text = "Add more";
+            //
             // btn_paymentMethod
-            // 
-            this.btn_paymentMethod.Location = new System.Drawing.Point(183, 589);
+            //
+            this.btn_paymentMethod.Location = new System.Drawing.Point(196, 100);
+            this.btn_paymentMethod.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right));
             this.btn_paymentMethod.Name = "btn_paymentMethod";
-            this.btn_paymentMethod.Size = new System.Drawing.Size(120, 23);
-            this.btn_paymentMethod.TabIndex = 3;
-            this.btn_paymentMethod.Text = "Proceed to Payment";
-            this.btn_paymentMethod.UseVisualStyleBackColor = true;
-            this.btn_paymentMethod.Click += new System.EventHandler(this.btn_paymentMethod_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(231, 573);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(22, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "-or-";
-            // 
-            // labelTotal
-            // 
-            this.labelTotal.AutoSize = true;
-            this.labelTotal.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.labelTotal.Font = new System.Drawing.Font("Sylfaen", 9.75F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTotal.Location = new System.Drawing.Point(56, 476);
-            this.labelTotal.Name = "labelTotal";
-            this.labelTotal.Size = new System.Drawing.Size(39, 18);
-            this.labelTotal.TabIndex = 8;
-            this.labelTotal.Text = "Total:";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::kiosk.Properties.Resources.icon2;
-            this.pictureBox1.Location = new System.Drawing.Point(200, 21);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(103, 98);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
-            // 
+            this.btn_paymentMethod.Size = new System.Drawing.Size(268, 54);
+            this.btn_paymentMethod.Style = kiosk.UI.HiveStyle.Accent;
+            this.btn_paymentMethod.Text = "Checkout";
+            //
+            // footer
+            //
+            this.footer.BackColor = System.Drawing.Color.White;
+            this.footer.Controls.Add(this.btn_menu);
+            this.footer.Controls.Add(this.btn_paymentMethod);
+            this.footer.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.footer.Name = "footer";
+            this.footer.Size = new System.Drawing.Size(480, 172);
+            //
+            // header
+            //
+            this.header.Dock = System.Windows.Forms.DockStyle.Top;
+            this.header.Name = "header";
+            this.header.Size = new System.Drawing.Size(480, 92);
+            this.header.Title = "Your order";
+            //
             // viewOrder
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            //
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(480, 720);
-            this.Controls.Add(this.labelTotal);
-            this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.btn_paymentMethod);
-            this.Controls.Add(this.button_menu);
-            this.Controls.Add(this.listBoxOrders);
+            this.Controls.Add(this.list);
+            this.Controls.Add(this.footer);
+            this.Controls.Add(this.header);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "viewOrder";
-            this.Text = "viewOrder";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Your order";
+            this.footer.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
-
         }
 
         #endregion
-        private System.Windows.Forms.ListView listBoxOrders;
-        private System.Windows.Forms.Button button_menu;
-        private System.Windows.Forms.Button btn_paymentMethod;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Label labelTotal;
+
+        private kiosk.UI.AppHeader header;
+        private kiosk.UI.ScrollHost list;
+        private System.Windows.Forms.Panel footer;
+        private kiosk.UI.HiveButton btn_menu;
+        private kiosk.UI.HiveButton btn_paymentMethod;
     }
 }

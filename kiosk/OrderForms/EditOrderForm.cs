@@ -1,123 +1,218 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using kiosk.UI;
 
 namespace kiosk
 {
+    /// <summary>
+    /// Edits one line of the order. Removing takes two taps rather than a
+    /// system dialog, so the guest never leaves the kiosk's own look.
+    /// </summary>
     public partial class EditOrderForm : Form
     {
-        private Order originalOrder;
+        private const int SheetW = Hive.ScreenW;
+
+        private readonly Order _original;
+        private readonly MenuProduct _product;
+        private readonly Segmented _size;
+        private readonly Segmented _temp;
+        private readonly Stepper _qty;
+        private readonly HiveButton _save;
+        private readonly HiveButton _cancel;
+        private readonly HiveButton _remove;
+
+        private bool _removeArmed;
+        private readonly int _totalRowTop;
 
         public Order UpdatedOrder { get; private set; }
-        public bool IsRemoved { get; private set; } = false;
+        public bool IsRemoved { get; private set; }
 
-        private decimal unitPrice;
+        /// <summary>
+        /// Raised once the guest has saved or removed the line. The cart page
+        /// listens for this instead of waiting on a dialog result.
+        /// </summary>
+        public event EventHandler Committed;
+
         public EditOrderForm(Order orderToEdit)
         {
+            _original = orderToEdit;
+            _product = MenuCatalog.Find(orderToEdit.Product);
+
             InitializeComponent();
 
-            originalOrder = orderToEdit;
-            unitPrice = orderToEdit.Price;
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            BackColor = Hive.Surface;
+            Font = Hive.Body;
+            ShowInTaskbar = false;
 
-            txtProduct.Text = orderToEdit.Product;
-            numericUpDown_Quantity.Value = orderToEdit.Quantity;
+            int left = Hive.Gutter + 4;
+            int width = SheetW - left * 2;
+            int y = 108;
 
-            if (orderToEdit.Size == "16L")
-                radio_L16.Checked = true;
-            else if (orderToEdit.Size == "22L")
-                radio_L22.Checked = true;
+            if (_product != null && _product.HasSizes)
+            {
+                y += 22;
+                _size = new Segmented();
+                _size.Options = Array.ConvertAll(_product.Sizes, s => s.Label);
+                _size.Bounds = new Rectangle(left, y, width, Hive.TapTarget);
+                _size.SelectionChanged += (s, e) => Refresh();
+                Controls.Add(_size);
+                y += Hive.TapTarget + 14;
+            }
 
-            if (orderToEdit.Temperature == "Hot")
-                radio_Hot.Checked = true;
-            else if (orderToEdit.Temperature == "Iced")
-                radio_Iced.Checked = true;
+            if (_product != null && _product.HasTemperature)
+            {
+                y += 22;
+                _temp = new Segmented();
+                _temp.Options = new[] { "Hot", "Iced" };
+                _temp.Bounds = new Rectangle(left, y, width, Hive.TapTarget);
+                Controls.Add(_temp);
+                y += Hive.TapTarget + 14;
+            }
 
-            unitPrice = PriceTable.GetPrice(orderToEdit.Product, orderToEdit.Size);
+            y += 22;
+            _qty = new Stepper();
+            _qty.Bounds = new Rectangle(left, y, 170, Hive.TapTarget);
+            _qty.ValueChanged += (s, e) => Refresh();
+            Controls.Add(_qty);
+            y += Hive.TapTarget + 14;
 
-            radio_L16.CheckedChanged += (s, e) => OnSizeChanged();
-            radio_L22.CheckedChanged += (s, e) => OnSizeChanged();
+            // The options flow from the top; the decisions stay pinned to the
+            // bottom of the page so they are always in the same place.
+            int footerTop = Hive.ScreenH - 92;
+            _totalRowTop = footerTop - 108;
 
-            numericUpDown_Quantity.ValueChanged += (s, e) => UpdatePriceLabel();
+            _remove = new HiveButton();
+            _remove.Text = "Remove item";
+            _remove.Style = HiveStyle.Ghost;
+            _remove.TextColor = Hive.Danger;
+            _remove.Bounds = new Rectangle(left, footerTop - 60, width, 44);
+            _remove.Click += RemoveClicked;
+            Controls.Add(_remove);
 
-            UpdatePriceLabel();
+            _cancel = new HiveButton();
+            _cancel.Text = "Cancel";
+            _cancel.Style = HiveStyle.Outline;
+            _cancel.Bounds = new Rectangle(left, footerTop + 14, 150, 54);
+            _cancel.Click += (s, e) => Nav.Back();
+            Controls.Add(_cancel);
 
+            _save = new HiveButton();
+            _save.Text = "Save changes";
+            _save.Style = HiveStyle.Accent;
+            _save.Bounds = new Rectangle(left + 158, footerTop + 14, width - 158, 54);
+            _save.Click += SaveClicked;
+            Controls.Add(_save);
+
+            ClientSize = new Size(SheetW, Hive.ScreenH);
+
+            PreselectFrom(orderToEdit);
         }
-        private void OnSizeChanged()
+
+        private void PreselectFrom(Order order)
         {
-            string size = radio_L16.Checked ? "16L" : "22L";
-            unitPrice = PriceTable.GetPrice(txtProduct.Text, size);
-            UpdatePriceLabel();
+            _qty.Value = Math.Max(1, order.Quantity);
+
+            if (_size != null)
+            {
+                int index = Array.FindIndex(_product.Sizes, s => s.Code == order.Size);
+                _size.SelectedIndex = index < 0 ? 0 : index;
+            }
+
+            if (_temp != null)
+                _temp.SelectedIndex = string.Equals(order.Temperature, "Iced", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
         }
-        private void UpdatePriceLabel()
+
+        private decimal UnitPrice
         {
-            int quantity = (int)numericUpDown_Quantity.Value;
-            decimal total = unitPrice * quantity;
-            label_TotalPrice.Text = $"Total: ₱{total}";
+            get
+            {
+                if (_product == null) return _original.Price;
+                if (!_product.HasSizes) return _product.BasePrice;
+                int i = _size == null || _size.SelectedIndex < 0 ? 0 : _size.SelectedIndex;
+                return _product.Sizes[i].Price;
+            }
         }
-        private void btnSave_Click(object sender, EventArgs e)
+
+        private void RemoveClicked(object sender, EventArgs e)
         {
+            if (!_removeArmed)
+            {
+                _removeArmed = true;
+                _remove.Text = "Tap again to remove";
+                _remove.Style = HiveStyle.Danger;
+                return;
+            }
+
+            IsRemoved = true;
+            Commit();
+        }
+
+        private void Commit()
+        {
+            EventHandler handler = Committed;
+            if (handler != null) handler(this, EventArgs.Empty);
+            Nav.Back();
+        }
+
+        private void SaveClicked(object sender, EventArgs e)
+        {
+            string sizeCode = _original.Size;
+            if (_size != null && _product != null)
+                sizeCode = _product.Sizes[Math.Max(0, _size.SelectedIndex)].Code;
+
             UpdatedOrder = new Order
             {
-                Product = txtProduct.Text,
-                Quantity = (int)numericUpDown_Quantity.Value,
-                Size = radio_L16.Checked ? "16L" : "22L",
-                Temperature = radio_Hot.Checked ? "Hot" : "Iced",
-                Price = unitPrice
+                Product = _original.Product,
+                Size = sizeCode,
+                Temperature = _temp != null ? (_temp.SelectedOption ?? _original.Temperature) : _original.Temperature,
+                Quantity = _qty.Value,
+                Price = UnitPrice,
+                ImagePath = _original.ImagePath
             };
 
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-            
-        }
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            Commit();
         }
 
-        private void btnRemove_Click(object sender, EventArgs e)
+        protected override void OnPaint(PaintEventArgs e)
         {
-            var confirm = MessageBox.Show("Are you sure you want to remove this order?", "Confirm Remove", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (confirm == DialogResult.Yes)
-            {
-                IsRemoved = true;
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
+            Graphics g = e.Graphics;
+            Hive.Smooth(g);
+            g.Clear(Hive.Surface);
+
+            // ---- header ----
+            RectangleF band = new RectangleF(0, 0, Width, 88);
+            using (SolidBrush b = new SolidBrush(Hive.Teal))
+                g.FillRectangle(b, band);
+
+            using (SolidBrush rule = new SolidBrush(Hive.Honey))
+                g.FillRectangle(rule, 0, band.Height - 3, Width, 3);
+
+            int left = Hive.Gutter + 4;
+
+            Hive.Text(g, "EDIT ITEM", Hive.Overline,
+                      new Rectangle(left, 18, 240, 16), Color.FromArgb(170, 255, 255, 255), Hive.LeftMid);
+            Hive.Text(g, _original.Product, Hive.Title,
+                      new Rectangle(left, 36, Width - left * 2, 34), Color.White, Hive.LeftMid);
+
+            if (_size != null) SectionLabel(g, "SIZE", _size.Top);
+            if (_temp != null) SectionLabel(g, "SERVED", _temp.Top);
+            SectionLabel(g, "QUANTITY", _qty.Top);
+
+            int footerTop = _save.Top - 14;
+            using (Pen p = new Pen(Hive.Line, 1))
+                g.DrawLine(p, Hive.Gutter, footerTop, Width - Hive.Gutter, footerTop);
+
+            Summary.Row(g, new Rectangle(left, _totalRowTop, Width - left * 2, 34),
+                        "Line total", Hive.Money(UnitPrice * _qty.Value), true);
         }
 
-        private void numericUpDown_Quantity_ValueChanged(object sender, EventArgs e)
+        private void SectionLabel(Graphics g, string text, int controlTop)
         {
-            UpdatePriceLabel();
-        }
-
-        private void radio_L16_CheckedChanged(object sender, EventArgs e)
-        {
-            if (radio_L16.Checked)
-            {
-                unitPrice = 85m;    //Price form this Size
-                UpdatePriceLabel();
-            }
-        }
-
-        private void radio_L22_CheckedChanged(object sender, EventArgs e)
-        {
-            if (radio_L22.Checked)
-            {
-                unitPrice = 115m;   //Price form this Size
-                UpdatePriceLabel();
-            }
-        }
-
-        private void radioh_CheckedChanged(object sender, EventArgs e)
-        {
-
+            Hive.TextTracked(g, text, Hive.Overline,
+                             new Rectangle(Hive.Gutter + 4, controlTop - 22, 200, 18), Hive.Muted, 1.4f, false);
         }
     }
 }

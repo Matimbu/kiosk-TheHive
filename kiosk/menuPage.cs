@@ -1,85 +1,75 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using kiosk.UI;
 
 namespace kiosk
 {
-    public partial class menuPage : Form
+    /// <summary>
+    /// The ordering screen: category rail on top, menu grid in the middle,
+    /// running order pinned to the bottom. Everything else opens as a sheet
+    /// over this window, so the guest never loses their place.
+    /// </summary>
+    public partial class menuPage : Form, IPage
     {
-        public string selectedSize { get; private set; }
-        public string product { get; private set; }
-        public string temperature { get; private set; }
-        public int quantity { get; private set; }
+        private readonly CartPill _cartPill = new CartPill();
 
-        
         public menuPage()
         {
             InitializeComponent();
 
-            OrderStorage.ClearOrders(); // clear orders if using a shared storage
+            header.Logo = MenuCatalog.Logo;
+            header.SetAccessory(_cartPill);
+            _cartPill.Click += (s, e) => OpenOrder();
 
-            // Add a hidden dummy control to prevent unwanted auto-focus
-            TextBox hiddenDummy = new TextBox();
-            hiddenDummy.Visible = false;
-            hiddenDummy.TabStop = false;
-            this.Controls.Add(hiddenDummy);
+            foreach (MenuCategory category in MenuCatalog.Categories)
+                rail.Add(category.Name, category.Name);
 
-            this.Load += (s, e) =>
+            rail.ChipSelected += (s, e) => ShowCategory((string)e.Tag);
+            grid.ProductChosen += (s, e) => OpenProduct(e.Item);
+            cartBar.Action.Click += (s, e) => OpenOrder();
+
+            OrderStorage.OrdersUpdated += RefreshOrderTotals;
+            Disposed += (s, e) => OrderStorage.OrdersUpdated -= RefreshOrderTotals;
+
+            Load += (s, e) =>
             {
-                this.ActiveControl = hiddenDummy;
+                rail.Select(0);
+                RefreshOrderTotals();
             };
         }
 
-        public void loadform(object Form)
+        private void ShowCategory(string category)
         {
-            if (this.show_panel.Controls.Count > 0)
-                this.show_panel.Controls.RemoveAt(0);
-
-            Form f = Form as Form;
-            f.TopLevel = false;
-            f.Dock = DockStyle.Fill;
-            this.show_panel.Controls.Add(f);
-            this.show_panel.Tag = f;
-            f.Show();
-        }
-        private void buttonViewOrder_Click_Click(object sender, EventArgs e)
-        {
-            viewOrder orderListForm = new viewOrder();
-            orderListForm.Show();
-        }
-        private void viewOrder_Load(object sender, EventArgs e)
-        {
-
-
+            MenuCategory meta = MenuCatalog.CategoryOf(category);
+            header.Subtitle = meta != null ? meta.Tagline : null;
+            grid.Load(category);
         }
 
-        private void btn_bestSeller_Click(object sender, EventArgs e)
+        private void OpenProduct(MenuProduct product)
         {
-            loadform(new bestSeller());
-        }
-        private void btn_coffee_Click(object sender, EventArgs e)
-        {
-            loadform(new Coffee());
-        }
-        private void btn_rice_Click(object sender, EventArgs e)
-        {
-            loadform(new rice());
+            Nav.Go(new ProductSheet(product));
         }
 
-        private void btn_pasta_Click(object sender, EventArgs e)
+        private void OpenOrder()
         {
-
+            if (OrderStorage.Orders.Count == 0) return;
+            Nav.Go(new viewOrder());
         }
 
-        private void btn_barchow_Click(object sender, EventArgs e)
+        /// <summary>Called by the shell when the guest returns to the menu.</summary>
+        public void OnRevealed()
         {
-            loadform(new option2());
+            RefreshOrderTotals();
+        }
+
+        private void RefreshOrderTotals()
+        {
+            int count = 0;
+            foreach (Order order in OrderStorage.Orders) count += order.Quantity;
+
+            cartBar.Update(count, OrderStorage.GetTotal());
+            _cartPill.Count = count;
         }
     }
 }

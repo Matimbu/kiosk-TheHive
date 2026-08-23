@@ -1,120 +1,126 @@
-﻿using kiosk.Payments;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using kiosk.Payments;
+using kiosk.UI;
 
 namespace kiosk
 {
-    public partial class viewOrder : Form
+    /// <summary>
+    /// Order review. Every line is tappable for edits, the total is always in
+    /// view, and checkout is one button away.
+    /// </summary>
+    public partial class viewOrder : Form, IPage
     {
-
-
         public viewOrder()
         {
             InitializeComponent();
 
-            if (listBoxOrders.Columns.Count == 0)
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            BackColor = Hive.Canvas;
+            Font = Hive.Body;
+            ShowInTaskbar = false;
+
+            header.ShowBack((s, e) => Nav.Back());
+            footer.Paint += PaintSummary;
+
+            btn_menu.Click += (s, e) => Nav.Back();
+            btn_paymentMethod.Click += Checkout;
+
+            OrderStorage.OrdersUpdated += Rebuild;
+            Load += (s, e) => Rebuild();
+
+            // Hosted pages are disposed rather than closed, so unhook here.
+            Disposed += (s, e) => OrderStorage.OrdersUpdated -= Rebuild;
+        }
+
+        private void Rebuild()
+        {
+            foreach (Control c in list.Content.Controls.Cast<Control>().ToList())
             {
-                listBoxOrders.View = View.Details;
-                listBoxOrders.Columns.Add("Item", 140, HorizontalAlignment.Left);
-                listBoxOrders.Columns.Add("Size & Temp", 100, HorizontalAlignment.Left);
-                listBoxOrders.Columns.Add("Qty", 40, HorizontalAlignment.Center);
-                listBoxOrders.Columns.Add("Total", 80, HorizontalAlignment.Right);
+                list.Content.Controls.Remove(c);
+                c.Dispose();
             }
 
-            listBoxOrders.LabelEdit = false;
-            
-            listBoxOrders.ColumnWidthChanging += listBoxOrders_ColumnWidthChanging;
-            listBoxOrders.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+            List<Order> orders = OrderStorage.GetOrders();
 
-            listBoxOrders.FullRowSelect = true;
-            listBoxOrders.MultiSelect = false;
-            listBoxOrders.Click += listBoxOrders_Click;
-
-            OrderStorage.OrdersUpdated += UpdateOrderList;
-            UpdateOrderList();
-        }
-
-        private void UpdateOrderList()
-        {
-            listBoxOrders.Items.Clear();
-
-            foreach (var order in OrderStorage.Orders)
+            if (orders.Count == 0)
             {
-                decimal total = order.Price * order.Quantity;
-
-                var item = new ListViewItem(order.Product);
-                item.SubItems.Add(order.SizeTemp);
-                item.SubItems.Add(order.Quantity.ToString());
-                item.SubItems.Add($"₱{total:F2}");
-
-                listBoxOrders.Items.Add(item);
+                EmptyState empty = new EmptyState("Nothing here yet",
+                    "Add something from the menu and it will show up right here.");
+                empty.Bounds = new Rectangle(0, 0, list.Width, Math.Max(240, list.Height - 20));
+                list.Content.Controls.Add(empty);
             }
-
-            labelTotal.Text = $"Total: ₱{OrderStorage.GetTotal():F2}";
-        }
-        protected override void OnFormClosed(FormClosedEventArgs e)
-        {          
-            OrderStorage.OrdersUpdated -= UpdateOrderList;
-            base.OnFormClosed(e);
-        }
-
-        private void button_menu_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-        private void listBoxOrders_Click(object sender, EventArgs e)
-        {
-            if (listBoxOrders.SelectedItems.Count == 0)
-                return;
-
-            int index = listBoxOrders.SelectedItems[0].Index;
-
-            if (index < 0 || index >= OrderStorage.Orders.Count)
-                return;
-
-            Order selectedOrder = OrderStorage.Orders[index];
-
-            using (EditOrderForm editForm = new EditOrderForm(selectedOrder))
+            else
             {
-                if (editForm.ShowDialog() == DialogResult.OK)
+                int top = 8;
+                foreach (Order order in orders)
                 {
-                    if (editForm.IsRemoved)
-                    {
-                        OrderStorage.Orders.RemoveAt(index);
-                        listBoxOrders.Items.RemoveAt(index);
-                    }
-                    else if (editForm.UpdatedOrder != null)
-                    {
-                        OrderStorage.Orders[index] = editForm.UpdatedOrder;
-                    }
-
-                    UpdateOrderList();
+                    OrderRow row = new OrderRow(order);
+                    row.Bounds = new Rectangle(Hive.Gutter - 4, top, list.Width - (Hive.Gutter - 4) * 2 - 6, 88);
+                    row.Edit += (s, e) => EditLine(e.Order);
+                    list.Hook(row);
+                    list.Content.Controls.Add(row);
+                    top += 92;
                 }
             }
-        }
-        private void listBoxOrders_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
-        {
-            e.Cancel = true; 
-            e.NewWidth = listBoxOrders.Columns[e.ColumnIndex].Width; 
+
+            list.Measure(Hive.Gap);
+            btn_paymentMethod.Enabled = orders.Count > 0;
+            footer.Invalidate();
         }
 
-        private void btn_paymentMethod_Click(object sender, EventArgs e)
+        private void EditLine(Order order)
         {
-            List<Order> currentOrders = OrderStorage.GetOrders(); 
-            decimal totalAmount = OrderStorage.GetTotalPrice();
+            int index = OrderStorage.Orders.IndexOf(order);
+            if (index < 0) return;
 
-            PaymentSelectionForm paymentForm = new PaymentSelectionForm(currentOrders, totalAmount);
-            paymentForm.Show();
-        }     
-    }    
+            EditOrderForm editor = new EditOrderForm(order);
+            editor.Committed += (s, e) =>
+            {
+                if (editor.IsRemoved) OrderStorage.Orders.RemoveAt(index);
+                else if (editor.UpdatedOrder != null) OrderStorage.Orders[index] = editor.UpdatedOrder;
+            };
+
+            Nav.Go(editor);
+        }
+
+        private void Checkout(object sender, EventArgs e)
+        {
+            if (OrderStorage.Orders.Count == 0) return;
+
+            Nav.Go(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotalPrice()));
+        }
+
+        /// <summary>Refreshes when the guest comes back from editing a line.</summary>
+        public void OnRevealed()
+        {
+            Rebuild();
+        }
+
+        private void PaintSummary(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            Hive.Smooth(g);
+
+            using (Pen p = new Pen(Hive.Line, 1))
+                g.DrawLine(p, 0, 0, footer.Width, 0);
+
+            int count = OrderStorage.Orders.Sum(o => o.Quantity);
+            decimal total = OrderStorage.GetTotal();
+
+            Hive.Text(g, "Total to pay", Hive.Subhead,
+                      new Rectangle(Hive.Gutter, 22, 220, 26), Hive.Ink, Hive.LeftMid);
+            Hive.Text(g, count == 1 ? "1 item" : count + " items", Hive.Caption,
+                      new Rectangle(Hive.Gutter, 46, 220, 20), Hive.Muted, Hive.LeftMid);
+
+            using (Font big = Hive.Sized(Hive.PriceBig, 23f))
+                Hive.Text(g, Hive.Money(total), big,
+                          new Rectangle(footer.Width - 240 - Hive.Gutter, 24, 240, 40), Hive.Teal, Hive.RightMid);
+        }
+
+    }
 }
-
-
-

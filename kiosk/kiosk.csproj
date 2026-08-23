@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -161,6 +161,26 @@
     <Compile Include="menuPage.Designer.cs">
       <DependentUpon>menuPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Shell.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Hive.cs" />
+    <Compile Include="UI\HiveControls.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\HiveViews.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\MenuCatalog.cs" />
+    <Compile Include="UI\CategoryView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\CategoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\ProductSheet.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -270,6 +290,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\keisuke.jpg" />
+    <None Include="Resources\fpAmericano.jpg" />
+    <None Include="Resources\fpAppleade.jpg" />
+    <None Include="Resources\fpBananaMalt.jpg" />
+    <None Include="Resources\fpBelgianCocoa.jpg" />
+    <None Include="Resources\fpBerryBanana.jpg" />
+    <None Include="Resources\fpBerryMalt.jpg" />
+    <None Include="Resources\fpCafeLatte.jpg" />
+    <None Include="Resources\fpCaramelMacchiato.jpg" />
+    <None Include="Resources\fpChocoHazelnut.jpg" />
+    <None Include="Resources\fpChocoMalt.jpg" />
+    <None Include="Resources\fpCinnamonLatte.jpg" />
+    <None Include="Resources\fpCookiesCream.jpg" />
+    <None Include="Resources\fpCreamBerry.jpg" />
+    <None Include="Resources\fpCreamMocha.jpg" />
+    <None Include="Resources\fpDarkChoco.jpg" />
+    <None Include="Resources\fpFraise.jpg" />
+    <None Include="Resources\fpHazelnutAmericano.jpg" />
+    <None Include="Resources\fpIrishCream.jpg" />
+    <None Include="Resources\fpMatchaLatte.jpg" />
+    <None Include="Resources\fpOkinawa.jpg" />
+    <None Include="Resources\fpPassionFruit.jpg" />
+    <None Include="Resources\fpPearl.jpg" />
+    <None Include="Resources\fpRedVelvet.jpg" />
+    <None Include="Resources\fpSpanishLatte.jpg" />
+    <None Include="Resources\fpTaro.jpg" />
+    <None Include="Resources\fpUjiMatcha.jpg" />
+    <None Include="Resources\fpWinterMelon.jpg" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
