@@ -23,6 +23,37 @@ namespace kiosk.UI
         public CategoryView()
         {
             BackColor = Hive.Canvas;
+
+            // Tiles are built from MenuCatalog at run time, so the Visual Studio
+            // designer would otherwise show an empty panel. Sketch the grid there
+            // instead, so the page layout is still readable while designing.
+            Content.Paint += (s, e) =>
+            {
+                if (DesignMode && Content.Controls.Count == 0) PaintDesignPreview(e.Graphics);
+            };
+        }
+
+        private void PaintDesignPreview(Graphics g)
+        {
+            Hive.Smooth(g);
+
+            int rows = Math.Max(1, (Height - 8) / (TileH + ColGap));
+            using (Pen p = new Pen(Hive.Line, 1.2f))
+            {
+                p.DashPattern = new float[] { 4f, 4f };
+                for (int i = 0; i < rows * 2; i++)
+                {
+                    int col = i % 2, row = i / 2;
+                    g.DrawRectangle(p,
+                        14 + col * (TileW + ColGap),
+                        10 + row * (TileH + ColGap),
+                        TileW - 5, TileH - 8);
+                }
+            }
+
+            Hive.Text(g, "Menu tiles are built at run time from MenuCatalog", Hive.Caption,
+                      new Rectangle(0, 10 + rows * (TileH + ColGap) + 8, Width, 40), Hive.Muted,
+                      TextFormatFlags.HorizontalCenter | TextFormatFlags.WordBreak);
         }
 
         public string Category { get { return _category; } }

@@ -393,6 +393,17 @@ namespace kiosk.UI
 
         public Panel Content { get { return _content; } }
 
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+
+            // While there is nothing in it - which is the case in the Visual
+            // Studio designer, where the content is never built - let the inner
+            // panel fill the viewport so it has somewhere to draw a preview.
+            if (_content != null && _content.Controls.Count == 0)
+                _content.Bounds = new Rectangle(0, 0, Width, Height);
+        }
+
         /// <summary>Call after filling Content so the viewport knows its extent.</summary>
         public void Measure(int padding)
         {

@@ -88,7 +88,7 @@ namespace kiosk.Payments
             RectangleF qr = new RectangleF(card.X + (card.Width - 208) / 2f, card.Y + 48, 208, 208);
             Hive.Fill(g, RectangleF.Inflate(qr, 10, 10), 16, Hive.Canvas);
 
-            Image code = MenuCatalog.LoadImage("qrCode_Gcash");
+            Image code = MenuCatalog.LoadImage("Pay_GcashQr");
             if (code != null)
             {
                 using (GraphicsPath clip = Hive.Rounded(qr, 8))

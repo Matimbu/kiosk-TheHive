@@ -274,7 +274,7 @@
     <None Include="Resources\ICON1.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\icon2.jpg" />
+    <None Include="Resources\Brand_HiveMark.jpg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\header.jpg" />
@@ -290,37 +290,37 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\keisuke.jpg" />
-    <None Include="Resources\omHokkaido.jpg" />
-    <None Include="Resources\omMacadamia.jpg" />
-    <None Include="Resources\omMatchaMT.jpg" />
-    <None Include="Resources\omPomegranate.jpg" />
-    <None Include="Resources\fpAmericano.jpg" />
-    <None Include="Resources\fpAppleade.jpg" />
-    <None Include="Resources\fpBananaMalt.jpg" />
-    <None Include="Resources\fpBelgianCocoa.jpg" />
-    <None Include="Resources\fpBerryBanana.jpg" />
-    <None Include="Resources\fpBerryMalt.jpg" />
-    <None Include="Resources\fpCafeLatte.jpg" />
-    <None Include="Resources\fpCaramelMacchiato.jpg" />
-    <None Include="Resources\fpChocoHazelnut.jpg" />
-    <None Include="Resources\fpChocoMalt.jpg" />
-    <None Include="Resources\fpCinnamonLatte.jpg" />
-    <None Include="Resources\fpCookiesCream.jpg" />
-    <None Include="Resources\fpCreamBerry.jpg" />
-    <None Include="Resources\fpCreamMocha.jpg" />
-    <None Include="Resources\fpDarkChoco.jpg" />
-    <None Include="Resources\fpFraise.jpg" />
-    <None Include="Resources\fpHazelnutAmericano.jpg" />
-    <None Include="Resources\fpIrishCream.jpg" />
-    <None Include="Resources\fpMatchaLatte.jpg" />
-    <None Include="Resources\fpOkinawa.jpg" />
-    <None Include="Resources\fpPassionFruit.jpg" />
-    <None Include="Resources\fpPearl.jpg" />
-    <None Include="Resources\fpRedVelvet.jpg" />
-    <None Include="Resources\fpSpanishLatte.jpg" />
-    <None Include="Resources\fpTaro.jpg" />
-    <None Include="Resources\fpUjiMatcha.jpg" />
-    <None Include="Resources\fpWinterMelon.jpg" />
+    <None Include="Resources\Menu_HokkaidoMilkTea.jpg" />
+    <None Include="Resources\Menu_MacadamiaNutCafeLatte.jpg" />
+    <None Include="Resources\Menu_MatchaMilkTea.jpg" />
+    <None Include="Resources\Menu_PomegranateBliss.jpg" />
+    <None Include="Resources\Menu_Americano.jpg" />
+    <None Include="Resources\Menu_GreenteaAppleade.jpg" />
+    <None Include="Resources\Menu_BananaMalt.jpg" />
+    <None Include="Resources\Menu_BelgianCocoa.jpg" />
+    <None Include="Resources\Menu_BerryBanana.jpg" />
+    <None Include="Resources\Menu_BerryMalt.jpg" />
+    <None Include="Resources\Menu_CafeLatte.jpg" />
+    <None Include="Resources\Menu_CaramelMacchiato.jpg" />
+    <None Include="Resources\Menu_ChocoHazelnut.jpg" />
+    <None Include="Resources\Menu_ChocoMalt.jpg" />
+    <None Include="Resources\Menu_CinnamonOatmilkLatte.jpg" />
+    <None Include="Resources\Menu_CookiesAndCream.jpg" />
+    <None Include="Resources\Menu_CafeCreamBerry.jpg" />
+    <None Include="Resources\Menu_CafeCreamMocha.jpg" />
+    <None Include="Resources\Menu_DarkChocoMilkTea.jpg" />
+    <None Include="Resources\Menu_FraiseStrawberry.jpg" />
+    <None Include="Resources\Menu_HazelnutAmericano.jpg" />
+    <None Include="Resources\Menu_IrishCreamCafeLatte.jpg" />
+    <None Include="Resources\Menu_TraditionalMatcha.jpg" />
+    <None Include="Resources\Menu_OkinawaBrownSugarMilkTea.jpg" />
+    <None Include="Resources\Menu_PassionFruit.jpg" />
+    <None Include="Resources\Menu_PearlMilkTea.jpg" />
+    <None Include="Resources\Menu_RedVelvet.jpg" />
+    <None Include="Resources\Menu_SpanishLatte.jpg" />
+    <None Include="Resources\Menu_TaroMilkTea.jpg" />
+    <None Include="Resources\Menu_MatchaCheesecake.jpg" />
+    <None Include="Resources\Menu_WinterMelonMilkTea.jpg" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

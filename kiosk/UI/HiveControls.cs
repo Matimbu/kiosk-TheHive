@@ -372,7 +372,33 @@ namespace kiosk.UI
             g.Clear(Hive.Surface);
             using (Pen p = new Pen(Hive.Line, 1))
                 g.DrawLine(p, 0, Height - 1, Width, Height - 1);
+
+            // The tabs are added at run time, so preview them for the designer.
+            if (DesignMode && _strip.Controls.Count == 0)
+                PaintDesignPreview(g);
+
             base.OnPaint(e);
+        }
+
+        private void PaintDesignPreview(Graphics g)
+        {
+            Hive.Smooth(g);
+            int x = Hive.Gutter;
+
+            for (int i = 0; i < MenuCatalog.Categories.Length && x < Width; i++)
+            {
+                string label = MenuCatalog.Categories[i].Name.ToUpperInvariant();
+                int w = TextRenderer.MeasureText(label, Hive.Tab).Width + (int)(label.Length * 1.0f) + 18;
+
+                Hive.TextTracked(g, label, Hive.Tab, new Rectangle(x, 0, w, Height - 5),
+                                 i == 0 ? Hive.Ink : Hive.Muted, 1.0f, true);
+
+                if (i == 0)
+                    using (SolidBrush b = new SolidBrush(Hive.Teal))
+                        g.FillRectangle(b, x, Height - 5, w, 3);
+
+                x += w + 4;
+            }
         }
 
         public void Add(string label, object tag)

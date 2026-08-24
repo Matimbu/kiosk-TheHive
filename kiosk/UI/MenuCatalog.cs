@@ -157,43 +157,43 @@ namespace kiosk.UI
             // ---- Coffee ----
             new MenuProduct
             {
-                Name = "Americano", Category = "Coffee", ImageKey = "fpAmericano", ShowWhole = true,
+                Name = "Americano", Category = "Coffee", ImageKey = "Menu_Americano", ShowWhole = true,
                 Description = "Espresso over filtered water.",
                 Sizes = Cups(20m, 45m), HasTemperature = true, Badge = "Best seller"
             },
             new MenuProduct
             {
-                Name = "Hazelnut Americano", Category = "Coffee", ImageKey = "fpHazelnutAmericano", ShowWhole = true,
+                Name = "Hazelnut Americano", Category = "Coffee", ImageKey = "Menu_HazelnutAmericano", ShowWhole = true,
                 Description = "Americano rounded out with toasted hazelnut.",
                 Sizes = Cups(50m, 75m), HasTemperature = true
             },
             new MenuProduct
             {
-                Name = "Cafe Latte", Category = "Coffee", ImageKey = "fpCafeLatte", ShowWhole = true,
+                Name = "Cafe Latte", Category = "Coffee", ImageKey = "Menu_CafeLatte", ShowWhole = true,
                 Description = "Espresso with steamed milk and a thin veil of foam.",
                 Sizes = Cups(50m, 75m), HasTemperature = true, Badge = "Best seller"
             },
             new MenuProduct
             {
-                Name = "Macadamia Nut Cafe Latte", Category = "Coffee", ImageKey = "omMacadamia",
+                Name = "Macadamia Nut Cafe Latte", Category = "Coffee", ImageKey = "Menu_MacadamiaNutCafeLatte",
                 Description = "Cafe latte with buttery macadamia.",
                 Sizes = Cups(55m, 85m), HasTemperature = true
             },
             new MenuProduct
             {
-                Name = "Irish Cream Cafe Latte", Category = "Coffee", ImageKey = "fpIrishCream", ShowWhole = true,
+                Name = "Irish Cream Cafe Latte", Category = "Coffee", ImageKey = "Menu_IrishCreamCafeLatte", ShowWhole = true,
                 Description = "Cafe latte with Irish cream syrup.",
                 Sizes = Cups(55m, 85m), HasTemperature = true
             },
             new MenuProduct
             {
-                Name = "Spanish Latte", Category = "Coffee", ImageKey = "fpSpanishLatte", ShowWhole = true,
+                Name = "Spanish Latte", Category = "Coffee", ImageKey = "Menu_SpanishLatte", ShowWhole = true,
                 Description = "Espresso and milk sweetened the Spanish way.",
                 Sizes = Cups(50m, 75m), HasTemperature = true, Badge = "Best seller"
             },
             new MenuProduct
             {
-                Name = "Caramel Macchiato", Category = "Coffee", ImageKey = "fpCaramelMacchiato", ShowWhole = true,
+                Name = "Caramel Macchiato", Category = "Coffee", ImageKey = "Menu_CaramelMacchiato", ShowWhole = true,
                 Description = "Vanilla, steamed milk, espresso and a caramel finish.",
                 Sizes = Cups(55m, 85m), HasTemperature = true
             },
@@ -205,13 +205,13 @@ namespace kiosk.UI
             },
             new MenuProduct
             {
-                Name = "Cafe Cream Mocha", Category = "Coffee", ImageKey = "fpCreamMocha", ShowWhole = true,
+                Name = "Cafe Cream Mocha", Category = "Coffee", ImageKey = "Menu_CafeCreamMocha", ShowWhole = true,
                 Description = "Chocolate and espresso under a cap of cream.",
                 Sizes = Cups(55m, 85m), HasTemperature = true
             },
             new MenuProduct
             {
-                Name = "Cafe Cream Berry", Category = "Coffee", ImageKey = "fpCreamBerry", ShowWhole = true,
+                Name = "Cafe Cream Berry", Category = "Coffee", ImageKey = "Menu_CafeCreamBerry", ShowWhole = true,
                 Description = "Espresso, cream and mixed berries.",
                 Sizes = Cups(55m, 85m), HasTemperature = true
             },
@@ -223,7 +223,7 @@ namespace kiosk.UI
             },
             new MenuProduct
             {
-                Name = "Cinnamon Oatmilk Latte", Category = "Coffee", ImageKey = "fpCinnamonLatte", ShowWhole = true,
+                Name = "Cinnamon Oatmilk Latte", Category = "Coffee", ImageKey = "Menu_CinnamonOatmilkLatte", ShowWhole = true,
                 Description = "Espresso and oat milk finished with cinnamon.",
                 Sizes = Cups(60m, 95m), HasTemperature = true
             },
@@ -231,13 +231,13 @@ namespace kiosk.UI
             // ---- Non-coffee ----
             new MenuProduct
             {
-                Name = "Fraise Strawberry", Category = "Non-Coffee", ImageKey = "fpFraise", ShowWhole = true,
+                Name = "Fraise Strawberry", Category = "Non-Coffee", ImageKey = "Menu_FraiseStrawberry", ShowWhole = true,
                 Description = "Strawberry cream over ice.",
                 Sizes = Cups(55m, 85m)
             },
             new MenuProduct
             {
-                Name = "Traditional Matcha", Category = "Non-Coffee", ImageKey = "fpMatchaLatte", ShowWhole = true,
+                Name = "Traditional Matcha", Category = "Non-Coffee", ImageKey = "Menu_TraditionalMatcha", ShowWhole = true,
                 Description = "Stone-ground matcha with milk.",
                 Sizes = Cups(55m, 85m), Badge = "Best seller"
             },
@@ -267,7 +267,7 @@ namespace kiosk.UI
             },
             new MenuProduct
             {
-                Name = "Belgian Cocoa", Category = "Non-Coffee", ImageKey = "fpBelgianCocoa", ShowWhole = true,
+                Name = "Belgian Cocoa", Category = "Non-Coffee", ImageKey = "Menu_BelgianCocoa", ShowWhole = true,
                 Description = "Belgian chocolate, hot or iced.",
                 Sizes = Cups(60m, 90m), HasTemperature = true
             },
@@ -287,28 +287,28 @@ namespace kiosk.UI
             // ---- The Hive Classics: milk tea, one price ----
             new MenuProduct
             {
-                Name = "Okinawa Brown Sugar Milk Tea", Category = "Classics", ImageKey = "fpOkinawa", ShowWhole = true,
+                Name = "Okinawa Brown Sugar Milk Tea", Category = "Classics", ImageKey = "Menu_OkinawaBrownSugarMilkTea", ShowWhole = true,
                 Description = "Black tea with Okinawa brown sugar.",
                 BasePrice = 75m, Badge = "Best seller"
             },
             new MenuProduct
             {
-                Name = "Dark Choco Milk Tea", Category = "Classics", ImageKey = "fpDarkChoco", ShowWhole = true,
+                Name = "Dark Choco Milk Tea", Category = "Classics", ImageKey = "Menu_DarkChocoMilkTea", ShowWhole = true,
                 Description = "Dark chocolate milk tea.", BasePrice = 75m
             },
             new MenuProduct
             {
-                Name = "Pearl Milk Tea", Category = "Classics", ImageKey = "fpPearl", ShowWhole = true,
+                Name = "Pearl Milk Tea", Category = "Classics", ImageKey = "Menu_PearlMilkTea", ShowWhole = true,
                 Description = "The house milk tea with pearls.", BasePrice = 75m
             },
             new MenuProduct
             {
-                Name = "Matcha Milk Tea", Category = "Classics", ImageKey = "omMatchaMT",
+                Name = "Matcha Milk Tea", Category = "Classics", ImageKey = "Menu_MatchaMilkTea",
                 Description = "Matcha blended into milk tea.", BasePrice = 75m
             },
             new MenuProduct
             {
-                Name = "Winter Melon Milk Tea", Category = "Classics", ImageKey = "fpWinterMelon", ShowWhole = true,
+                Name = "Winter Melon Milk Tea", Category = "Classics", ImageKey = "Menu_WinterMelonMilkTea", ShowWhole = true,
                 Description = "Winter melon with milk tea.", BasePrice = 75m
             },
             new MenuProduct
@@ -318,71 +318,71 @@ namespace kiosk.UI
             },
             new MenuProduct
             {
-                Name = "Hokkaido Milk Tea", Category = "Classics", ImageKey = "omHokkaido",
+                Name = "Hokkaido Milk Tea", Category = "Classics", ImageKey = "Menu_HokkaidoMilkTea",
                 Description = "Hokkaido-style creamy milk tea.", BasePrice = 75m
             },
             new MenuProduct
             {
-                Name = "Taro Milk Tea", Category = "Classics", ImageKey = "fpTaro", ShowWhole = true,
+                Name = "Taro Milk Tea", Category = "Classics", ImageKey = "Menu_TaroMilkTea", ShowWhole = true,
                 Description = "Taro root with milk tea.", BasePrice = 75m
             },
 
             // ---- The Hive Cheesecake series ----
             new MenuProduct
             {
-                Name = "Choco Malt", Category = "Cheesecake", ImageKey = "fpChocoMalt", ShowWhole = true,
+                Name = "Choco Malt", Category = "Cheesecake", ImageKey = "Menu_ChocoMalt", ShowWhole = true,
                 Description = "Chocolate malt with cheesecake cream.", BasePrice = 90m
             },
             new MenuProduct
             {
-                Name = "Berry Malt", Category = "Cheesecake", ImageKey = "fpBerryMalt", ShowWhole = true,
+                Name = "Berry Malt", Category = "Cheesecake", ImageKey = "Menu_BerryMalt", ShowWhole = true,
                 Description = "Mixed berry malt with cheesecake cream.", BasePrice = 90m
             },
             new MenuProduct
             {
-                Name = "Banana Malt", Category = "Cheesecake", ImageKey = "fpBananaMalt", ShowWhole = true,
+                Name = "Banana Malt", Category = "Cheesecake", ImageKey = "Menu_BananaMalt", ShowWhole = true,
                 Description = "Banana malt with cheesecake cream.", BasePrice = 90m
             },
             new MenuProduct
             {
-                Name = "Berry Banana", Category = "Cheesecake", ImageKey = "fpBerryBanana", ShowWhole = true,
+                Name = "Berry Banana", Category = "Cheesecake", ImageKey = "Menu_BerryBanana", ShowWhole = true,
                 Description = "Berries and banana with cheesecake cream.", BasePrice = 90m
             },
             new MenuProduct
             {
-                Name = "Choco Hazelnut", Category = "Cheesecake", ImageKey = "fpChocoHazelnut", ShowWhole = true,
+                Name = "Choco Hazelnut", Category = "Cheesecake", ImageKey = "Menu_ChocoHazelnut", ShowWhole = true,
                 Description = "Chocolate and hazelnut with cheesecake cream.", BasePrice = 90m
             },
             new MenuProduct
             {
-                Name = "Red Velvet", Category = "Cheesecake", ImageKey = "fpRedVelvet", ShowWhole = true,
+                Name = "Red Velvet", Category = "Cheesecake", ImageKey = "Menu_RedVelvet", ShowWhole = true,
                 Description = "Red velvet with cheesecake cream.", BasePrice = 90m
             },
             new MenuProduct
             {
-                Name = "Cookies & Cream", Category = "Cheesecake", ImageKey = "fpCookiesCream", ShowWhole = true,
+                Name = "Cookies & Cream", Category = "Cheesecake", ImageKey = "Menu_CookiesAndCream", ShowWhole = true,
                 Description = "Crushed cookies with cheesecake cream.", BasePrice = 90m
             },
             new MenuProduct
             {
-                Name = "Matcha Cheesecake", Category = "Cheesecake", ImageKey = "fpUjiMatcha", ShowWhole = true,
+                Name = "Matcha Cheesecake", Category = "Cheesecake", ImageKey = "Menu_MatchaCheesecake", ShowWhole = true,
                 Description = "Matcha with cheesecake cream.", BasePrice = 90m
             },
 
             // ---- The Hive GentleTea series ----
             new MenuProduct
             {
-                Name = "Greentea Appleade", Category = "GentleTea", ImageKey = "fpAppleade", ShowWhole = true,
+                Name = "Greentea Appleade", Category = "GentleTea", ImageKey = "Menu_GreenteaAppleade", ShowWhole = true,
                 Description = "Green tea with apple, sparkling.", BasePrice = 75m
             },
             new MenuProduct
             {
-                Name = "Passion Fruit", Category = "GentleTea", ImageKey = "fpPassionFruit", ShowWhole = true,
+                Name = "Passion Fruit", Category = "GentleTea", ImageKey = "Menu_PassionFruit", ShowWhole = true,
                 Description = "Passion fruit fruit tea.", BasePrice = 75m
             },
             new MenuProduct
             {
-                Name = "Pomegranate Bliss", Category = "GentleTea", ImageKey = "omPomegranate",
+                Name = "Pomegranate Bliss", Category = "GentleTea", ImageKey = "Menu_PomegranateBliss",
                 Description = "Pomegranate fruit tea.", BasePrice = 75m
             },
 
@@ -391,37 +391,37 @@ namespace kiosk.UI
             // prices are placeholders. Replace them with the real ones.
             new MenuProduct
             {
-                Name = "Beef Tapa", Category = "Rice Meals", ImageKey = "beefTapa",
+                Name = "Beef Tapa", Category = "Rice Meals", ImageKey = "Menu_BeefTapa",
                 Description = "Cured beef, garlic rice, egg and fresh tomato.",
                 BasePrice = 145m, Badge = "Best seller"
             },
             new MenuProduct
             {
-                Name = "Baked Bangus", Category = "Rice Meals", ImageKey = "bakedBangus",
+                Name = "Baked Bangus", Category = "Rice Meals", ImageKey = "Menu_BakedBangus",
                 Description = "Boneless milkfish baked with herbs and butter.",
                 BasePrice = 165m
             },
             new MenuProduct
             {
-                Name = "Caramelized Chicken", Category = "Rice Meals", ImageKey = "caramelizedChicken",
+                Name = "Caramelized Chicken", Category = "Rice Meals", ImageKey = "Menu_CaramelizedChicken",
                 Description = "Glazed chicken thigh with steamed rice and egg.",
                 BasePrice = 155m
             },
             new MenuProduct
             {
-                Name = "Giant Pork Tonkatsu", Category = "Rice Meals", ImageKey = "giantPorkTonkatsu",
+                Name = "Giant Pork Tonkatsu", Category = "Rice Meals", ImageKey = "Menu_GiantPorkTonkatsu",
                 Description = "Breaded pork cutlet under house katsu sauce.",
                 BasePrice = 185m
             },
             new MenuProduct
             {
-                Name = "Ham & Egg", Category = "Rice Meals", ImageKey = "hamEgg",
+                Name = "Ham & Egg", Category = "Rice Meals", ImageKey = "Menu_HamAndEgg",
                 Description = "Grilled ham, two eggs and toasted garlic rice.",
                 BasePrice = 130m
             },
             new MenuProduct
             {
-                Name = "Hungarian", Category = "Rice Meals", ImageKey = "hungarian",
+                Name = "Hungarian", Category = "Rice Meals", ImageKey = "Menu_Hungarian",
                 Description = "Hungarian sausage with rice, egg and pickles.",
                 BasePrice = 160m
             }
@@ -497,6 +497,6 @@ namespace kiosk.UI
         }
 
         /// <summary>The hive mark used in headers and on the welcome screen.</summary>
-        public static Image Logo { get { return LoadImage("icon2"); } }
+        public static Image Logo { get { return LoadImage("Brand_HiveMark"); } }
     }
 }
