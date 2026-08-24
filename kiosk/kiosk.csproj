@@ -56,66 +56,6 @@
     <Compile Include="OrderForms\EditOrderForm.Designer.cs">
       <DependentUpon>EditOrderForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="menuBar\bestSeller.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="menuBar\bestSeller.Designer.cs">
-      <DependentUpon>bestSeller.cs</DependentUpon>
-    </Compile>
-    <Compile Include="menuBar\option4.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="menuBar\option4.Designer.cs">
-      <DependentUpon>option4.cs</DependentUpon>
-    </Compile>
-    <Compile Include="menuBar\option3.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="menuBar\option3.Designer.cs">
-      <DependentUpon>option3.cs</DependentUpon>
-    </Compile>
-    <Compile Include="menuBar\option2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="menuBar\option2.Designer.cs">
-      <DependentUpon>option2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="menuBar\rice.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="menuBar\rice.Designer.cs">
-      <DependentUpon>rice.cs</DependentUpon>
-    </Compile>
-    <Compile Include="menuBar\Coffee.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="menuBar\Coffee.Designer.cs">
-      <DependentUpon>Coffee.cs</DependentUpon>
-    </Compile>
-    <Compile Include="options\Coffee\cafeLatte.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="options\Coffee\cafeLatte.Designer.cs">
-      <DependentUpon>cafeLatte.cs</DependentUpon>
-    </Compile>
-    <Compile Include="options\Coffee\americano.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="options\Coffee\americano.Designer.cs">
-      <DependentUpon>americano.cs</DependentUpon>
-    </Compile>
-    <Compile Include="options\Coffee\hazelnutAmericano.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="options\Coffee\hazelnutAmericano.Designer.cs">
-      <DependentUpon>hazelnutAmericano.cs</DependentUpon>
-    </Compile>
-    <Compile Include="options\Rice\beefTapa.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="options\Rice\beefTapa.Designer.cs">
-      <DependentUpon>beefTapa.cs</DependentUpon>
-    </Compile>
     <Compile Include="OrderForms\Order.cs" />
     <Compile Include="OrderForms\OrderStorage.cs" />
     <Compile Include="Payments\CardPaymentForm.cs">
@@ -194,44 +134,14 @@
     <Compile Include="OrderForms\viewOrder.Designer.cs">
       <DependentUpon>viewOrder.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="options\Rice\beefTapa.resx">
-      <DependentUpon>beefTapa.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="OrderForms\EditOrderForm.resx">
       <DependentUpon>EditOrderForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="menuBar\bestSeller.resx">
-      <DependentUpon>bestSeller.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="menuBar\option4.resx">
-      <DependentUpon>option4.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="menuBar\option3.resx">
-      <DependentUpon>option3.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="menuBar\option2.resx">
-      <DependentUpon>option2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="menuBar\rice.resx">
-      <DependentUpon>rice.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="menuBar\Coffee.resx">
-      <DependentUpon>Coffee.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="options\Coffee\cafeLatte.resx">
-      <DependentUpon>cafeLatte.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="menuPage.resx">
       <DependentUpon>menuPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="options\Coffee\americano.resx">
-      <DependentUpon>americano.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="options\Coffee\hazelnutAmericano.resx">
-      <DependentUpon>hazelnutAmericano.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Payments\CardPaymentForm.resx">
       <DependentUpon>CardPaymentForm.cs</DependentUpon>
@@ -271,25 +181,19 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ICON1.jpg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Brand_HiveMark.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\header.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Cafe Latte.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\pictureBoxCoffee.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\cafeLatte.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\keisuke.jpg" />
     <None Include="Resources\Menu_HokkaidoMilkTea.jpg" />
     <None Include="Resources\Menu_MacadamiaNutCafeLatte.jpg" />
     <None Include="Resources\Menu_MatchaMilkTea.jpg" />

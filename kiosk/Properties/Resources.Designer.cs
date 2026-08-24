@@ -48,101 +48,11 @@ namespace kiosk.Properties
             set { resourceCulture = value; }
         }
 
-        internal static System.Drawing.Bitmap Cafe_Latte
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("Cafe Latte", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
         internal static System.Drawing.Bitmap Brand_HiveMark
         {
             get
             {
                 object obj = ResourceManager.GetObject("Brand_HiveMark", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap pictureBoxCoffee
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("pictureBoxCoffee", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap keisuke2
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("keisuke2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap ICON
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("ICON", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap header
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("header", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap keisuke1
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("keisuke1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap cafeLatte
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("cafeLatte", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap cafeLatte1
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("cafeLatte1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap americano
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("americano", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        internal static System.Drawing.Bitmap hazelnutAmericano
-        {
-            get
-            {
-                object obj = ResourceManager.GetObject("hazelnutAmericano", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
