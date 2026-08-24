@@ -78,6 +78,5 @@ from a cold start.
 
 ## License
 
-No license file yet — until one is added, this code is shared for
-reference and portfolio purposes rather than reuse. Open an issue if
-you'd like to use it and I'll sort one out.
+MIT — see [LICENSE](LICENSE). Use it, learn from it, build on it; just
+keep the copyright notice.
