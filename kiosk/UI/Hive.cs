@@ -375,10 +375,13 @@ namespace kiosk.UI
             TextFormatFlags.Right | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis;
 
         /// <summary>
-        /// Fallback artwork for menu items that have no photo yet: a warm
-        /// gradient tile with the item's monogram, so gaps still look designed.
+        /// Fallback artwork for menu items that have no photo yet: a quiet
+        /// hexagon monogram, so the gap reads as a deliberate placeholder
+        /// rather than a broken image. Pass a caption where there is room for
+        /// one (a menu tile, a product page) to make that explicit to the
+        /// guest; omit it in tight spaces such as a cart row.
         /// </summary>
-        public static void Monogram(Graphics g, string name, RectangleF r, GraphicsPath clip)
+        public static void Monogram(Graphics g, string name, RectangleF r, GraphicsPath clip, string caption = null)
         {
             Region saved = g.Clip;
             if (clip != null) g.SetClip(clip, CombineMode.Intersect);
@@ -388,9 +391,14 @@ namespace kiosk.UI
             using (SolidBrush b = new SolidBrush(SurfaceAlt))
                 g.FillRectangle(b, r);
 
-            float side = Math.Min(r.Width, r.Height) * 0.62f;
-            RectangleF hex = new RectangleF(r.X + (r.Width - side) / 2f,
-                                            r.Y + (r.Height - side) / 2f, side, side);
+            bool showCaption = !string.IsNullOrEmpty(caption) && r.Height >= 70;
+            RectangleF badge = showCaption
+                              ? new RectangleF(r.X, r.Y, r.Width, r.Height - 22)
+                              : r;
+
+            float side = Math.Min(badge.Width, badge.Height) * 0.6f;
+            RectangleF hex = new RectangleF(badge.X + (badge.Width - side) / 2f,
+                                            badge.Y + (badge.Height - side) / 2f, side, side);
             using (GraphicsPath p = Hexagon(hex))
             using (Pen pen = new Pen(Mix(Line, SurfaceAlt, 0.35f), 1.4f))
             {
@@ -398,8 +406,13 @@ namespace kiosk.UI
                 g.DrawPath(pen, p);
             }
 
-            using (Font f = Sized(Display, Math.Max(10f, r.Height * 0.24f)))
-                Text(g, Initials(name), f, Rectangle.Round(r), Mix(Muted, Line, 0.35f), Centered);
+            using (Font f = Sized(Display, Math.Max(10f, badge.Height * 0.24f)))
+                Text(g, Initials(name), f, Rectangle.Round(badge), Mix(Muted, Line, 0.35f), Centered);
+
+            if (showCaption)
+                TextTracked(g, caption.ToUpperInvariant(), Overline,
+                           new Rectangle((int)r.X, (int)r.Bottom - 20, (int)r.Width, 16),
+                           Mix(Muted, SurfaceAlt, 0.15f), 1.1f, true);
 
             g.Clip = saved;
         }

@@ -431,10 +431,15 @@ namespace kiosk.UI
 
         public static IEnumerable<MenuProduct> InCategory(string category)
         {
-            if (string.Equals(category, "Best Sellers", StringComparison.OrdinalIgnoreCase))
-                return Products.Where(p => p.Badge != null);
+            IEnumerable<MenuProduct> items = string.Equals(category, "Best Sellers", StringComparison.OrdinalIgnoreCase)
+                ? Products.Where(p => p.Badge != null)
+                : Products.Where(p => string.Equals(p.Category, category, StringComparison.OrdinalIgnoreCase));
 
-            return Products.Where(p => string.Equals(p.Category, category, StringComparison.OrdinalIgnoreCase));
+            // Photographed items lead the grid; anything still waiting on a
+            // photo settles to the end of its category instead of breaking up
+            // the run of real photos. OrderBy is a stable sort, so within each
+            // group the menu keeps the order it was declared in above.
+            return items.OrderBy(p => p.ImageKey == null ? 1 : 0);
         }
 
         public static MenuProduct Find(string name)

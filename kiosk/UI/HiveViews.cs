@@ -288,7 +288,7 @@ namespace kiosk.UI
                 Image img = _item.Image;
                 if (img == null)
                 {
-                    Hive.Monogram(g, _item.Name, photo, clip);
+                    Hive.Monogram(g, _item.Name, photo, clip, "Photo coming soon");
                 }
                 else if (_item.ShowWhole)
                 {

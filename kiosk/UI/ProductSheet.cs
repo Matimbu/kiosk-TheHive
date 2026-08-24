@@ -164,7 +164,7 @@ namespace kiosk.UI
                 }
                 else
                 {
-                    Hive.Monogram(g, _product.Name, hero, clip);
+                    Hive.Monogram(g, _product.Name, hero, clip, "Photo coming soon");
                 }
             }
 
