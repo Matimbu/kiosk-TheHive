@@ -9,10 +9,6 @@ using kiosk.UI;
 
 namespace kiosk
 {
-    /// <summary>
-    /// Order review. Every line is tappable for edits, the total is always in
-    /// view, and checkout is one button away.
-    /// </summary>
     public partial class viewOrder : Form, IPage
     {
         public viewOrder()
@@ -33,7 +29,7 @@ namespace kiosk
             OrderStorage.OrdersUpdated += Rebuild;
             Load += (s, e) => Rebuild();
 
-            // Hosted pages are disposed rather than closed, so unhook here.
+            // pages get disposed, not closed, so unhook here
             Disposed += (s, e) => OrderStorage.OrdersUpdated -= Rebuild;
         }
 
@@ -95,7 +91,6 @@ namespace kiosk
             Nav.Go(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotalPrice()));
         }
 
-        /// <summary>Refreshes when the guest comes back from editing a line.</summary>
         public void OnRevealed()
         {
             Rebuild();

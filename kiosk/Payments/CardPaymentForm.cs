@@ -9,10 +9,6 @@ using kiosk.UI;
 
 namespace kiosk.Payments
 {
-    /// <summary>
-    /// Card entry. Same validation as before - card number grouping, type
-    /// detection, masked CVV - presented as a proper payment form.
-    /// </summary>
     public partial class CardPaymentForm : Form
     {
         private const int BandH = 116;
@@ -40,7 +36,6 @@ namespace kiosk.Payments
             int left = Hive.Gutter;
             int width = ClientSize.Width - left * 2;
 
-            // ---- card number ----
             _cardNumber.Label = "CARD NUMBER";
             _cardNumber.Hint = "0000-0000-0000-0000";
             _cardNumber.Bounds = new Rectangle(left, BandH + 20, width, 74);
@@ -55,7 +50,6 @@ namespace kiosk.Payments
             };
             Controls.Add(_cardNumber);
 
-            // ---- expiry + cvv ----
             int row = _cardNumber.Bottom + 14;
 
             _month.Items.AddRange(Enumerable.Range(1, 12).Select(i => i.ToString("D2")).Cast<object>().ToArray());
@@ -76,7 +70,6 @@ namespace kiosk.Payments
 
             _expiryRow = row;
 
-            // ---- actions ----
             HiveButton back = new HiveButton();
             back.Text = "Back";
             back.Style = HiveStyle.Outline;
@@ -110,7 +103,6 @@ namespace kiosk.Payments
             Controls.Add(combo);
         }
 
-        /// <summary>Owner-draws the dropdowns so they match the rest of the kiosk.</summary>
         private void DrawComboItem(object sender, DrawItemEventArgs e)
         {
             ComboBox combo = (ComboBox)sender;
@@ -124,14 +116,12 @@ namespace kiosk.Payments
                 g.FillRectangle(back, e.Bounds);
 
             string text = e.Index >= 0 ? combo.Items[e.Index].ToString() : (string)combo.Tag;
-            Color colour = e.Index >= 0 ? Hive.Ink : Hive.Muted;
+            Color color = e.Index >= 0 ? Hive.Ink : Hive.Muted;
 
             Hive.Text(g, text, combo.Font,
                       new Rectangle(e.Bounds.X + 6, e.Bounds.Y, e.Bounds.Width - 6, e.Bounds.Height),
-                      colour, Hive.LeftMid);
+                      color, Hive.LeftMid);
         }
-
-        // ---- input helpers -------------------------------------------------
 
         private static string Digits(string text)
         {
@@ -178,8 +168,6 @@ namespace kiosk.Payments
             return "";
         }
 
-        // ---- payment -------------------------------------------------------
-
         private void Pay(object sender, EventArgs e)
         {
             string raw = Digits(_cardNumber.Input.Text);
@@ -218,7 +206,6 @@ namespace kiosk.Payments
 
         private string _notice;
 
-        // ---- painting ------------------------------------------------------
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;
@@ -245,7 +232,6 @@ namespace kiosk.Payments
                           new Rectangle(Width - 190, 30, 174, 18),
                           Color.FromArgb(210, 255, 255, 255), Hive.RightMid);
 
-            // ---- expiry frame, drawn behind the two combo boxes ----
             Hive.Text(g, "EXPIRES", Hive.Overline,
                       new Rectangle(Hive.Gutter + 2, _expiryRow, 200, 16), Hive.Muted, Hive.LeftMid);
 
@@ -255,7 +241,6 @@ namespace kiosk.Payments
             Hive.Text(g, "/", Hive.Subhead, new Rectangle(Hive.Gutter + 104, _expiryRow + 20, 22, 53),
                       Hive.Muted, Hive.Centered);
 
-            // ---- notice / reassurance ----
             int noticeTop = _cvv.Bottom + 12;
             if (!string.IsNullOrEmpty(_notice))
             {

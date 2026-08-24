@@ -6,14 +6,7 @@ using System.Windows.Forms;
 
 namespace kiosk.UI
 {
-    // =====================================================================
-    //  App header
-    // =====================================================================
 
-    /// <summary>
-    /// The teal band at the top of every screen: logo or back arrow, title,
-    /// and an optional control docked to the right.
-    /// </summary>
     public class AppHeader : Panel
     {
         private Image _mark;
@@ -36,7 +29,6 @@ namespace kiosk.UI
         public string Title    { get { return _title; }    set { _title = value; Invalidate(); } }
         public string Subtitle { get { return _subtitle; } set { _subtitle = value; Invalidate(); } }
 
-        /// <summary>Adds a back arrow on the left and reports taps on it.</summary>
         public void ShowBack(EventHandler onBack)
         {
             if (_back == null)
@@ -53,7 +45,6 @@ namespace kiosk.UI
             Invalidate();
         }
 
-        /// <summary>Docks a control (usually a cart pill) to the right edge.</summary>
         public void SetAccessory(Control control)
         {
             if (_accessory != null) Controls.Remove(_accessory);
@@ -72,7 +63,7 @@ namespace kiosk.UI
             using (SolidBrush b = new SolidBrush(Hive.Teal))
                 g.FillRectangle(b, ClientRectangle);
 
-            // One honey rule along the bottom - the only ornament on the band.
+            // honey line along the bottom
             using (SolidBrush b = new SolidBrush(Hive.Honey))
                 g.FillRectangle(b, 0, Height - 3, Width, 3);
 
@@ -116,11 +107,6 @@ namespace kiosk.UI
         }
     }
 
-    // =====================================================================
-    //  Cart summary bar
-    // =====================================================================
-
-    /// <summary>Sticky bottom bar showing the running order and the way forward.</summary>
     public class CartBar : Panel
     {
         private readonly HiveButton _action;
@@ -185,7 +171,6 @@ namespace kiosk.UI
         }
     }
 
-    /// <summary>Small pill that lives in the header and shows the basket count.</summary>
     public class CartPill : HiveControl
     {
         private readonly Anim _hover;
@@ -223,10 +208,6 @@ namespace kiosk.UI
             base.Dispose(disposing);
         }
     }
-
-    // =====================================================================
-    //  Product tile
-    // =====================================================================
 
     public class ProductTile : HiveControl
     {
@@ -281,7 +262,6 @@ namespace kiosk.UI
             RectangleF card = new RectangleF(2, 2, Width - 5, Height - 8);
             Hive.Fill(g, card, Hive.RadiusCard, Hive.Surface);
 
-            // ---- photo, flush to three edges ----
             RectangleF photo = new RectangleF(card.X, card.Y, card.Width, 118);
             using (GraphicsPath clip = Hive.RoundedTop(photo, Hive.RadiusCard))
             {
@@ -313,7 +293,6 @@ namespace kiosk.UI
                 Hive.TextTracked(g, badgeText, Hive.Overline, Rectangle.Round(badge), Color.White, 1.1f, true);
             }
 
-            // ---- name + price ----
             Rectangle name = new Rectangle((int)card.X + 12, (int)photo.Bottom + 10, (int)card.Width - 24, 38);
             Hive.Text(g, _item.Name, Hive.Serif, name, Hive.Ink,
                       TextFormatFlags.WordBreak | TextFormatFlags.Top | TextFormatFlags.EndEllipsis);
@@ -344,15 +323,6 @@ namespace kiosk.UI
         public MenuProduct Item { get; private set; }
     }
 
-    // =====================================================================
-    //  Scrolling content area
-    // =====================================================================
-
-    /// <summary>
-    /// A viewport with no chrome: content scrolls by wheel or by dragging,
-    /// and a slim indicator appears on the right while there is more to see.
-    /// </summary>
-    /// <summary>A plain panel that paints itself in one go instead of flickering.</summary>
     public class BufferedPanel : Panel
     {
         public BufferedPanel()
@@ -378,9 +348,8 @@ namespace kiosk.UI
                    | ControlStyles.OptimizedDoubleBuffer, true);
             BackColor = Hive.Canvas;
 
-            // Opaque, not transparent: a transparent panel makes every child
-            // ask its parent to repaint, which is what tore the text apart
-            // while scrolling.
+            // opaque on purpose. transparent makes every child repaint through the
+            // parent and the text tears while scrolling
             _content = new BufferedPanel();
             _content.BackColor = Hive.Canvas;
             _content.Location = Point.Empty;
@@ -397,14 +366,11 @@ namespace kiosk.UI
         {
             base.OnSizeChanged(e);
 
-            // While there is nothing in it - which is the case in the Visual
-            // Studio designer, where the content is never built - let the inner
-            // panel fill the viewport so it has somewhere to draw a preview.
+            // empty (designer case) - let it fill so the preview has somewhere to draw
             if (_content != null && _content.Controls.Count == 0)
                 _content.Bounds = new Rectangle(0, 0, Width, Height);
         }
 
-        /// <summary>Call after filling Content so the viewport knows its extent.</summary>
         public void Measure(int padding)
         {
             int bottom = 0;
@@ -415,7 +381,6 @@ namespace kiosk.UI
             Invalidate();
         }
 
-        /// <summary>Lets a child control drag the viewport instead of swallowing the gesture.</summary>
         public void Hook(Control c)
         {
             c.MouseDown += (s, e) => { _dragging = true; _originY = Cursor.Position.Y; _contentTop = _content.Top; };
@@ -456,10 +421,6 @@ namespace kiosk.UI
         }
     }
 
-    // =====================================================================
-    //  Empty state
-    // =====================================================================
-
     public class EmptyState : HiveControl
     {
         public EmptyState(string title, string body)
@@ -492,11 +453,6 @@ namespace kiosk.UI
         }
     }
 
-    // =====================================================================
-    //  Line items (order review)
-    // =====================================================================
-
-    /// <summary>One row in the order list: photo, name, options, quantity, price.</summary>
     public class OrderRow : HiveControl
     {
         private readonly Anim _hover;
@@ -584,7 +540,6 @@ namespace kiosk.UI
 
     public static class OrderText
     {
-        /// <summary>"16 oz / Iced", or "Regular" when a line has no options.</summary>
         public static string Describe(Order order)
         {
             List<string> parts = new List<string>();
@@ -603,7 +558,6 @@ namespace kiosk.UI
         public Order Order { get; private set; }
     }
 
-    /// <summary>A labelled amount row, used for subtotal / total summaries.</summary>
     public static class Summary
     {
         public static void Row(Graphics g, Rectangle bounds, string label, string amount, bool emphasise)

@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace kiosk.UI
 {
-    /// <summary>One size a drink can be ordered in.</summary>
     public sealed class SizeOption
     {
         public SizeOption(string code, string label, decimal price)
@@ -15,16 +14,13 @@ namespace kiosk.UI
             Price = price;
         }
 
-        /// <summary>Stored on the order (kept short for the receipt).</summary>
         public string Code { get; private set; }
 
-        /// <summary>Shown to the guest.</summary>
         public string Label { get; private set; }
 
         public decimal Price { get; private set; }
     }
 
-    /// <summary>A single sellable item on the menu.</summary>
     public sealed class MenuProduct
     {
         private Image _image;
@@ -35,11 +31,6 @@ namespace kiosk.UI
         public string Badge { get; set; }
         public string ImageKey { get; set; }
 
-        /// <summary>
-        /// True for cut-out product shots on a white background, which have to
-        /// be shown whole; false for full-bleed food photography, which looks
-        /// better cropped to fill the tile.
-        /// </summary>
         public bool ShowWhole { get; set; }
 
         public decimal BasePrice { get; set; }
@@ -48,7 +39,6 @@ namespace kiosk.UI
 
         public bool HasSizes { get { return Sizes != null && Sizes.Length > 0; } }
 
-        /// <summary>Cheapest price, which is what the tile advertises.</summary>
         public decimal StartingPrice
         {
             get { return HasSizes ? Sizes.Min(s => s.Price) : BasePrice; }
@@ -77,10 +67,6 @@ namespace kiosk.UI
         }
     }
 
-    /// <summary>
-    /// Who the receipt says the order was bought from. Fill these in with the
-    /// branch's real details before the kiosk goes live.
-    /// </summary>
     public static class CafeInfo
     {
         public const string Name     = "THE HIVE CAFE";
@@ -89,21 +75,11 @@ namespace kiosk.UI
         public const string Contact  = "fb.com/thehivecafe";
         public const string Terminal = "KIOSK-01";
 
-        /// <summary>
-        /// Registered taxpayer number. Left blank on purpose - put the real one
-        /// here rather than anything invented.
-        /// </summary>
         public const string TaxId = "";
 
-        /// <summary>
-        /// Only set this true once the kiosk is actually BIR-accredited to
-        /// issue official receipts. Until then every receipt is stamped as not
-        /// being one, which is what a non-accredited till must print.
-        /// </summary>
         public const bool IssuesOfficialReceipts = false;
     }
 
-    /// <summary>A tab in the category rail.</summary>
     public sealed class MenuCategory
     {
         public MenuCategory(string name, string tagline)
@@ -116,18 +92,12 @@ namespace kiosk.UI
         public string Tagline { get; private set; }
     }
 
-    /// <summary>
-    /// The single source of truth for what The Hive Cafe sells.
-    /// Add a product here and it appears on the menu, prices correctly, and
-    /// shows up on the receipt - no new forms required.
-    /// </summary>
     public static class MenuCatalog
     {
         private static readonly Dictionary<string, Image> ImageCache = new Dictionary<string, Image>();
 
-        // ---- Sizes ---------------------------------------------------------
-        // Codes stay as "16L" / "22L" so previously placed orders and the
-        // receipt printer keep working; only the labels are guest-facing.
+        // keep the 16L/22L codes, the receipt and old orders depend on them.
+        // only the labels are guest-facing
         private static SizeOption[] Cups(decimal regular, decimal large)
         {
             return new[]
@@ -148,13 +118,10 @@ namespace kiosk.UI
             new MenuCategory("Rice Meals",   "Served hot, all day")
         };
 
-        // ---- Products ------------------------------------------------------
-        // Drink names and prices are transcribed from The Hive Cafe's printed
-        // menu: the two columns there are 22oz and 16oz, so Cups(16oz, 22oz).
-        // Edit a price here and the menu, the cart and the receipt all follow.
+        // prices copied off the printed menu. the columns there are 22oz then
+        // 16oz, so Cups(16oz, 22oz). change a price here and everything follows
         private static readonly MenuProduct[] Products =
         {
-            // ---- Coffee ----
             new MenuProduct
             {
                 Name = "Americano", Category = "Coffee", ImageKey = "Menu_Americano", ShowWhole = true,
@@ -228,7 +195,6 @@ namespace kiosk.UI
                 Sizes = Cups(60m, 95m), HasTemperature = true
             },
 
-            // ---- Non-coffee ----
             new MenuProduct
             {
                 Name = "Fraise Strawberry", Category = "Non-Coffee", ImageKey = "Menu_FraiseStrawberry", ShowWhole = true,
@@ -284,7 +250,6 @@ namespace kiosk.UI
                 Sizes = Cups(50m, 75m)
             },
 
-            // ---- The Hive Classics: milk tea, one price ----
             new MenuProduct
             {
                 Name = "Okinawa Brown Sugar Milk Tea", Category = "Classics", ImageKey = "Menu_OkinawaBrownSugarMilkTea", ShowWhole = true,
@@ -327,7 +292,6 @@ namespace kiosk.UI
                 Description = "Taro root with milk tea.", BasePrice = 75m
             },
 
-            // ---- The Hive Cheesecake series ----
             new MenuProduct
             {
                 Name = "Choco Malt", Category = "Cheesecake", ImageKey = "Menu_ChocoMalt", ShowWhole = true,
@@ -369,7 +333,6 @@ namespace kiosk.UI
                 Description = "Matcha with cheesecake cream.", BasePrice = 90m
             },
 
-            // ---- The Hive GentleTea series ----
             new MenuProduct
             {
                 Name = "Greentea Appleade", Category = "GentleTea", ImageKey = "Menu_GreenteaAppleade", ShowWhole = true,
@@ -386,9 +349,7 @@ namespace kiosk.UI
                 Description = "Pomegranate fruit tea.", BasePrice = 75m
             },
 
-            // ---- Rice meals ----
-            // NOTE: the printed menu we have covers drinks only, so these
-            // prices are placeholders. Replace them with the real ones.
+            // TODO get real prices - the printed menu only covers drinks
             new MenuProduct
             {
                 Name = "Beef Tapa", Category = "Rice Meals", ImageKey = "Menu_BeefTapa",
@@ -427,7 +388,6 @@ namespace kiosk.UI
             }
         };
 
-        // ---- Queries -------------------------------------------------------
 
         public static IEnumerable<MenuProduct> InCategory(string category)
         {
@@ -435,10 +395,7 @@ namespace kiosk.UI
                 ? Products.Where(p => p.Badge != null)
                 : Products.Where(p => string.Equals(p.Category, category, StringComparison.OrdinalIgnoreCase));
 
-            // Photographed items lead the grid; anything still waiting on a
-            // photo settles to the end of its category instead of breaking up
-            // the run of real photos. OrderBy is a stable sort, so within each
-            // group the menu keeps the order it was declared in above.
+            // photos first. OrderBy is stable so the declared order holds inside each group
             return items.OrderBy(p => p.ImageKey == null ? 1 : 0);
         }
 
@@ -452,14 +409,12 @@ namespace kiosk.UI
             return Categories.FirstOrDefault(c => string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
         }
 
-        /// <summary>Price lookup used by the order editor and the receipt.</summary>
         public static decimal PriceOf(string product, string sizeCode)
         {
             MenuProduct match = Find(product);
             return match == null ? 0m : match.PriceFor(sizeCode);
         }
 
-        /// <summary>Turns a stored size code such as "16L" into "16 oz".</summary>
         public static string SizeLabel(string product, string sizeCode)
         {
             if (string.IsNullOrWhiteSpace(sizeCode)) return null;
@@ -479,7 +434,6 @@ namespace kiosk.UI
             return match == null ? null : match.Image;
         }
 
-        /// <summary>Pulls artwork out of Properties.Resources by name, once.</summary>
         public static Image LoadImage(string key)
         {
             if (string.IsNullOrEmpty(key)) return null;
@@ -501,7 +455,6 @@ namespace kiosk.UI
             return loaded;
         }
 
-        /// <summary>The hive mark used in headers and on the welcome screen.</summary>
         public static Image Logo { get { return LoadImage("Brand_HiveMark"); } }
     }
 }

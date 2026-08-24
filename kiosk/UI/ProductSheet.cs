@@ -5,10 +5,6 @@ using System.Windows.Forms;
 
 namespace kiosk.UI
 {
-    /// <summary>
-    /// The "add to order" sheet: one screen per product, with sensible
-    /// defaults already selected so a guest can add an item in a single tap.
-    /// </summary>
     public class ProductSheet : Form
     {
         private const int SheetW = Hive.ScreenW;
@@ -22,7 +18,6 @@ namespace kiosk.UI
 
         private int _heroHeight = 268;
 
-        /// <summary>Opens the sheet for a product looked up by name.</summary>
         public ProductSheet(string productName) : this(Resolve(productName)) { }
 
         private static MenuProduct Resolve(string name)
@@ -49,7 +44,7 @@ namespace kiosk.UI
             Font = Hive.Body;
             ShowInTaskbar = false;
 
-            // Fewer options to choose means more room for the photograph.
+            // fewer options = more room for the photo
             int optionRows = (_product.HasSizes ? 1 : 0) + (_product.HasTemperature ? 1 : 0);
             _heroHeight += (2 - optionRows) * 46;
 
@@ -83,7 +78,6 @@ namespace kiosk.UI
             Controls.Add(_qty);
             y += Hive.TapTarget + 20;
 
-            // ---- footer, pinned to the bottom of the page ----
             int footerTop = Hive.ScreenH - 98;
             _add = new HiveButton();
             _add.Text = "Add to order";
@@ -103,7 +97,7 @@ namespace kiosk.UI
 
             ClientSize = new Size(SheetW, Hive.ScreenH);
 
-            // Defaults, so "Add to order" works without hunting for options.
+            // preselect so Add to order works in one tap
             if (_size != null) _size.SelectedIndex = 0;
             if (_temp != null) _temp.SelectedIndex = 0;
         }
@@ -148,13 +142,12 @@ namespace kiosk.UI
             Hive.Smooth(g);
             g.Clear(Hive.Surface);
 
-            // ---- hero ----
             RectangleF hero = new RectangleF(0, 0, Width, _heroHeight);
             using (GraphicsPath clip = Hive.Rounded(hero, 0))
             {
                 if (_product.Image != null)
                 {
-                    // Show the whole dish rather than a crop of it.
+                    // fit the whole thing, dont crop
                     Region saved = g.Clip;
                     g.SetClip(clip, CombineMode.Intersect);
                     using (SolidBrush wash = new SolidBrush(Color.White))
@@ -177,7 +170,6 @@ namespace kiosk.UI
                 Hive.TextTracked(g, badgeText, Hive.Overline, Rectangle.Round(badge), Color.White, 1.1f, true);
             }
 
-            // ---- name + description ----
             int left = Hive.Gutter + 4;
             int width = Width - left * 2;
 
@@ -188,12 +180,10 @@ namespace kiosk.UI
                       new Rectangle(left, _heroHeight + 42, width, 36), Hive.Muted,
                       TextFormatFlags.WordBreak | TextFormatFlags.Top);
 
-            // ---- section labels, drawn just above each control ----
             if (_size != null) SectionLabel(g, "SIZE", _size.Top);
             if (_temp != null) SectionLabel(g, "SERVED", _temp.Top);
             SectionLabel(g, "QUANTITY", _qty.Top);
 
-            // ---- footer ----
             int footerTop = _add.Top - 18;
             using (Pen p = new Pen(Hive.Line, 1))
                 g.DrawLine(p, Hive.Gutter, footerTop, Width - Hive.Gutter, footerTop);

@@ -5,11 +5,7 @@ using System.Windows.Forms;
 
 namespace kiosk.UI
 {
-    // =====================================================================
-    //  Base
-    // =====================================================================
 
-    /// <summary>Common plumbing for every hand-painted control in the kiosk.</summary>
     public abstract class HiveControl : Control
     {
         protected HiveControl()
@@ -24,10 +20,6 @@ namespace kiosk.UI
             ForeColor = Hive.Ink;
         }
     }
-
-    // =====================================================================
-    //  Button
-    // =====================================================================
 
     public enum HiveStyle
     {
@@ -71,24 +63,20 @@ namespace kiosk.UI
             get { return _radius; }
             set { _radius = value; Invalidate(); }
         }
-        /// <summary>Optional stroked icon. On its own it makes an icon button.</summary>
         public Mark? Icon
         {
             get { return _icon; }
             set { _icon = value; Invalidate(); }
         }
 
-        /// <summary>Uppercase with letter tracking, the way a menu board sets a label.</summary>
         public bool Tracked
         {
             get { return _tracked; }
             set { _tracked = value; Invalidate(); }
         }
 
-        /// <summary>Overrides the label colour the style would otherwise pick.</summary>
         public Color TextColor { get; set; }
 
-        /// <summary>Optional second line under the label, e.g. a price.</summary>
         public string Caption
         {
             get { return _caption; }
@@ -167,7 +155,6 @@ namespace kiosk.UI
             if (Focused && Enabled)
                 Hive.Stroke(g, RectangleF.Inflate(body, -3, -3), 1, Color.FromArgb(120, Hive.Honey), 1.4f);
 
-            // ---- label ----
             string label = Text ?? string.Empty;
 
             if (_icon.HasValue && label.Length == 0)
@@ -203,11 +190,6 @@ namespace kiosk.UI
         }
     }
 
-    // =====================================================================
-    //  Card / surface
-    // =====================================================================
-
-    /// <summary>A rounded surface that can hold ordinary child controls.</summary>
     public class HiveCard : Panel
     {
         private int _radius = Hive.RadiusCard;
@@ -246,7 +228,6 @@ namespace kiosk.UI
         }
     }
 
-    /// <summary>Flat coloured band, optionally with a vertical gradient.</summary>
     public class HiveBand : Panel
     {
         private Color _from = Hive.Teal;
@@ -272,10 +253,6 @@ namespace kiosk.UI
             base.OnPaint(e);
         }
     }
-
-    // =====================================================================
-    //  Category chips
-    // =====================================================================
 
     public class HiveChip : HiveControl
     {
@@ -333,10 +310,6 @@ namespace kiosk.UI
         }
     }
 
-    /// <summary>
-    /// Horizontal, scrollbar-free strip of category chips. Drag or use the
-    /// wheel to scroll; selecting a chip pulls it into view.
-    /// </summary>
     public class ChipRail : Panel
     {
         private readonly Panel _strip;
@@ -373,7 +346,7 @@ namespace kiosk.UI
             using (Pen p = new Pen(Hive.Line, 1))
                 g.DrawLine(p, 0, Height - 1, Width, Height - 1);
 
-            // The tabs are added at run time, so preview them for the designer.
+            // tabs are added at runtime, so fake them for the designer
             if (DesignMode && _strip.Controls.Count == 0)
                 PaintDesignPreview(g);
 
@@ -409,7 +382,7 @@ namespace kiosk.UI
             chip.Top = 0;
             chip.Height = Height;
 
-            // Uppercase plus letter tracking, so measure what is actually drawn.
+            // measure the uppercase + tracked version, thats what gets drawn
             Size measured = TextRenderer.MeasureText(label.ToUpperInvariant(), chip.Font);
             chip.Width = measured.Width + (int)(label.Length * 1.0f) + 18;
 
@@ -462,11 +435,6 @@ namespace kiosk.UI
             SetLeft(_strip.Left + delta);
         }
 
-        /// <summary>
-        /// Moves the strip, stopping dead at either end. Clamping has to happen
-        /// here rather than when the finger lifts, otherwise a long drag pulls
-        /// the tabs right off the rail and leaves a gap.
-        /// </summary>
         private void SetLeft(int left)
         {
             int min = Math.Min(Hive.Gutter, Width - _strip.Width);
@@ -502,10 +470,6 @@ namespace kiosk.UI
         public string Label { get; private set; }
         public object Tag { get; private set; }
     }
-
-    // =====================================================================
-    //  Segmented selector (replaces radio buttons)
-    // =====================================================================
 
     public class Segmented : HiveControl
     {
@@ -613,10 +577,6 @@ namespace kiosk.UI
         }
     }
 
-    // =====================================================================
-    //  Quantity stepper (replaces NumericUpDown)
-    // =====================================================================
-
     public class Stepper : HiveControl
     {
         private int _value = 1;
@@ -691,7 +651,6 @@ namespace kiosk.UI
             Hive.Text(g, _value.ToString(), Font, mid, Hive.Ink, Hive.Centered);
         }
 
-        /// <summary>Signs are stroked, not typed - no font can drop them.</summary>
         private void DrawKnob(Graphics g, Rectangle bounds, bool plus, bool enabled, bool hot)
         {
             if (enabled && hot)
@@ -715,11 +674,6 @@ namespace kiosk.UI
         }
     }
 
-    // =====================================================================
-    //  Text field
-    // =====================================================================
-
-    /// <summary>A labelled input drawn as a rounded, borderless field.</summary>
     public class HiveField : Panel
     {
         private readonly TextBox _input = new TextBox();
@@ -748,7 +702,6 @@ namespace kiosk.UI
         public TextBox Input { get { return _input; } }
         public string Label { get { return _label; } set { _label = value; Invalidate(); } }
 
-        /// <summary>Placeholder shown inside the field while it is empty.</summary>
         public string Hint
         {
             get { return _hint; }
@@ -762,8 +715,7 @@ namespace kiosk.UI
 
         private void ApplyHint()
         {
-            // The cue banner is a window message, so it only sticks once the
-            // field actually has a handle.
+            // EM_SETCUEBANNER is a window message, needs a handle first
             if (_hint == null || !IsHandleCreated) return;
             SendMessage(_input.Handle, EM_SETCUEBANNER, (IntPtr)1, _hint);
         }
@@ -796,11 +748,6 @@ namespace kiosk.UI
         }
     }
 
-    // =====================================================================
-    //  Payment method tile
-    // =====================================================================
-
-    /// <summary>Full-width tappable row used to pick a payment method.</summary>
     public class MethodTile : HiveControl
     {
         private readonly Anim _hover;

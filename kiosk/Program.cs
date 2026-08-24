@@ -6,10 +6,6 @@ namespace kiosk
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application. Everything runs inside a
-        /// single Shell window; the screens are pages swapped inside it.
-        /// </summary>
         [STAThread]
         static void Main()
         {

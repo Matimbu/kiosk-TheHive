@@ -6,10 +6,6 @@ using kiosk.UI;
 
 namespace kiosk
 {
-    /// <summary>
-    /// Welcome screen. The kiosk sits here between guests and returns here
-    /// once an order is paid for.
-    /// </summary>
     public partial class Form1 : Form
     {
         public Form1()
@@ -35,7 +31,6 @@ namespace kiosk
                 g.FillRectangle(b, ClientRectangle);
             DrawHoneycomb(g);
 
-            // ---- logo, cut to the house hexagon ----
             RectangleF plate = new RectangleF(Width / 2f - 68, 156, 136, 136);
             using (GraphicsPath clip = Hive.Hexagon(plate))
             {
@@ -49,16 +44,15 @@ namespace kiosk
                 g.Clip = saved;
             }
 
-            // ---- wordmark ----
             Hive.TextTracked(g, "THE HIVE CAFE", Hive.Overline,
                              new Rectangle(0, 326, Width, 20), Hive.HoneyLight, 3.6f, true);
 
-            // Sitka has deep descenders - the box has to allow for them.
+            // Sitka descenders need the extra height
             using (Font display = Hive.Sized(Hive.Display, 33f))
                 Hive.Text(g, "Good day.", display,
                           new Rectangle(0, 350, Width, 64), Color.White, Hive.Centered);
 
-            // A single hairline rule instead of a second block of colour.
+            // hairline, not another color block
             using (Pen p = new Pen(Color.FromArgb(70, 255, 255, 255), 1))
                 g.DrawLine(p, Width / 2 - 26, 428, Width / 2 + 26, 428);
 
@@ -70,7 +64,6 @@ namespace kiosk
                              new Rectangle(0, 644, Width, 20), Color.FromArgb(120, 255, 255, 255), 2.2f, true);
         }
 
-        /// <summary>Faint hexagon lattice - the one flourish on the screen.</summary>
         private void DrawHoneycomb(Graphics g)
         {
             const float radius = 30f;

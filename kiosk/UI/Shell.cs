@@ -5,17 +5,11 @@ using System.Windows.Forms;
 
 namespace kiosk.UI
 {
-    /// <summary>Implemented by pages that need to refresh when navigated back to.</summary>
     public interface IPage
     {
         void OnRevealed();
     }
 
-    /// <summary>
-    /// The kiosk's only real window. Every screen is a borderless form hosted
-    /// inside it, so moving between the menu, payment and the receipt swaps the
-    /// contents instead of opening another window.
-    /// </summary>
     public class Shell : Form
     {
         private const int WS_EX_COMPOSITED = 0x02000000;
@@ -46,10 +40,6 @@ namespace kiosk.UI
             Load += (s, e) => Go(new Form1());
         }
 
-        /// <summary>
-        /// Paints the whole window bottom-up into one buffer. Without this the
-        /// hand-painted controls tear against each other while a list scrolls.
-        /// </summary>
         protected override CreateParams CreateParams
         {
             get
@@ -65,7 +55,6 @@ namespace kiosk.UI
             get { return _stack.Count == 0 ? null : _stack[_stack.Count - 1]; }
         }
 
-        /// <summary>Opens a page on top of the current one.</summary>
         public void Go(Form page)
         {
             if (page == null) return;
@@ -83,7 +72,6 @@ namespace kiosk.UI
             page.BringToFront();
         }
 
-        /// <summary>Returns to the previous page, discarding the current one.</summary>
         public void Back()
         {
             if (_stack.Count <= 1) return;
@@ -96,7 +84,6 @@ namespace kiosk.UI
             Reveal(Active);
         }
 
-        /// <summary>Unwinds to the welcome screen, ready for the next guest.</summary>
         public void Home()
         {
             while (_stack.Count > 1)
@@ -133,7 +120,6 @@ namespace kiosk.UI
         }
     }
 
-    /// <summary>Navigation, reachable from any page without passing the shell around.</summary>
     public static class Nav
     {
         public static void Go(Form page)

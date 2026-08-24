@@ -6,10 +6,6 @@ using System.Windows.Forms;
 
 namespace kiosk.UI
 {
-    /// <summary>
-    /// The scrolling two-column grid of menu tiles. One instance is reused for
-    /// every category, so switching tabs only swaps the contents.
-    /// </summary>
     public class CategoryView : ScrollHost
     {
         private const int TileW = 226;
@@ -24,9 +20,7 @@ namespace kiosk.UI
         {
             BackColor = Hive.Canvas;
 
-            // Tiles are built from MenuCatalog at run time, so the Visual Studio
-            // designer would otherwise show an empty panel. Sketch the grid there
-            // instead, so the page layout is still readable while designing.
+            // designer never runs Load(), so sketch the grid instead of showing nothing
             Content.Paint += (s, e) =>
             {
                 if (DesignMode && Content.Controls.Count == 0) PaintDesignPreview(e.Graphics);

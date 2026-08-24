@@ -8,10 +8,6 @@ using kiosk.UI;
 
 namespace kiosk.Payments
 {
-    /// <summary>
-    /// E-wallet payment: scan the QR, confirm, receipt. The QR artwork comes
-    /// from Properties.Resources so it can be swapped without touching code.
-    /// </summary>
     public partial class EWalletPaymentForm : Form
     {
         private const int BandH = 116;
@@ -77,7 +73,6 @@ namespace kiosk.Payments
                 Hive.Text(g, Hive.Money(_total), big,
                           new Rectangle(left, 46, Width - left * 2, 38), Color.White, Hive.LeftMid);
 
-            // ---- QR card ----
             RectangleF card = new RectangleF(Hive.Gutter, BandH + 22, Width - Hive.Gutter * 2, 318);
             Hive.Shadow(g, card, 20, 4, 44);
             Hive.Fill(g, card, 20, Hive.Surface);

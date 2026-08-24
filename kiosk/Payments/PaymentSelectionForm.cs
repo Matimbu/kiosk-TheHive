@@ -7,10 +7,6 @@ using kiosk.UI;
 
 namespace kiosk.Payments
 {
-    /// <summary>
-    /// Payment method picker. Each method is a full-width tap target with the
-    /// amount due kept in view above them.
-    /// </summary>
     public partial class PaymentSelectionForm : Form
     {
         private const int BandH = 128;

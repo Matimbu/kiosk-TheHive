@@ -8,10 +8,6 @@ using kiosk.UI;
 
 namespace kiosk.Payments
 {
-    /// <summary>
-    /// Cash instructions. The guest confirms here, the receipt prints, and the
-    /// kiosk hands itself back to the next person.
-    /// </summary>
     public partial class CashPaymentForm : Form
     {
         private const int BandH = 116;
@@ -74,7 +70,6 @@ namespace kiosk.Payments
                 Hive.Text(g, Hive.Money(_total), big,
                           new Rectangle(left, 46, Width - left * 2, 38), Color.White, Hive.LeftMid);
 
-            // ---- instructions, centred in the space below the band ----
             int free = Height - 78 - BandH;
             RectangleF card = new RectangleF(Hive.Gutter, BandH + (free - 250) / 2f,
                                              Width - Hive.Gutter * 2, 250);

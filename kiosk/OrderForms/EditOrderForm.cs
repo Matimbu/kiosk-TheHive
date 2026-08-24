@@ -6,10 +6,6 @@ using kiosk.UI;
 
 namespace kiosk
 {
-    /// <summary>
-    /// Edits one line of the order. Removing takes two taps rather than a
-    /// system dialog, so the guest never leaves the kiosk's own look.
-    /// </summary>
     public partial class EditOrderForm : Form
     {
         private const int SheetW = Hive.ScreenW;
@@ -29,10 +25,6 @@ namespace kiosk
         public Order UpdatedOrder { get; private set; }
         public bool IsRemoved { get; private set; }
 
-        /// <summary>
-        /// Raised once the guest has saved or removed the line. The cart page
-        /// listens for this instead of waiting on a dialog result.
-        /// </summary>
         public event EventHandler Committed;
 
         public EditOrderForm(Order orderToEdit)
@@ -79,8 +71,7 @@ namespace kiosk
             Controls.Add(_qty);
             y += Hive.TapTarget + 14;
 
-            // The options flow from the top; the decisions stay pinned to the
-            // bottom of the page so they are always in the same place.
+            // options from the top, buttons pinned to the bottom
             int footerTop = Hive.ScreenH - 92;
             _totalRowTop = footerTop - 108;
 
@@ -182,7 +173,6 @@ namespace kiosk
             Hive.Smooth(g);
             g.Clear(Hive.Surface);
 
-            // ---- header ----
             RectangleF band = new RectangleF(0, 0, Width, 88);
             using (SolidBrush b = new SolidBrush(Hive.Teal))
                 g.FillRectangle(b, band);

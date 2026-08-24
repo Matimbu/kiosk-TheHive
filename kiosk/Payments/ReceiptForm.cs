@@ -12,10 +12,6 @@ using kiosk.UI;
 
 namespace kiosk.Payments
 {
-    /// <summary>
-    /// The order receipt: a laid-out till slip on screen, and the same content
-    /// written to bin\Debug\Receipts as 40-column text for a thermal printer.
-    /// </summary>
     public partial class ReceiptForm : Form
     {
         private const int BandH = 120;
@@ -54,7 +50,7 @@ namespace kiosk.Payments
             done.Click += (s, e) => Nav.Home();
             Controls.Add(done);
 
-            // Written first, so the viewport can leave room if it failed.
+            // save first so we know whether to leave room for the error line
             Save(BuildText());
             _errorHeight = _saveError == null ? 0 : 34;
 
@@ -74,8 +70,6 @@ namespace kiosk.Payments
             Load += (s, e) => ActiveControl = done;
         }
 
-        // ---- data the paper draws -------------------------------------------
-
         internal List<Order> Lines { get { return _orders; } }
         internal string OrderNumber { get { return _orderNumber; } }
         internal DateTime Issued { get { return _issued; } }
@@ -94,11 +88,6 @@ namespace kiosk.Payments
             }
         }
 
-        /// <summary>
-        /// A per-day sequence kept beside the saved receipts, so the number a
-        /// guest is given at the counter does not restart every time the kiosk
-        /// is relaunched.
-        /// </summary>
         private static string NextOrderNumber()
         {
             try
@@ -138,27 +127,24 @@ namespace kiosk.Payments
             return "Card";
         }
 
-        // ---- printable copy --------------------------------------------------
-
-        /// <summary>40 columns, the usual width of a thermal till roll.</summary>
         private string BuildText()
         {
             const int cols = 40;
             StringBuilder r = new StringBuilder();
 
-            Action<string> centre = t => r.AppendLine(new string(' ', Math.Max(0, (cols - t.Length) / 2)) + t);
+            Action<string> center = t => r.AppendLine(new string(' ', Math.Max(0, (cols - t.Length) / 2)) + t);
             Action rule = () => r.AppendLine(new string('-', cols));
             Action<string, string> row = (l, v) =>
                 r.AppendLine(l + new string(' ', Math.Max(1, cols - l.Length - v.Length)) + v);
 
-            centre(CafeInfo.Name);
-            centre(CafeInfo.Branch);
-            centre(CafeInfo.Address);
-            centre(CafeInfo.Contact);
-            if (!string.IsNullOrEmpty(CafeInfo.TaxId)) centre("TIN " + CafeInfo.TaxId);
+            center(CafeInfo.Name);
+            center(CafeInfo.Branch);
+            center(CafeInfo.Address);
+            center(CafeInfo.Contact);
+            if (!string.IsNullOrEmpty(CafeInfo.TaxId)) center("TIN " + CafeInfo.TaxId);
             r.AppendLine();
 
-            centre("ORDER No. " + _orderNumber);
+            center("ORDER No. " + _orderNumber);
             rule();
             row("Date", _issued.ToString("dd MMM yyyy HH:mm"));
             row("Terminal", CafeInfo.Terminal);
@@ -183,10 +169,10 @@ namespace kiosk.Payments
             row("TOTAL", Hive.Peso + _total.ToString("N2"));
             rule();
             r.AppendLine();
-            centre("Thank you, see you again!");
+            center("Thank you, see you again!");
             r.AppendLine();
             if (!CafeInfo.IssuesOfficialReceipts)
-                centre("THIS IS NOT AN OFFICIAL RECEIPT");
+                center("THIS IS NOT AN OFFICIAL RECEIPT");
 
             return r.ToString();
         }
@@ -206,8 +192,6 @@ namespace kiosk.Payments
                 _saveError = "Receipt could not be saved: " + ex.Message;
             }
         }
-
-        // ---- painting --------------------------------------------------------
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -238,10 +222,6 @@ namespace kiosk.Payments
         }
     }
 
-    /// <summary>
-    /// The till slip itself. One layout routine both measures and draws, so the
-    /// paper is always exactly as tall as its contents.
-    /// </summary>
     internal class ReceiptPaper : HiveControl
     {
         private const int Pad = 20;
@@ -273,7 +253,6 @@ namespace kiosk.Payments
             Compose(g);
         }
 
-        /// <summary>Draws when g is supplied, measures when it is null.</summary>
         private int Compose(Graphics g)
         {
             int left = Pad;
@@ -281,7 +260,6 @@ namespace kiosk.Payments
             int w = right - left;
             int y = 4 + Pad;
 
-            // ---- masthead ----
             if (g != null)
             {
                 RectangleF hex = new RectangleF(Width / 2f - 21, y, 42, 42);
@@ -305,17 +283,16 @@ namespace kiosk.Payments
                                  new Rectangle(left, y, w, 20), Hive.Ink, 2.6f, true);
             y += 20;
 
-            y = Centred(g, CafeInfo.Branch, Hive.Caption, Hive.InkSoft, left, y, w, 15);
-            y = Centred(g, CafeInfo.Address, Hive.Caption, Hive.Muted, left, y, w, 15);
-            y = Centred(g, CafeInfo.Contact, Hive.Caption, Hive.Muted, left, y, w, 15);
+            y = CenterLine(g, CafeInfo.Branch, Hive.Caption, Hive.InkSoft, left, y, w, 15);
+            y = CenterLine(g, CafeInfo.Address, Hive.Caption, Hive.Muted, left, y, w, 15);
+            y = CenterLine(g, CafeInfo.Contact, Hive.Caption, Hive.Muted, left, y, w, 15);
             if (!string.IsNullOrEmpty(CafeInfo.TaxId))
-                y = Centred(g, "TIN " + CafeInfo.TaxId, Hive.Caption, Hive.Muted, left, y, w, 15);
+                y = CenterLine(g, "TIN " + CafeInfo.TaxId, Hive.Caption, Hive.Muted, left, y, w, 15);
 
             y += 10;
             y = Dashes(g, left, y, w);
             y += 12;
 
-            // ---- order number, the thing the guest shows at the counter ----
             if (g != null)
             {
                 Hive.TextTracked(g, "ORDER NUMBER", Hive.Overline,
@@ -329,7 +306,6 @@ namespace kiosk.Payments
             y = Dashes(g, left, y, w);
             y += 10;
 
-            // ---- meta, kept to three rows so the totals stay above the fold ----
             y = Row(g, "Date", _receipt.Issued.ToString("dd MMM yyyy, HH:mm"), left, y, w);
             y = Row(g, "Terminal", CafeInfo.Terminal, left, y, w);
             y = Row(g, "Payment",
@@ -349,7 +325,6 @@ namespace kiosk.Payments
             y = Hairline(g, left, y, w);
             y += 8;
 
-            // ---- lines ----
             foreach (Order o in _receipt.Lines)
             {
                 if (g != null)
@@ -374,7 +349,6 @@ namespace kiosk.Payments
             y = Dashes(g, left, y, w);
             y += 10;
 
-            // ---- totals ----
             if (g != null)
             {
                 Hive.Text(g, "TOTAL", Hive.Subhead, new Rectangle(left, y, w, 32), Hive.Ink, Hive.LeftMid);
@@ -387,7 +361,7 @@ namespace kiosk.Payments
             y = Dashes(g, left, y, w);
             y += 10;
 
-            y = Centred(g, "Thank you, see you again!", Hive.Body, Hive.InkSoft, left, y, w, 20);
+            y = CenterLine(g, "Thank you, see you again!", Hive.Body, Hive.InkSoft, left, y, w, 20);
 
             if (!CafeInfo.IssuesOfficialReceipts)
             {
@@ -401,12 +375,10 @@ namespace kiosk.Payments
             return y + Pad;
         }
 
-        // ---- layout helpers --------------------------------------------------
-
-        private static int Centred(Graphics g, string text, Font font, Color colour,
+        private static int CenterLine(Graphics g, string text, Font font, Color color,
                                    int left, int y, int w, int h)
         {
-            if (g != null) Hive.Text(g, text, font, new Rectangle(left, y, w, h), colour, Hive.Centered);
+            if (g != null) Hive.Text(g, text, font, new Rectangle(left, y, w, h), color, Hive.Centered);
             return y + h;
         }
 
@@ -442,7 +414,6 @@ namespace kiosk.Payments
             return y + 1;
         }
 
-        /// <summary>Torn-paper edges, so the slip reads as a slip.</summary>
         private void Serrate(Graphics g, RectangleF paper)
         {
             const float tooth = 12f;

@@ -7,17 +7,9 @@ using System.Windows.Forms;
 
 namespace kiosk.UI
 {
-    /// <summary>
-    /// Design tokens and drawing primitives for The Hive Cafe kiosk.
-    /// Everything visual in the app is derived from the values in here, so
-    /// re-skinning the whole kiosk means editing this one file.
-    /// </summary>
     public static class Hive
     {
-        // ---- Palette -------------------------------------------------------
-        // Flat ink on paper. The teal comes off the hive logo and is used in
-        // solid blocks; honey is rationed to the one action that matters most
-        // on each screen.
+        // teal off the logo, honey only for the one action that matters
         public static readonly Color Ink        = Color.FromArgb(0x14, 0x21, 0x22);
         public static readonly Color InkSoft    = Color.FromArgb(0x45, 0x55, 0x56);
         public static readonly Color Muted      = Color.FromArgb(0x8A, 0x93, 0x93);
@@ -39,9 +31,7 @@ namespace kiosk.UI
         public static readonly Color Success    = Color.FromArgb(0x1E, 0x7A, 0x50);
         public static readonly Color Danger     = Color.FromArgb(0xAE, 0x3B, 0x33);
 
-        // ---- Metrics -------------------------------------------------------
-        // Corners are all but square: 3px reads as a printed edge rather than
-        // a bubble, and nothing in the app is a pill.
+        // 3px, basically square. nothing here is a pill
         public const int ScreenW      = 480;
         public const int ScreenH      = 720;
         public const int Gutter       = 16;   // page padding
@@ -51,16 +41,13 @@ namespace kiosk.UI
         public const int TapTarget    = 52;   // minimum comfortable touch height
         public const float Hairline   = 1f;
 
-        /// <summary>Peso sign, kept as an escape so every source file stays ASCII.</summary>
         public const string Peso = "₱";
 
-        /// <summary>Full precision, for anything the guest is asked to pay.</summary>
         public static string Money(decimal amount)
         {
             return Peso + amount.ToString("N2");
         }
 
-        /// <summary>Menu-board style: no trailing zeroes on round prices.</summary>
         public static string MoneyShort(decimal amount)
         {
             return Peso + (amount == decimal.Truncate(amount)
@@ -68,11 +55,8 @@ namespace kiosk.UI
                          : amount.ToString("0.00"));
         }
 
-        // ---- Type ----------------------------------------------------------
-        // Two voices. Sitka (a serif cut at several optical sizes) carries the
-        // name of the cafe and the food; Bahnschrift, a DIN-style grotesque,
-        // handles the working text - prices, labels, buttons. Segoe is left
-        // for descriptions only, where neutrality is the point.
+        // Sitka for the cafe name + food, Bahnschrift for prices and labels,
+        // Segoe for descriptions
         private static readonly string Banner  = Resolve("Sitka Banner", "Georgia", "Cambria", "Times New Roman");
         private static readonly string SerifUI = Resolve("Sitka Heading", "Sitka Text", "Georgia", "Cambria");
         private static readonly string Grotesk = Resolve("Bahnschrift SemiBold", "Bahnschrift", "Franklin Gothic Medium", "Segoe UI");
@@ -105,11 +89,6 @@ namespace kiosk.UI
             return FontFamily.GenericSansSerif.Name;
         }
 
-        /// <summary>
-        /// Builds a font, stepping down to a style the family actually ships.
-        /// Named instances such as "Bahnschrift SemiBold" only carry one face,
-        /// and asking them for Bold throws.
-        /// </summary>
         private static Font Make(string family, float size, FontStyle style)
         {
             try
@@ -129,16 +108,11 @@ namespace kiosk.UI
             }
         }
 
-        /// <summary>
-        /// Same face, different size. Use this instead of building a new Font
-        /// from someone else's FontFamily - the style may not exist there.
-        /// </summary>
         public static Font Sized(Font basis, float size)
         {
             return new Font(basis.FontFamily, size, basis.Style);
         }
 
-        // ---- Drawing helpers ----------------------------------------------
         public static void Smooth(Graphics g)
         {
             g.SmoothingMode     = SmoothingMode.AntiAlias;
@@ -163,7 +137,6 @@ namespace kiosk.UI
             return path;
         }
 
-        /// <summary>Rounded rect with only the top two corners curved (image headers).</summary>
         public static GraphicsPath RoundedTop(RectangleF r, float radius)
         {
             GraphicsPath path = new GraphicsPath();
@@ -175,10 +148,6 @@ namespace kiosk.UI
             return path;
         }
 
-        /// <summary>
-        /// Flat-topped hexagon inscribed in the rectangle - the house shape,
-        /// used wherever a plain circle would have gone.
-        /// </summary>
         public static GraphicsPath Hexagon(RectangleF r)
         {
             float cx = r.X + r.Width / 2f;
@@ -221,11 +190,6 @@ namespace kiosk.UI
                 g.DrawPath(pen, p);
         }
 
-        /// <summary>
-        /// Angled gradient brush. GDI+ tiles a rotated gradient outside its own
-        /// rectangle, which leaves a visible seam across the fill - inflating
-        /// the rectangle and mirroring the tile keeps the ramp smooth.
-        /// </summary>
         public static LinearGradientBrush Gradient(RectangleF r, Color from, Color to, float angle)
         {
             RectangleF safe = RectangleF.Inflate(r, 2, 2);
@@ -242,7 +206,6 @@ namespace kiosk.UI
                 g.FillPath(b, p);
         }
 
-        /// <summary>Soft ambient shadow, drawn as stacked translucent rounded rects.</summary>
         public static void Shadow(Graphics g, RectangleF r, float radius, int depth, int strength)
         {
             for (int i = depth; i >= 1; i--)
@@ -256,10 +219,8 @@ namespace kiosk.UI
             }
         }
 
-        // ---- Scaled-image cache -------------------------------------------
-        // The menu photos are up to 1200x1200. Resampling them down to tile
-        // size on every paint is what made scrolling stutter, so each size is
-        // rendered once and kept.
+        // photos are up to 1200x1200. rescaling on every paint killed scrolling,
+        // so cache one bitmap per size
         private static readonly System.Collections.Generic.Dictionary<string, Image> Thumbs =
             new System.Collections.Generic.Dictionary<string, Image>();
 
@@ -291,7 +252,6 @@ namespace kiosk.UI
             return thumb;
         }
 
-        /// <summary>Draws an image scaled to fill (and centre-cropped to) the destination.</summary>
         public static void ImageCover(Graphics g, Image img, RectangleF dest, GraphicsPath clip)
         {
             if (img == null || dest.Width <= 0 || dest.Height <= 0) return;
@@ -306,7 +266,6 @@ namespace kiosk.UI
             g.Clip = saved;
         }
 
-        /// <summary>Draws an image scaled to fit entirely inside the destination.</summary>
         public static void ImageContain(Graphics g, Image img, RectangleF dest, float inset)
         {
             if (img == null || dest.Width <= 0 || dest.Height <= 0) return;
@@ -336,13 +295,8 @@ namespace kiosk.UI
             TextRenderer.DrawText(g, text ?? string.Empty, font, bounds, color, flags | TextFormatFlags.NoPrefix);
         }
 
-        /// <summary>
-        /// Draws text with extra space between letters. GDI has no tracking
-        /// setting, so the glyphs are placed one at a time - which is fine for
-        /// the short uppercase labels this is meant for.
-        /// </summary>
         public static void TextTracked(Graphics g, string text, Font font, Rectangle bounds,
-                                       Color color, float tracking, bool centre)
+                                       Color color, float tracking, bool center)
         {
             if (string.IsNullOrEmpty(text)) return;
 
@@ -356,7 +310,7 @@ namespace kiosk.UI
                 total += widths[i] + (i < text.Length - 1 ? tracking : 0);
             }
 
-            float x = centre ? bounds.X + (bounds.Width - total) / 2f : bounds.X;
+            float x = center ? bounds.X + (bounds.Width - total) / 2f : bounds.X;
             int y = bounds.Y + (bounds.Height - font.Height) / 2;
 
             for (int i = 0; i < text.Length; i++)
@@ -374,20 +328,12 @@ namespace kiosk.UI
         public const TextFormatFlags RightMid =
             TextFormatFlags.Right | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis;
 
-        /// <summary>
-        /// Fallback artwork for menu items that have no photo yet: a quiet
-        /// hexagon monogram, so the gap reads as a deliberate placeholder
-        /// rather than a broken image. Pass a caption where there is room for
-        /// one (a menu tile, a product page) to make that explicit to the
-        /// guest; omit it in tight spaces such as a cart row.
-        /// </summary>
         public static void Monogram(Graphics g, string name, RectangleF r, GraphicsPath clip, string caption = null)
         {
             Region saved = g.Clip;
             if (clip != null) g.SetClip(clip, CombineMode.Intersect);
 
-            // Deliberately quiet: an item with no photo should read as a gap in
-            // the photography, not compete with the dishes that do have one.
+            // keep it quiet, it should not fight the real photos
             using (SolidBrush b = new SolidBrush(SurfaceAlt))
                 g.FillRectangle(b, r);
 
@@ -428,20 +374,15 @@ namespace kiosk.UI
 
     public enum Mark { ArrowLeft, Cross, Check, Plus, Bag, Chevron, Cash, Card, Wallet }
 
-    /// <summary>
-    /// The icon set, stroked with a pen rather than typed. Nothing here depends
-    /// on a font shipping the right symbol - Sitka has no peso sign and no
-    /// installed face has a tick - and stroked marks stay crisp at any size.
-    /// </summary>
     public static class Marks
     {
-        public static void Draw(Graphics g, Mark mark, RectangleF box, Color colour, float weight)
+        public static void Draw(Graphics g, Mark mark, RectangleF box, Color color, float weight)
         {
             float cx = box.X + box.Width / 2f;
             float cy = box.Y + box.Height / 2f;
             float r = Math.Min(box.Width, box.Height) / 2f;
 
-            using (Pen pen = new Pen(colour, weight))
+            using (Pen pen = new Pen(color, weight))
             {
                 pen.StartCap = LineCap.Round;
                 pen.EndCap = LineCap.Round;
@@ -527,20 +468,10 @@ namespace kiosk.UI
         }
     }
 
-    /// <summary>
-    /// Tiny easing helper: drives a 0..1 value over a few frames so hover and
-    /// press states fade instead of snapping.
-    /// </summary>
     public sealed class Anim : IDisposable
     {
-        /// <summary>
-        /// 15ms, not 16. Windows ticks WinForms timers on a ~15.6ms period, so
-        /// an interval of 16 rounds up to two periods and runs at about 32Hz -
-        /// asking for 15 keeps it to one period and gives a true 60fps.
-        /// </summary>
         public const int FrameMs = 15;
 
-        /// <summary>The speed values below are authored per 60fps frame.</summary>
         private const float ReferenceFps = 60f;
 
         private static readonly Stopwatch Clock = Stopwatch.StartNew();
@@ -580,11 +511,6 @@ namespace kiosk.UI
             _owner.Invalidate();
         }
 
-        /// <summary>
-        /// Advances by elapsed time rather than by a fixed amount per tick, so
-        /// a transition takes the same wall-clock time whether or not the
-        /// machine manages to hit every frame.
-        /// </summary>
         private void Tick(object sender, EventArgs e)
         {
             long now = Clock.ElapsedMilliseconds;

@@ -5,11 +5,6 @@ using kiosk.UI;
 
 namespace kiosk
 {
-    /// <summary>
-    /// The ordering screen: category rail on top, menu grid in the middle,
-    /// running order pinned to the bottom. Everything else opens as a sheet
-    /// over this window, so the guest never loses their place.
-    /// </summary>
     public partial class menuPage : Form, IPage
     {
         private readonly CartPill _cartPill = new CartPill();
@@ -57,7 +52,6 @@ namespace kiosk
             Nav.Go(new viewOrder());
         }
 
-        /// <summary>Called by the shell when the guest returns to the menu.</summary>
         public void OnRevealed()
         {
             RefreshOrderTotals();

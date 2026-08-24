@@ -4,11 +4,6 @@ using System.Windows.Forms;
 
 namespace kiosk.UI
 {
-    /// <summary>
-    /// A standalone window for one menu category. The main kiosk flow shows
-    /// categories inside <c>menuPage</c>; this exists so each category can
-    /// still be opened - and previewed in the designer - on its own.
-    /// </summary>
     public class CategoryForm : Form
     {
         private readonly AppHeader _header = new AppHeader();
