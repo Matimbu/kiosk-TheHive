@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -18,7 +18,6 @@ namespace kiosk.Payments
 
         private readonly List<Order> _orders;
         private readonly string _paymentMethod;
-        private readonly string _fullCardNumber;
         private readonly string _orderNumber;
         private readonly DateTime _issued = DateTime.Now;
         private readonly decimal _total;
@@ -27,14 +26,27 @@ namespace kiosk.Payments
         private string _saveError;
         private readonly int _errorHeight;
 
-        public ReceiptForm(List<Order> ordersToUse, string paymentMethod, string fullCardNumber)
+        public static void Submit(string method)
         {
-            _orders = ordersToUse.ToList();
-            _paymentMethod = paymentMethod;
-            _fullCardNumber = fullCardNumber;
-            _total = _orders.Sum(o => o.Price * o.Quantity);
-            _orderNumber = NextOrderNumber();
+            try
+            {
+                var saved = LocalStore.Submit(method);
+                var receipt = new ReceiptForm(saved);
+                Shell.Current.Complete(receipt);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Order could not be completed. Your cart is still available.\n" + ex.Message, "Please try again");
+            }
+        }
 
+        private ReceiptForm(SavedOrder saved)
+        {
+            _orders = saved.Lines;
+            _paymentMethod = saved.Method;
+            _total = saved.Total;
+            _orderNumber = saved.Id;
+            _issued = saved.Created;
             InitializeComponent();
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
@@ -76,66 +88,19 @@ namespace kiosk.Payments
         internal decimal Total { get { return _total; } }
         internal string PaymentMethod { get { return _paymentMethod; } }
 
-        internal string CardLine
-        {
-            get
-            {
-                if (_paymentMethod != "Card" || string.IsNullOrEmpty(_fullCardNumber)) return null;
-                string last4 = _fullCardNumber.Length >= 4
-                             ? _fullCardNumber.Substring(_fullCardNumber.Length - 4)
-                             : "****";
-                return CardType(_fullCardNumber) + " ending " + last4;
-            }
-        }
-
-        private static string NextOrderNumber()
-        {
-            try
-            {
-                string folder = Path.Combine(Application.StartupPath, "Receipts");
-                Directory.CreateDirectory(folder);
-                string file = Path.Combine(folder, "counter.txt");
-
-                string today = DateTime.Now.ToString("yyyyMMdd");
-                int next = 1;
-
-                if (File.Exists(file))
-                {
-                    string[] parts = File.ReadAllText(file).Split(',');
-                    int previous;
-                    if (parts.Length == 2 && parts[0] == today &&
-                        int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out previous))
-                        next = previous + 1;
-                }
-
-                File.WriteAllText(file, today + "," + next.ToString(CultureInfo.InvariantCulture));
-                return next.ToString("D3", CultureInfo.InvariantCulture);
-            }
-            catch (Exception)
-            {
-                return DateTime.Now.ToString("HHmm");   // still unique enough to call out
-            }
-        }
-
-        private static string CardType(string cardNumber)
-        {
-            if (string.IsNullOrWhiteSpace(cardNumber) || cardNumber.Length < 4) return "Card";
-            if (Regex.IsMatch(cardNumber, @"^4")) return "Visa";
-            if (Regex.IsMatch(cardNumber, @"^5[1-5]")) return "MasterCard";
-            if (Regex.IsMatch(cardNumber, @"^3[47]")) return "AmEx";
-            if (Regex.IsMatch(cardNumber, @"^6(?:011|5)")) return "Discover";
-            return "Card";
-        }
+        internal string CardLine { get { return null; } }
 
         private string BuildText()
         {
             const int cols = 40;
             StringBuilder r = new StringBuilder();
 
-            Action<string> center = t => r.AppendLine(new string(' ', Math.Max(0, (cols - t.Length) / 2)) + t);
+            Action<string> center = t => { t = GuestText.T(t); r.AppendLine(new string(' ', Math.Max(0, (cols - t.Length) / 2)) + t); };
             Action rule = () => r.AppendLine(new string('-', cols));
-            Action<string, string> row = (l, v) =>
+            Action<string, string> row = (l, v) => {
+                l = GuestText.T(l);
                 r.AppendLine(l + new string(' ', Math.Max(1, cols - l.Length - v.Length)) + v);
+            };
 
             center(CafeInfo.Name);
             center(CafeInfo.Branch);
@@ -144,7 +109,8 @@ namespace kiosk.Payments
             if (!string.IsNullOrEmpty(CafeInfo.TaxId)) center("TIN " + CafeInfo.TaxId);
             r.AppendLine();
 
-            center("ORDER No. " + _orderNumber);
+            center((GuestText.Filipino ? "ORDER BLG. " : "ORDER No. ") + _orderNumber);
+            center(_paymentMethod == "Cash" ? "PENDING COUNTER PAYMENT" : "DEMO - NO PAYMENT TAKEN");
             rule();
             row("Date", _issued.ToString("dd MMM yyyy HH:mm"));
             row("Terminal", CafeInfo.Terminal);
@@ -181,7 +147,7 @@ namespace kiosk.Payments
         {
             try
             {
-                string folder = Path.Combine(Application.StartupPath, "Receipts");
+                string folder = LocalStore.ReceiptFolder;
                 Directory.CreateDirectory(folder);
                 File.WriteAllText(
                     Path.Combine(folder, "receipt_" + _issued.ToString("yyyyMMdd_HHmmss") + "_" + _orderNumber + ".txt"),
@@ -210,9 +176,9 @@ namespace kiosk.Payments
             Hive.FillHex(g, hex, Color.FromArgb(48, 255, 255, 255));
             Marks.Draw(g, Mark.Check, RectangleF.Inflate(hex, -13, -13), Color.White, 2.2f);
 
-            Hive.Text(g, "Payment received", Hive.Title,
+            Hive.Text(g, _paymentMethod == "Cash" ? "Order placed" : "Demo order created", Hive.Title,
                       new Rectangle(0, 60, Width, 32), Color.White, Hive.Centered);
-            Hive.Text(g, Hive.Money(_total) + " paid by " + _paymentMethod.ToLowerInvariant(), Hive.Caption,
+            Hive.Text(g, _paymentMethod == "Cash" ? "Please pay " + Hive.Money(_total) + " at the counter" : "No payment taken - " + _paymentMethod, Hive.Caption,
                       new Rectangle(0, 92, Width, 20), Color.FromArgb(190, 255, 255, 255), Hive.Centered);
 
             if (!string.IsNullOrEmpty(_saveError))
@@ -297,7 +263,7 @@ namespace kiosk.Payments
             {
                 Hive.TextTracked(g, "ORDER NUMBER", Hive.Overline,
                                  new Rectangle(left, y, w, 16), Hive.Muted, 2f, true);
-                using (Font big = Hive.Sized(Hive.PriceBig, 31f))
+                using (Font big = Hive.Sized(Hive.PriceBig, 14f))
                     Hive.Text(g, _receipt.OrderNumber, big,
                               new Rectangle(left, y + 16, w, 42), Hive.Teal, Hive.Centered);
             }
@@ -308,6 +274,7 @@ namespace kiosk.Payments
 
             y = Row(g, "Date", _receipt.Issued.ToString("dd MMM yyyy, HH:mm"), left, y, w);
             y = Row(g, "Terminal", CafeInfo.Terminal, left, y, w);
+            y = Row(g, "Status", _receipt.PaymentMethod == "Cash" ? "Pending counter payment" : "Demo - no payment taken", left, y, w);
             y = Row(g, "Payment",
                     _receipt.CardLine == null ? _receipt.PaymentMethod : _receipt.CardLine,
                     left, y, w);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using kiosk.UI;
@@ -7,15 +7,11 @@ namespace kiosk
 {
     public partial class menuPage : Form, IPage
     {
-        private readonly CartPill _cartPill = new CartPill();
-
         public menuPage()
         {
             InitializeComponent();
 
             header.Logo = MenuCatalog.Logo;
-            header.SetAccessory(_cartPill);
-            _cartPill.Click += (s, e) => OpenOrder();
 
             foreach (MenuCategory category in MenuCatalog.Categories)
                 rail.Add(category.Name, category.Name);
@@ -63,7 +59,6 @@ namespace kiosk
             foreach (Order order in OrderStorage.Orders) count += order.Quantity;
 
             cartBar.Update(count, OrderStorage.GetTotal());
-            _cartPill.Count = count;
         }
     }
 }

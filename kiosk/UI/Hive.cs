@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -16,28 +16,31 @@ namespace kiosk.UI
 
         public static readonly Color Teal       = Color.FromArgb(0x0B, 0x54, 0x57);
         public static readonly Color TealDeep   = Color.FromArgb(0x07, 0x38, 0x3B);
+        public static readonly Color TealDarker = Color.FromArgb(0x04, 0x22, 0x24);
         public static readonly Color TealLight  = Color.FromArgb(0x13, 0x74, 0x78);
+        public static readonly Color TealWash   = Color.FromArgb(0xEE, 0xF6, 0xF6);
 
         public static readonly Color Honey      = Color.FromArgb(0xC8, 0x86, 0x12);
         public static readonly Color HoneyLight = Color.FromArgb(0xE3, 0xA5, 0x2E);
+        public static readonly Color HoneyGold  = Color.FromArgb(0xD8, 0x93, 0x1A);
         public static readonly Color HoneyWash  = Color.FromArgb(0xF7, 0xEE, 0xDC);
 
-        public static readonly Color Canvas     = Color.FromArgb(0xF4, 0xF3, 0xEF);
+        public static readonly Color Canvas     = Color.FromArgb(0xF3, 0xF7, 0xF7);
         public static readonly Color Surface    = Color.White;
-        public static readonly Color SurfaceAlt = Color.FromArgb(0xEB, 0xE9, 0xE3);
-        public static readonly Color Line       = Color.FromArgb(0xD8, 0xD5, 0xCC);
-        public static readonly Color LineSoft   = Color.FromArgb(0xE8, 0xE6, 0xE0);
+        public static readonly Color SurfaceAlt = Color.FromArgb(0xE6, 0xEF, 0xEF);
+        public static readonly Color Line       = Color.FromArgb(0xCD, 0xDF, 0xDF);
+        public static readonly Color LineSoft   = Color.FromArgb(0xE6, 0xEF, 0xEF);
 
         public static readonly Color Success    = Color.FromArgb(0x1E, 0x7A, 0x50);
         public static readonly Color Danger     = Color.FromArgb(0xAE, 0x3B, 0x33);
 
-        // 3px, basically square. nothing here is a pill
+        // Modern tactile squircle radii for premium feel
         public const int ScreenW      = 480;
         public const int ScreenH      = 720;
         public const int Gutter       = 16;   // page padding
         public const int Gap          = 12;   // space between siblings
-        public const int RadiusCard   = 3;
-        public const int RadiusButton = 3;
+        public const int RadiusCard   = 20;
+        public const int RadiusButton = 26;
         public const int TapTarget    = 52;   // minimum comfortable touch height
         public const float Hairline   = 1f;
 
@@ -208,13 +211,14 @@ namespace kiosk.UI
 
         public static void Shadow(Graphics g, RectangleF r, float radius, int depth, int strength)
         {
+            if (depth <= 0 || strength <= 0) return;
             for (int i = depth; i >= 1; i--)
             {
-                RectangleF rr = RectangleF.Inflate(r, i, i);
-                rr.Offset(0, i * 0.6f);
-                int alpha = Math.Max(1, strength / (i * 2));
-                using (GraphicsPath p = Hive.Rounded(rr, radius + i))
-                using (SolidBrush b = new SolidBrush(Color.FromArgb(alpha, 20, 45, 45)))
+                RectangleF rr = RectangleF.Inflate(r, i * 0.75f, i * 0.75f);
+                rr.Offset(0, i * 0.8f);
+                int alpha = Math.Max(1, Math.Min(255, strength / (i * 2 + 1)));
+                using (GraphicsPath p = Hive.Rounded(rr, radius + i * 0.5f))
+                using (SolidBrush b = new SolidBrush(Color.FromArgb(alpha, 10, 34, 36)))
                     g.FillPath(b, p);
             }
         }
@@ -277,6 +281,43 @@ namespace kiosk.UI
             g.DrawImageUnscaled(thumb, area.X, area.Y);
         }
 
+        private static readonly System.Collections.Generic.Dictionary<Image, Bitmap> CroppedPhotos =
+            new System.Collections.Generic.Dictionary<Image, Bitmap>();
+
+        public static void ImageContainProduct(Graphics g, Image img, RectangleF dest, float inset)
+        {
+            if (img == null) return;
+            Bitmap cropped;
+            if (!CroppedPhotos.TryGetValue(img, out cropped))
+            {
+                using (var sample = new Bitmap(img, new Size(240, 240)))
+                {
+                    int minX = 240, minY = 240, maxX = -1, maxY = -1;
+                    for (int y = 0; y < 240; y += 2)
+                    for (int x = 0; x < 240; x += 2)
+                    {
+                        Color pixel = sample.GetPixel(x, y);
+                        if (pixel.A < 30 || (pixel.R > 244 && pixel.G > 244 && pixel.B > 244)) continue;
+                        minX = Math.Min(minX, x); minY = Math.Min(minY, y);
+                        maxX = Math.Max(maxX, x); maxY = Math.Max(maxY, y);
+                    }
+                    if (maxX < minX) { minX = 0; minY = 0; maxX = 239; maxY = 239; }
+                    int pad = 5;
+                    Rectangle crop = Rectangle.FromLTRB(
+                        Math.Max(0, (minX - pad) * img.Width / 240),
+                        Math.Max(0, (minY - pad) * img.Height / 240),
+                        Math.Min(img.Width, (maxX + pad + 1) * img.Width / 240),
+                        Math.Min(img.Height, (maxY + pad + 1) * img.Height / 240));
+                    if (crop.Width < 1 || crop.Height < 1) crop = new Rectangle(0, 0, img.Width, img.Height);
+                    cropped = new Bitmap(crop.Width, crop.Height);
+                    using (Graphics cg = Graphics.FromImage(cropped))
+                        cg.DrawImage(img, new Rectangle(0, 0, crop.Width, crop.Height), crop, GraphicsUnit.Pixel);
+                }
+                CroppedPhotos.Add(img, cropped);
+            }
+            ImageContain(g, cropped, dest, inset);
+        }
+
         public static Color Mix(Color a, Color b, float t)
         {
             t = Math.Max(0f, Math.Min(1f, t));
@@ -292,13 +333,37 @@ namespace kiosk.UI
 
         public static void Text(Graphics g, string text, Font font, Rectangle bounds, Color color, TextFormatFlags flags)
         {
-            TextRenderer.DrawText(g, text ?? string.Empty, font, bounds, color, flags | TextFormatFlags.NoPrefix);
+            text = GuestText.T(text) ?? string.Empty;
+            Font drawFont = ReadableFont(g, text, font, bounds, flags);
+            TextRenderer.DrawText(g, text, drawFont, bounds, color, flags | TextFormatFlags.NoPrefix);
+        }
+
+        private static readonly System.Collections.Generic.Dictionary<string, Font> ReadableFonts =
+            new System.Collections.Generic.Dictionary<string, Font>();
+
+        private static Font ReadableFont(Graphics g, string value, Font original, Rectangle bounds, TextFormatFlags flags)
+        {
+            if (!GuestText.LargeText || original == null) return original;
+            string key = original.FontFamily.Name + "|" + original.SizeInPoints + "|" + (int)original.Style;
+            Font larger;
+            if (!ReadableFonts.TryGetValue(key, out larger))
+            {
+                larger = new Font(original.FontFamily, original.SizeInPoints * 1.18f, original.Style);
+                ReadableFonts.Add(key, larger);
+            }
+            if (larger.Height > bounds.Height) return original;
+            if ((flags & TextFormatFlags.WordBreak) == 0 && value.IndexOf('\n') < 0 &&
+                TextRenderer.MeasureText(g, value, larger, Size.Empty, TextFormatFlags.NoPadding).Width > bounds.Width)
+                return original;
+            return larger;
         }
 
         public static void TextTracked(Graphics g, string text, Font font, Rectangle bounds,
                                        Color color, float tracking, bool center)
         {
             if (string.IsNullOrEmpty(text)) return;
+            text = GuestText.T(text);
+            font = ReadableFont(g, text, font, bounds, TextFormatFlags.NoPadding);
 
             const TextFormatFlags flags = TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
 
@@ -308,6 +373,14 @@ namespace kiosk.UI
             {
                 widths[i] = TextRenderer.MeasureText(g, text[i].ToString(), font, Size.Empty, flags).Width;
                 total += widths[i] + (i < text.Length - 1 ? tracking : 0);
+            }
+
+            if (total > bounds.Width)
+            {
+                TextRenderer.DrawText(g, text, font, bounds, color,
+                    TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix |
+                    (center ? TextFormatFlags.HorizontalCenter : TextFormatFlags.Left));
+                return;
             }
 
             float x = center ? bounds.X + (bounds.Width - total) / 2f : bounds.X;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -61,7 +61,24 @@ namespace kiosk.UI
         public int Radius
         {
             get { return _radius; }
-            set { _radius = value; Invalidate(); }
+            set { _radius = value; UpdateShape(); Invalidate(); }
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            UpdateShape();
+        }
+
+        private void UpdateShape()
+        {
+            if (Width < 2 || Height < 2) return;
+            using (GraphicsPath path = Hive.Rounded(new RectangleF(0, 0, Width, Height), _radius))
+            {
+                Region old = Region;
+                Region = new Region(path);
+                if (old != null) old.Dispose();
+            }
         }
         public Mark? Icon
         {
@@ -87,6 +104,9 @@ namespace kiosk.UI
         public void NotifyDefault(bool value) { }
         public void PerformClick() { if (Enabled) OnClick(EventArgs.Empty); }
 
+        public void HoldPressed() { _press.Set(1f); }
+        public void ReleasePressed() { _press.To(0f); }
+
         protected override void OnClick(EventArgs e)
         {
             base.OnClick(e);
@@ -97,7 +117,7 @@ namespace kiosk.UI
 
         protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hover.To(1f); }
         protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hover.To(0f); _press.To(0f); }
-        protected override void OnMouseDown(MouseEventArgs e) { base.OnMouseDown(e); _press.To(1f); }
+        protected override void OnMouseDown(MouseEventArgs e) { base.OnMouseDown(e); _press.Set(1f); }
         protected override void OnMouseUp(MouseEventArgs e) { base.OnMouseUp(e); _press.To(0f); }
         protected override void OnEnabledChanged(EventArgs e) { base.OnEnabledChanged(e); Invalidate(); }
 
@@ -121,7 +141,8 @@ namespace kiosk.UI
             Hive.Smooth(g);
 
             float radius = _radius;
-            RectangleF body = new RectangleF(0, 0, Width - 1, Height - 1);
+            float pressOffset = _press.Value * 1.5f;
+            RectangleF body = new RectangleF(1, 1 + pressOffset, Width - 3, Height - 3 - pressOffset);
 
             Color fill, text, border;
             Palette(out fill, out text, out border);
@@ -144,16 +165,27 @@ namespace kiosk.UI
                 }
             }
 
+            if (Enabled && lift > 0.02f && (!fill.IsEmpty || _style == HiveStyle.Outline))
+                Hive.Shadow(g, body, radius, 2, (int)(15 * lift));
+
             if (!fill.IsEmpty)
+            {
                 Hive.Fill(g, body, radius, fill);
+                if (Enabled && (_style == HiveStyle.Accent || _style == HiveStyle.Primary))
+                    Hive.Stroke(g, RectangleF.Inflate(body, -2, -2), radius - 2,
+                        Color.FromArgb(60, 255, 255, 255), 1);
+            }
             else if (Enabled && lift > 0.01f)
-                Hive.Fill(g, body, radius, Color.FromArgb((int)(22 * lift), Hive.Teal));
+            {
+                Hive.Fill(g, body, radius, Color.FromArgb((int)(26 * lift), Hive.Teal));
+            }
 
             if (!border.IsEmpty)
                 Hive.Stroke(g, body, radius, Enabled ? Hive.Mix(border, Hive.Teal, lift * 0.7f) : border, 1.2f);
 
             if (Focused && Enabled)
-                Hive.Stroke(g, RectangleF.Inflate(body, -3, -3), 1, Color.FromArgb(120, Hive.Honey), 1.4f);
+                Hive.Stroke(g, RectangleF.Inflate(body, -4, -4), Math.Max(2, radius - 4),
+                    Color.FromArgb(140, 255, 255, 255), 1.2f);
 
             string label = Text ?? string.Empty;
 
@@ -284,23 +316,14 @@ namespace kiosk.UI
             Graphics g = e.Graphics;
             Hive.Smooth(g);
 
-            Color ink = _selected
-                      ? Hive.Ink
-                      : Hive.Mix(Hive.Muted, Hive.InkSoft, _hover.Value);
-
-            Hive.TextTracked(g, (Text ?? "").ToUpperInvariant(), Font,
-                             new Rectangle(0, 0, Width, Height - 5), ink, 1.0f, true);
-
-            if (_selected)
-            {
-                using (SolidBrush b = new SolidBrush(Hive.Teal))
-                    g.FillRectangle(b, 0, Height - 5, Width, 3);
-            }
-            else if (_hover.Value > 0.01f)
-            {
-                using (SolidBrush b = new SolidBrush(Color.FromArgb((int)(80 * _hover.Value), Hive.Muted)))
-                    g.FillRectangle(b, 0, Height - 5, Width, 3);
-            }
+            g.Clear(Hive.Surface);
+            Color ink = _selected ? Color.White : Hive.InkSoft;
+            RectangleF surface = new RectangleF(2, 3, Width - 4, Height - 8);
+            if (_selected) Hive.Fill(g, surface, 17, Hive.Teal);
+            else if (_hover.Value > 0.01f) Hive.Fill(g, surface, 17, Hive.SurfaceAlt);
+            CategoryIcons.Draw(g, Text, new RectangleF((Width - 24) / 2f, 10, 24, 24),
+                _selected ? Hive.HoneyLight : ink);
+            Hive.Text(g, Text, Hive.BodyBold, new Rectangle(8, 39, Width - 16, 22), ink, Hive.Centered);
         }
 
         protected override void Dispose(bool disposing)
@@ -328,12 +351,12 @@ namespace kiosk.UI
                    | ControlStyles.AllPaintingInWmPaint
                    | ControlStyles.ResizeRedraw, true);
             BackColor = Hive.Surface;
-            Height = 52;
+            Height = 74;
 
             _strip = new Panel();
             _strip.Location = new Point(Hive.Gutter, 0);
             _strip.BackColor = Color.Transparent;
-            _strip.Height = 52;
+            _strip.Height = 70;
             Controls.Add(_strip);
 
             MouseWheel += (s, e) => ScrollBy(e.Delta > 0 ? 60 : -60);
@@ -380,13 +403,13 @@ namespace kiosk.UI
             chip.Text = label;
             chip.Tagged = tag;
             chip.Top = 0;
-            chip.Height = Height;
+            chip.Height = _strip.Height;
+            chip.AccessibleName = label;
+            chip.AccessibleRole = AccessibleRole.PageTab;
 
-            // measure the uppercase + tracked version, thats what gets drawn
-            Size measured = TextRenderer.MeasureText(label.ToUpperInvariant(), chip.Font);
-            chip.Width = measured.Width + (int)(label.Length * 1.0f) + 18;
+            chip.Width = Math.Max(108, TextRenderer.MeasureText(label, Hive.BodyBold).Width + 32);
 
-            chip.Left = _strip.Controls.Count == 0 ? 0 : LastRight() + 4;
+            chip.Left = _strip.Controls.Count == 0 ? 0 : LastRight() + 6;
             chip.Click += (s, e) => { if (!_dragMoved) Select(chip); };
             AttachDrag(chip);
             _strip.Controls.Add(chip);
@@ -551,22 +574,23 @@ namespace kiosk.UI
             Hive.Smooth(g);
 
             RectangleF track = new RectangleF(0, 0, Width - 1, Height - 1);
-            Hive.Fill(g, track, Hive.RadiusButton, Hive.Surface);
-            Hive.Stroke(g, track, Hive.RadiusButton, Hive.Line, 1.2f);
+            Hive.Fill(g, track, Height / 2f, Hive.SurfaceAlt);
 
             if (_index >= 0)
             {
                 float pos = _from + (_index - _from) * _slide.Value;
-                Hive.Fill(g, SlotOf(pos), 2, Hive.Teal);
+                RectangleF slot = RectangleF.Inflate(SlotOf(pos), -2f, -2f);
+                Hive.Fill(g, slot, slot.Height / 2f, Hive.Teal);
             }
 
             for (int i = 0; i < _options.Length; i++)
             {
                 Rectangle slot = Rectangle.Round(SlotOf(i));
                 Color color = i == _index ? Color.White
-                            : i == _hot   ? Hive.Ink
+                            : i == _hot   ? Hive.TealDeep
                             : Hive.InkSoft;
-                Hive.Text(g, _options[i], Font, slot, color, Hive.Centered);
+                Font font = i == _index ? Hive.BodyBold : Font;
+                Hive.Text(g, _options[i], font, slot, color, Hive.Centered);
             }
         }
 
@@ -635,36 +659,32 @@ namespace kiosk.UI
             Hive.Smooth(g);
 
             RectangleF track = new RectangleF(0, 0, Width - 1, Height - 1);
-            Hive.Fill(g, track, Hive.RadiusButton, Hive.Surface);
-            Hive.Stroke(g, track, Hive.RadiusButton, Hive.Line, 1.2f);
+            Hive.Fill(g, track, Height / 2f, Hive.SurfaceAlt);
 
             DrawKnob(g, MinusRect, false, _value > _min, _hot == -1);
             DrawKnob(g, PlusRect,  true,  _value < _max, _hot == 1);
 
-            using (Pen p = new Pen(Hive.Line, 1))
-            {
-                g.DrawLine(p, Height, 4, Height, Height - 5);
-                g.DrawLine(p, Width - Height, 4, Width - Height, Height - 5);
-            }
-
             Rectangle mid = new Rectangle(Height, 0, Width - Height * 2, Height);
-            Hive.Text(g, _value.ToString(), Font, mid, Hive.Ink, Hive.Centered);
+            Hive.Text(g, _value.ToString(), Hive.Price, mid, Hive.TealDeep, Hive.Centered);
         }
 
         private void DrawKnob(Graphics g, Rectangle bounds, bool plus, bool enabled, bool hot)
         {
+            RectangleF circle = RectangleF.Inflate(bounds, -5, -5);
             if (enabled && hot)
-                Hive.Fill(g, RectangleF.Inflate(bounds, -3, -3), 2, Hive.SurfaceAlt);
+                Hive.Fill(g, circle, circle.Width / 2f, Hive.HoneyWash);
+            else if (enabled)
+                Hive.Fill(g, circle, circle.Width / 2f, Hive.SurfaceAlt);
 
-            Color ink = !enabled ? Hive.Mix(Hive.Muted, Color.White, 0.4f)
-                      : hot      ? Hive.Ink
+            Color ink = !enabled ? Hive.Mix(Hive.Muted, Color.White, 0.5f)
+                      : hot      ? Hive.Honey
                                  : Hive.Teal;
 
             float cx = bounds.X + bounds.Width / 2f;
             float cy = bounds.Y + bounds.Height / 2f;
-            const float arm = 7f;
+            const float arm = 6f;
 
-            using (Pen pen = new Pen(ink, 2f))
+            using (Pen pen = new Pen(ink, 2.2f))
             {
                 pen.StartCap = LineCap.Round;
                 pen.EndCap = LineCap.Round;

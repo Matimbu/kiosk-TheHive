@@ -6,20 +6,73 @@ using kiosk.UI;
 
 namespace kiosk
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, IPage
     {
+        private readonly Timer _startDelay = new Timer { Interval = 180 };
+        private readonly HiveButton _languageButton = new HiveButton();
+        private readonly HiveButton _textSizeButton = new HiveButton();
+        private bool _starting;
+
         public Form1()
         {
             InitializeComponent();
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             BackColor = Hive.TealDeep;
+
+            _textSizeButton.Bounds = new Rectangle(18, 18, 96, 48);
+            _textSizeButton.Style = HiveStyle.Light;
+            _textSizeButton.Tracked = false;
+            _textSizeButton.AccessibleName = "Toggle larger text";
+            _textSizeButton.Click += (s, e) => {
+                GuestText.SetLargeText(!GuestText.LargeText);
+                UpdatePreferences();
+            };
+            Controls.Add(_textSizeButton);
+
+            _languageButton.Bounds = new Rectangle(342, 18, 120, 48);
+            _languageButton.Style = HiveStyle.Light;
+            _languageButton.Tracked = false;
+            _languageButton.AccessibleName = "Change language between English and Filipino";
+            _languageButton.Click += (s, e) => {
+                GuestText.SetFilipino(!GuestText.Filipino);
+                UpdatePreferences();
+            };
+            Controls.Add(_languageButton);
+            UpdatePreferences();
+            _startDelay.Tick += (s, e) =>
+            {
+                _startDelay.Stop();
+                OrderStorage.ClearOrders();
+                Nav.Go(new menuPage());
+            };
+            Disposed += (s, e) => _startDelay.Dispose();
         }
 
         private void btn_Start_Click(object sender, EventArgs e)
         {
-            OrderStorage.ClearOrders();
-            Nav.Go(new menuPage());
+            if (_starting) return;
+            _starting = true;
+            btn_Start.Text = "OPENING MENU...";
+            btn_Start.HoldPressed();
+            _startDelay.Start();
+        }
+
+        public void OnRevealed()
+        {
+            _startDelay.Stop();
+            _starting = false;
+            btn_Start.Text = "Start your order";
+            btn_Start.ReleasePressed();
+            UpdatePreferences();
+        }
+
+        private void UpdatePreferences()
+        {
+            _textSizeButton.Text = GuestText.LargeText ? "A+  ON" : "A+";
+            _textSizeButton.Style = GuestText.LargeText ? HiveStyle.Accent : HiveStyle.Light;
+            _languageButton.Text = GuestText.Filipino ? "FILIPINO" : "ENGLISH";
+            Invalidate(true);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -30,6 +83,11 @@ namespace kiosk
             using (SolidBrush b = new SolidBrush(Hive.Teal))
                 g.FillRectangle(b, ClientRectangle);
             DrawHoneycomb(g);
+
+            Hive.Text(g, GuestText.Filipino ? "LAKI NG TEKSTO" : "TEXT SIZE", Hive.Overline,
+                new Rectangle(18, 70, 115, 18), Color.FromArgb(190, 255, 255, 255), Hive.LeftMid);
+            Hive.Text(g, GuestText.Filipino ? "WIKA" : "LANGUAGE", Hive.Overline,
+                new Rectangle(342, 70, 120, 18), Color.FromArgb(190, 255, 255, 255), Hive.Centered);
 
             RectangleF plate = new RectangleF(Width / 2f - 68, 156, 136, 136);
             using (GraphicsPath clip = Hive.Hexagon(plate))
@@ -60,7 +118,7 @@ namespace kiosk
                       new Rectangle(60, 448, Width - 120, 52), Color.FromArgb(200, 255, 255, 255),
                       TextFormatFlags.HorizontalCenter | TextFormatFlags.WordBreak | TextFormatFlags.Top);
 
-            Hive.TextTracked(g, "CASH  ·  CARD  ·  E-WALLET", Hive.Overline,
+            Hive.TextTracked(g, "CASH AT COUNTER  ·  PAYMENT DEMOS", Hive.Overline,
                              new Rectangle(0, 644, Width, 20), Color.FromArgb(120, 255, 255, 255), 2.2f, true);
         }
 

@@ -32,7 +32,7 @@
             //
             // btn_menu
             //
-            this.btn_menu.Location = new System.Drawing.Point(16, 100);
+            this.btn_menu.Location = new System.Drawing.Point(16, 124);
             this.btn_menu.Name = "btn_menu";
             this.btn_menu.Size = new System.Drawing.Size(168, 54);
             this.btn_menu.Style = kiosk.UI.HiveStyle.Outline;
@@ -40,7 +40,7 @@
             //
             // btn_paymentMethod
             //
-            this.btn_paymentMethod.Location = new System.Drawing.Point(196, 100);
+            this.btn_paymentMethod.Location = new System.Drawing.Point(196, 124);
             this.btn_paymentMethod.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right));
             this.btn_paymentMethod.Name = "btn_paymentMethod";
             this.btn_paymentMethod.Size = new System.Drawing.Size(268, 54);
@@ -54,7 +54,7 @@
             this.footer.Controls.Add(this.btn_paymentMethod);
             this.footer.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.footer.Name = "footer";
-            this.footer.Size = new System.Drawing.Size(480, 172);
+            this.footer.Size = new System.Drawing.Size(480, 196);
             //
             // header
             //

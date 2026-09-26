@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -38,7 +38,7 @@ namespace kiosk.UI
                 _back.Style = HiveStyle.Ghost;
                 _back.TextColor = Color.White;
                 _back.Size = new Size(42, 42);
-                _back.Location = new Point(Hive.Gutter - 6, (Height - 42) / 2);
+                _back.Location = new Point(Hive.Gutter - 6, 25);
                 Controls.Add(_back);
             }
             _back.Click += onBack;
@@ -50,7 +50,7 @@ namespace kiosk.UI
             if (_accessory != null) Controls.Remove(_accessory);
             _accessory = control;
             if (control == null) return;
-            control.Location = new Point(Width - control.Width - Hive.Gutter, (Height - control.Height) / 2);
+            control.Location = new Point(Width - control.Width - Hive.Gutter, 25);
             control.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             Controls.Add(control);
         }
@@ -60,12 +60,11 @@ namespace kiosk.UI
             Graphics g = e.Graphics;
             Hive.Smooth(g);
 
-            using (SolidBrush b = new SolidBrush(Hive.Teal))
+            using (LinearGradientBrush b = Hive.Gradient(ClientRectangle, Hive.TealDeep, Hive.Teal, 90f))
                 g.FillRectangle(b, ClientRectangle);
 
-            // honey line along the bottom
             using (SolidBrush b = new SolidBrush(Hive.Honey))
-                g.FillRectangle(b, 0, Height - 3, Width, 3);
+                g.FillRectangle(b, 0, Height - 2, Width, 2);
 
             int left = Hive.Gutter;
 
@@ -75,7 +74,7 @@ namespace kiosk.UI
             }
             else if (_mark != null)
             {
-                RectangleF logo = new RectangleF(left, (Height - 48) / 2f - 1, 48, 48);
+                RectangleF logo = new RectangleF(left, 21, 48, 48);
                 using (GraphicsPath clip = Hive.Hexagon(logo))
                 {
                     Region saved = g.Clip;
@@ -92,8 +91,9 @@ namespace kiosk.UI
             if (string.IsNullOrEmpty(_subtitle))
             {
                 Hive.Text(g, _title, Hive.Title,
-                          new Rectangle(left, 0, textWidth, Height - 3), Color.White, Hive.LeftMid);
+                          new Rectangle(left, 14, textWidth, 58), Color.White, Hive.LeftMid);
             }
+
             else
             {
                 Hive.Text(g, _title, Hive.Title,
@@ -119,14 +119,15 @@ namespace kiosk.UI
                    | ControlStyles.AllPaintingInWmPaint
                    | ControlStyles.OptimizedDoubleBuffer
                    | ControlStyles.ResizeRedraw, true);
-            Height = 88;
+            Height = 124;
             Dock = DockStyle.Bottom;
-            BackColor = Hive.Surface;
+            BackColor = Hive.Canvas;
 
             _action = new HiveButton();
             _action.Text = "View order";
             _action.Style = HiveStyle.Accent;
-            _action.Size = new Size(164, 54);
+            _action.Tracked = false;
+            _action.Size = new Size(176, 54);
             _action.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             Controls.Add(_action);
         }
@@ -137,7 +138,7 @@ namespace kiosk.UI
         {
             base.OnSizeChanged(e);
             if (_action == null) return;   // fires while the constructor is still running
-            _action.Location = new Point(Width - _action.Width - Hive.Gutter, (Height - _action.Height) / 2);
+            _action.Location = new Point(Width - _action.Width - Hive.Gutter, 16);
         }
 
         public void Update(int count, decimal total)
@@ -152,20 +153,23 @@ namespace kiosk.UI
         {
             Graphics g = e.Graphics;
             Hive.Smooth(g);
-            g.Clear(Hive.Surface);
-
-            using (Pen p = new Pen(Hive.Line, 1))
-                g.DrawLine(p, 0, 0, Width, 0);
+            g.Clear(Hive.Canvas);
+            RectangleF tray = new RectangleF(7, 6, Width - 14, Height - 12);
+            Hive.Shadow(g, tray, 25, 2, 15);
+            Hive.Fill(g, tray, 25, Hive.Surface);
+            Hive.Stroke(g, tray, 25, Hive.LineSoft, 1);
 
             string label = _count == 0 ? "Your order is empty"
                          : _count == 1 ? "1 item"
                          : _count + " items";
 
             Hive.TextTracked(g, label.ToUpperInvariant(), Hive.Overline,
-                             new Rectangle(Hive.Gutter, 22, 220, 18), Hive.Muted, 1.2f, false);
+                             new Rectangle(Hive.Gutter, 20, 220, 18), Hive.Muted, 1.2f, false);
             Hive.Text(g, Hive.Money(_total), Hive.PriceBig,
-                      new Rectangle(Hive.Gutter, 40, 220, 30),
+                      new Rectangle(Hive.Gutter, 38, 220, 30),
                       _count == 0 ? Hive.Muted : Hive.Ink, Hive.LeftMid);
+
+            ProgressGuide.Draw(g, new Rectangle(Hive.Gutter, 80, Width - Hive.Gutter * 2, 36), 1);
 
             base.OnPaint(e);
         }
@@ -195,8 +199,8 @@ namespace kiosk.UI
             Hive.Smooth(g);
 
             RectangleF body = new RectangleF(0, 0, Width - 1, Height - 1);
-            Hive.Fill(g, body, Hive.RadiusButton, Color.FromArgb(28 + (int)(34 * _hover.Value), 255, 255, 255));
-            Hive.Stroke(g, body, Hive.RadiusButton, Color.FromArgb(90, 255, 255, 255), 1.2f);
+            Hive.Fill(g, body, Height / 2f, Color.FromArgb(35 + (int)(34 * _hover.Value), 255, 255, 255));
+            Hive.Stroke(g, body, Height / 2f, Color.FromArgb(105, 255, 255, 255), 1.2f);
 
             Marks.Draw(g, Mark.Bag, new RectangleF(12, Height / 2f - 11, 22, 22), Color.White, 1.6f);
             Hive.Text(g, _count.ToString(), Font, new Rectangle(38, 0, Width - 48, Height), Color.White, Hive.Centered);
@@ -259,10 +263,14 @@ namespace kiosk.UI
             Hive.Smooth(g);
 
             float lift = _hover.Value;
-            RectangleF card = new RectangleF(2, 2, Width - 5, Height - 8);
+            float cardY = 3f - lift * 1.5f;
+            RectangleF card = new RectangleF(3, cardY, Width - 7, Height - 8);
+
+            // Floating ambient shadow that deepens on hover
+            Hive.Shadow(g, card, Hive.RadiusCard, 2, 13 + (int)(10 * lift));
             Hive.Fill(g, card, Hive.RadiusCard, Hive.Surface);
 
-            RectangleF photo = new RectangleF(card.X, card.Y, card.Width, 118);
+            RectangleF photo = new RectangleF(card.X, card.Y, card.Width, 120);
             using (GraphicsPath clip = Hive.RoundedTop(photo, Hive.RadiusCard))
             {
                 Image img = _item.Image;
@@ -275,21 +283,22 @@ namespace kiosk.UI
                     Region saved = g.Clip;
                     g.SetClip(clip, CombineMode.Intersect);
                     using (SolidBrush b = new SolidBrush(Color.White)) g.FillRectangle(b, photo);
-                    Hive.ImageContain(g, img, photo, 4f);
+                    Hive.ImageContainProduct(g, img, photo, 4f);
                     g.Clip = saved;
                 }
                 else
                 {
                     Hive.ImageCover(g, img, photo, clip);
                 }
+
             }
 
             if (_item.Badge != null)
             {
                 string badgeText = _item.Badge.ToUpperInvariant();
                 Size size = TextRenderer.MeasureText(badgeText, Hive.Overline);
-                RectangleF badge = new RectangleF(photo.X, photo.Y + 12, size.Width + 22, 21);
-                using (SolidBrush b = new SolidBrush(Hive.Honey)) g.FillRectangle(b, badge);
+                RectangleF badge = new RectangleF(card.X + 8, card.Y + 8, size.Width + 18, 22);
+                Hive.Fill(g, badge, 11, Hive.Honey);
                 Hive.TextTracked(g, badgeText, Hive.Overline, Rectangle.Round(badge), Color.White, 1.1f, true);
             }
 
@@ -300,14 +309,14 @@ namespace kiosk.UI
             using (Pen p = new Pen(Hive.LineSoft, 1))
                 g.DrawLine(p, card.X + 12, card.Bottom - 38, card.Right - 12, card.Bottom - 38);
 
-            Rectangle price = new Rectangle((int)card.X + 12, (int)card.Bottom - 34, (int)card.Width - 58, 28);
-            Hive.Text(g, _item.PriceLabel, Hive.Price, price, Hive.Ink, Hive.LeftMid);
+            Rectangle price = new Rectangle((int)card.X + 12, (int)card.Bottom - 35, (int)card.Width - 58, 28);
+            Hive.Text(g, _item.PriceLabel, Hive.Price, price, Hive.TealDeep, Hive.LeftMid);
 
-            RectangleF hex = new RectangleF(card.Right - 40, card.Bottom - 33, 26, 26);
-            Hive.FillHex(g, hex, Hive.Mix(Hive.HoneyWash, Hive.Honey, lift));
-            Marks.Draw(g, Mark.Plus, hex, lift > 0.5f ? Color.White : Hive.Honey, 1.8f);
+            RectangleF plusBox = new RectangleF(card.Right - 43, card.Bottom - 41, 34, 34);
+            Hive.Fill(g, plusBox, 17, Hive.Teal);
+            Marks.Draw(g, Mark.Plus, plusBox, Color.White, 2.0f);
 
-            Hive.Stroke(g, card, Hive.RadiusCard, Hive.Mix(Hive.Line, Hive.Teal, lift * 0.8f), 1.2f);
+            Hive.Stroke(g, card, Hive.RadiusCard, Hive.Mix(Hive.Line, Hive.TealLight, lift * 0.8f), lift > 0.05f ? 1.4f : 1.0f);
         }
 
         protected override void Dispose(bool disposing)
@@ -505,7 +514,7 @@ namespace kiosk.UI
                     Region saved = g.Clip;
                     g.SetClip(clip, CombineMode.Intersect);
                     using (SolidBrush b = new SolidBrush(Color.White)) g.FillRectangle(b, photo);
-                    Hive.ImageContain(g, img, photo, 2f);
+                    Hive.ImageContainProduct(g, img, photo, 2f);
                     g.Clip = saved;
                 }
                 else
@@ -546,7 +555,9 @@ namespace kiosk.UI
 
             string size = MenuCatalog.SizeLabel(order.Product, order.Size);
             if (!string.IsNullOrWhiteSpace(size)) parts.Add(size);
-            if (!string.IsNullOrWhiteSpace(order.Temperature)) parts.Add(order.Temperature);
+            if (!string.IsNullOrWhiteSpace(order.Temperature)) parts.Add(GuestText.T(order.Temperature));
+            if (!string.IsNullOrWhiteSpace(order.Sweetness) && order.Sweetness != "100%")
+                parts.Add(GuestText.T(order.Sweetness + " sugar"));
 
             return parts.Count == 0 ? "Regular" : string.Join(" / ", parts.ToArray());
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -28,8 +28,8 @@ namespace kiosk.Payments
 
             int y = BandH + 26;
             y = AddMethod(y, Mark.Cash, "Cash", "Pay our cashier at the counter", PayCash);
-            y = AddMethod(y, Mark.Card, "Card", "Visa or MasterCard, tap or insert", PayCard);
-            y = AddMethod(y, Mark.Wallet, "E-wallet", "GCash and other QR wallets", PayEWallet);
+            y = AddMethod(y, Mark.Card, "Card", "Demo only - no terminal connected", PayCard);
+            y = AddMethod(y, Mark.Wallet, "E-wallet", "Demo only - no payment taken", PayEWallet);
 
             HiveButton cancel = new HiveButton();
             cancel.Text = "Not yet, go back";
@@ -89,6 +89,8 @@ namespace kiosk.Payments
             using (Font big = Hive.Sized(Hive.PriceBig, 26f))
                 Hive.Text(g, Hive.Money(_totalAmount), big,
                           new Rectangle(left, 48, Width - left * 2, 40), Color.White, Hive.LeftMid);
+
+            ProgressGuide.Draw(g, new Rectangle(Hive.Gutter, ClientSize.Height - 130, Width - Hive.Gutter * 2, 36), 3);
 
             Hive.Text(g, "HOW WOULD YOU LIKE TO PAY?", Hive.Overline,
                       new Rectangle(left, BandH + 4, Width - left * 2, 18), Hive.Muted, Hive.LeftMid);

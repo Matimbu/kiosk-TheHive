@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -30,6 +30,27 @@ namespace kiosk.UI
         public string Description { get; set; }
         public string Badge { get; set; }
         public string ImageKey { get; set; }
+        // Set these from verified recipe data when it becomes available.
+        public string CaffeineNote { get; set; }
+        public string AllergenNote { get; set; }
+
+        public string DisplayCaffeineNote
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(CaffeineNote)) return CaffeineNote;
+                if (Category == "Coffee") return "Contains caffeine (coffee)";
+                if (Category == "Classics" || Category == "GentleTea") return "Contains caffeine (tea)";
+                if (!string.IsNullOrEmpty(Name) && Name.IndexOf("matcha", StringComparison.OrdinalIgnoreCase) >= 0)
+                    return "Contains caffeine (matcha)";
+                return "Ask staff about caffeine";
+            }
+        }
+
+        public string DisplayAllergenNote
+        {
+            get { return string.IsNullOrEmpty(AllergenNote) ? "Ingredients unverified — ask staff" : AllergenNote; }
+        }
 
         public bool ShowWhole { get; set; }
 
@@ -389,6 +410,7 @@ namespace kiosk.UI
         };
 
 
+        public static IEnumerable<MenuProduct> All { get { return Products; } }
         public static IEnumerable<MenuProduct> InCategory(string category)
         {
             IEnumerable<MenuProduct> items = string.Equals(category, "Best Sellers", StringComparison.OrdinalIgnoreCase)

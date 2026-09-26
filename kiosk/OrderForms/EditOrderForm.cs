@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -14,6 +14,7 @@ namespace kiosk
         private readonly MenuProduct _product;
         private readonly Segmented _size;
         private readonly Segmented _temp;
+        private readonly Segmented _sweetness;
         private readonly Stepper _qty;
         private readonly HiveButton _save;
         private readonly HiveButton _cancel;
@@ -62,6 +63,15 @@ namespace kiosk
                 _temp.Bounds = new Rectangle(left, y, width, Hive.TapTarget);
                 Controls.Add(_temp);
                 y += Hive.TapTarget + 14;
+            }
+
+            if (_product != null && !string.IsNullOrWhiteSpace(_original.Sweetness))
+            {
+                y += 22;
+                _sweetness = new Segmented { Options = new[] { "100%", "75%", "50%", "25%", "0%" } };
+                _sweetness.Bounds = new Rectangle(left, y, width, 44);
+                Controls.Add(_sweetness);
+                y += 58;
             }
 
             y += 22;
@@ -114,6 +124,11 @@ namespace kiosk
 
             if (_temp != null)
                 _temp.SelectedIndex = string.Equals(order.Temperature, "Iced", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+            if (_sweetness != null)
+            {
+                int index = Array.IndexOf(_sweetness.Options, order.Sweetness ?? "100%");
+                _sweetness.SelectedIndex = index < 0 ? 0 : index;
+            }
         }
 
         private decimal UnitPrice
@@ -161,9 +176,12 @@ namespace kiosk
                 Temperature = _temp != null ? (_temp.SelectedOption ?? _original.Temperature) : _original.Temperature,
                 Quantity = _qty.Value,
                 Price = UnitPrice,
-                ImagePath = _original.ImagePath
+                ImagePath = _original.ImagePath,
+                Sweetness = _sweetness != null ? _sweetness.SelectedOption : _original.Sweetness
             };
 
+            try { OrderStorage.Validate(UpdatedOrder); }
+            catch (InvalidOperationException ex) { MessageBox.Show(ex.Message); return; }
             Commit();
         }
 
@@ -189,6 +207,7 @@ namespace kiosk
 
             if (_size != null) SectionLabel(g, "SIZE", _size.Top);
             if (_temp != null) SectionLabel(g, "SERVED", _temp.Top);
+            if (_sweetness != null) SectionLabel(g, "SWEETNESS", _sweetness.Top);
             SectionLabel(g, "QUANTITY", _qty.Top);
 
             int footerTop = _save.Top - 14;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -21,6 +21,14 @@ namespace kiosk
             ShowInTaskbar = false;
 
             header.ShowBack((s, e) => Nav.Back());
+            var clear = new HiveButton { Text = "Clear", Width = 88, Height = 44,
+                Style = HiveStyle.Ghost, TextColor = Color.White };
+            header.SetAccessory(clear);
+            clear.Click += (s, e) => {
+                if (OrderStorage.Orders.Count > 0 && MessageBox.Show(GuestText.Filipino ? "Alisin ang lahat ng item sa order?" : "Remove every item from your order?",
+                    GuestText.Filipino ? "Burahin ang order" : "Clear order", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    OrderStorage.ClearOrders();
+            };
             footer.Paint += PaintSummary;
 
             btn_menu.Click += (s, e) => Nav.Back();
@@ -79,6 +87,7 @@ namespace kiosk
             {
                 if (editor.IsRemoved) OrderStorage.Orders.RemoveAt(index);
                 else if (editor.UpdatedOrder != null) OrderStorage.Orders[index] = editor.UpdatedOrder;
+                OrderStorage.Notify();
             };
 
             Nav.Go(editor);
@@ -88,6 +97,7 @@ namespace kiosk
         {
             if (OrderStorage.Orders.Count == 0) return;
 
+            try { OrderStorage.ValidateCart(); } catch (InvalidOperationException ex) { MessageBox.Show(ex.Message); return; }
             Nav.Go(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotalPrice()));
         }
 
@@ -115,6 +125,7 @@ namespace kiosk
             using (Font big = Hive.Sized(Hive.PriceBig, 23f))
                 Hive.Text(g, Hive.Money(total), big,
                           new Rectangle(footer.Width - 240 - Hive.Gutter, 24, 240, 40), Hive.Teal, Hive.RightMid);
+            ProgressGuide.Draw(g, new Rectangle(Hive.Gutter, 82, footer.Width - Hive.Gutter * 2, 36), 2);
         }
 
     }

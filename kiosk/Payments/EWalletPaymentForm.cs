@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -35,7 +35,7 @@ namespace kiosk.Payments
             Controls.Add(back);
 
             HiveButton confirm = new HiveButton();
-            confirm.Text = "I have paid";
+            confirm.Text = "Create demo order";
             confirm.Style = HiveStyle.Accent;
             confirm.Bounds = new Rectangle(back.Right + 12, ClientSize.Height - 78,
                                            ClientSize.Width - back.Right - 12 - Hive.Gutter, 54);
@@ -45,12 +45,7 @@ namespace kiosk.Payments
 
         private void Confirm(object sender, EventArgs e)
         {
-            List<Order> ordersCopy = _ordersToUse != null && _ordersToUse.Count > 0
-                                   ? _ordersToUse.ToList()
-                                   : OrderStorage.GetOrders().ToList();
-            OrderStorage.ClearOrders();
-
-            Nav.Go(new ReceiptForm(ordersCopy, "E-Wallet", ""));
+            ReceiptForm.Submit("E-Wallet");
         }
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -73,17 +68,19 @@ namespace kiosk.Payments
                 Hive.Text(g, Hive.Money(_total), big,
                           new Rectangle(left, 46, Width - left * 2, 38), Color.White, Hive.LeftMid);
 
+            ProgressGuide.Draw(g, new Rectangle(Hive.Gutter, ClientSize.Height - 130, Width - Hive.Gutter * 2, 36), 3);
+
             RectangleF card = new RectangleF(Hive.Gutter, BandH + 22, Width - Hive.Gutter * 2, 318);
             Hive.Shadow(g, card, 20, 4, 44);
             Hive.Fill(g, card, 20, Hive.Surface);
 
-            Hive.Text(g, "SCAN TO PAY", Hive.Overline,
+            Hive.Text(g, "E-WALLET DEMO", Hive.Overline,
                       new Rectangle((int)card.X, (int)card.Y + 20, (int)card.Width, 18), Hive.Muted, Hive.Centered);
 
             RectangleF qr = new RectangleF(card.X + (card.Width - 208) / 2f, card.Y + 48, 208, 208);
             Hive.Fill(g, RectangleF.Inflate(qr, 10, 10), 16, Hive.Canvas);
 
-            Image code = MenuCatalog.LoadImage("Pay_GcashQr");
+            Image code = null;
             if (code != null)
             {
                 using (GraphicsPath clip = Hive.Rounded(qr, 8))
@@ -91,14 +88,14 @@ namespace kiosk.Payments
             }
             else
             {
-                Hive.Text(g, "QR code unavailable", Hive.Body, Rectangle.Round(qr), Hive.Muted, Hive.Centered);
+                Hive.Text(g, "Demo - no payment QR", Hive.Body, Rectangle.Round(qr), Hive.Muted, Hive.Centered);
             }
 
-            Hive.Text(g, "Open your wallet app, scan the code, then tap \"I have paid\".", Hive.Caption,
+            Hive.Text(g, "No wallet provider is connected. No money will be transferred.", Hive.Caption,
                       new Rectangle((int)card.X + 20, (int)qr.Bottom + 20, (int)card.Width - 40, 36), Hive.Muted,
                       TextFormatFlags.HorizontalCenter | TextFormatFlags.WordBreak | TextFormatFlags.Top);
 
-            Hive.Text(g, "Our staff will confirm the transfer before your order is prepared.", Hive.Caption,
+            Hive.Text(g, "This creates a demonstration order only.", Hive.Caption,
                       new Rectangle(Hive.Gutter, (int)card.Bottom + 16, Width - Hive.Gutter * 2, 40), Hive.Muted,
                       TextFormatFlags.HorizontalCenter | TextFormatFlags.WordBreak | TextFormatFlags.Top);
         }

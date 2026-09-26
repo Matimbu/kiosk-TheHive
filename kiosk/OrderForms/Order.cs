@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -15,7 +15,17 @@ namespace kiosk
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public string ImagePath { get; set; }
-        public string SizeTemp => $"{Size} - {Temperature}";
+        public string Sweetness { get; set; }
+        public string SizeTemp
+        {
+            get
+            {
+                string baseText = string.IsNullOrEmpty(Temperature) ? Size : $"{Size} - {Temperature}";
+                if (!string.IsNullOrEmpty(Sweetness) && Sweetness != "100%")
+                    return $"{baseText} ({Sweetness} sugar)";
+                return baseText;
+            }
+        }
         public decimal Total => Price * Quantity;
 
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -62,13 +62,13 @@ namespace kiosk.UI
                 c.Dispose();
             }
 
-            List<MenuProduct> items = MenuCatalog.InCategory(category).ToList();
+            List<MenuProduct> items = MenuCatalog.InCategory(category).Where(p => !LocalStore.SoldOut.Contains(p.Name)).ToList();
 
             if (items.Count == 0)
             {
                 EmptyState empty = new EmptyState(
-                    category + " is on the way",
-                    "This part of the menu is not ready yet. Ask our barista, or pick another tab above.");
+                    "No available items",
+                    "Try another category. Sold-out items are hidden.");
                 empty.Size = new Size(Width, Math.Max(300, Height - 20));
                 empty.Location = Point.Empty;
                 Content.Controls.Add(empty);

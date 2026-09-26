@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -33,7 +33,7 @@ namespace kiosk.Payments
             Controls.Add(back);
 
             HiveButton confirm = new HiveButton();
-            confirm.Text = "Payment handed over";
+            confirm.Text = "Place order";
             confirm.Style = HiveStyle.Accent;
             confirm.Bounds = new Rectangle(back.Right + 12,
                                            ClientSize.Height - 78,
@@ -44,10 +44,7 @@ namespace kiosk.Payments
 
         private void Confirm(object sender, EventArgs e)
         {
-            List<Order> ordersCopy = OrderStorage.GetOrders().ToList();
-            OrderStorage.ClearOrders();
-
-            Nav.Go(new ReceiptForm(ordersCopy, "Cash", ""));
+            ReceiptForm.Submit("Cash");
         }
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -70,6 +67,8 @@ namespace kiosk.Payments
                 Hive.Text(g, Hive.Money(_total), big,
                           new Rectangle(left, 46, Width - left * 2, 38), Color.White, Hive.LeftMid);
 
+            ProgressGuide.Draw(g, new Rectangle(Hive.Gutter, ClientSize.Height - 130, Width - Hive.Gutter * 2, 36), 3);
+
             int free = Height - 78 - BandH;
             RectangleF card = new RectangleF(Hive.Gutter, BandH + (free - 250) / 2f,
                                              Width - Hive.Gutter * 2, 250);
@@ -86,7 +85,7 @@ namespace kiosk.Payments
 
             Hive.Text(g, "Please pay at the counter", Hive.Title,
                       new Rectangle(tx, (int)disc.Bottom + 16, tw, 32), Hive.Ink, Hive.Centered);
-            Hive.Text(g, "Hand the exact amount to our cashier, then tap the button below to print your receipt.",
+            Hive.Text(g, "Place your order, then show the order number to our cashier and pay at the counter.",
                       Hive.Body, new Rectangle(tx, (int)disc.Bottom + 52, tw, 60), Hive.Muted,
                       TextFormatFlags.HorizontalCenter | TextFormatFlags.WordBreak | TextFormatFlags.Top);
 
