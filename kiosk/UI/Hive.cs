@@ -39,8 +39,9 @@ namespace kiosk.UI
         public const int ScreenH      = 720;
         public const int Gutter       = 16;   // page padding
         public const int Gap          = 12;   // space between siblings
-        public const int RadiusCard   = 20;
-        public const int RadiusButton = 26;
+        public const int RadiusCard   = 8;
+        public const int RadiusButton = 10;
+        public const int RadiusLarge  = 12;   // floating panels, e.g. the cart tray
         public const int TapTarget    = 52;   // minimum comfortable touch height
         public const float Hairline   = 1f;
 
@@ -334,28 +335,7 @@ namespace kiosk.UI
         public static void Text(Graphics g, string text, Font font, Rectangle bounds, Color color, TextFormatFlags flags)
         {
             text = GuestText.T(text) ?? string.Empty;
-            Font drawFont = ReadableFont(g, text, font, bounds, flags);
-            TextRenderer.DrawText(g, text, drawFont, bounds, color, flags | TextFormatFlags.NoPrefix);
-        }
-
-        private static readonly System.Collections.Generic.Dictionary<string, Font> ReadableFonts =
-            new System.Collections.Generic.Dictionary<string, Font>();
-
-        private static Font ReadableFont(Graphics g, string value, Font original, Rectangle bounds, TextFormatFlags flags)
-        {
-            if (!GuestText.LargeText || original == null) return original;
-            string key = original.FontFamily.Name + "|" + original.SizeInPoints + "|" + (int)original.Style;
-            Font larger;
-            if (!ReadableFonts.TryGetValue(key, out larger))
-            {
-                larger = new Font(original.FontFamily, original.SizeInPoints * 1.18f, original.Style);
-                ReadableFonts.Add(key, larger);
-            }
-            if (larger.Height > bounds.Height) return original;
-            if ((flags & TextFormatFlags.WordBreak) == 0 && value.IndexOf('\n') < 0 &&
-                TextRenderer.MeasureText(g, value, larger, Size.Empty, TextFormatFlags.NoPadding).Width > bounds.Width)
-                return original;
-            return larger;
+            TextRenderer.DrawText(g, text, font, bounds, color, flags | TextFormatFlags.NoPrefix);
         }
 
         public static void TextTracked(Graphics g, string text, Font font, Rectangle bounds,
@@ -363,7 +343,6 @@ namespace kiosk.UI
         {
             if (string.IsNullOrEmpty(text)) return;
             text = GuestText.T(text);
-            font = ReadableFont(g, text, font, bounds, TextFormatFlags.NoPadding);
 
             const TextFormatFlags flags = TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
 

@@ -29,12 +29,12 @@ namespace kiosk.UI
             confirmCash.Click += (s, e) => {
                 var order = _history.SelectedItem as SavedOrder;
                 if (order == null || order.Method != "Cash" || order.Status != "Pending counter payment") return;
-                if (MessageBox.Show("Confirm you received " + Hive.Money(order.Total) + " for order " + order.Id + "?", "Confirm cash received", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+                if (MessageBox.Show("Confirm you received " + Hive.Money(order.Total) + " for order " + order.DisplayNumber + "?", "Confirm cash received", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
                 try {
                     order.Status = "Paid at counter";
                     LocalStore.Write(System.IO.Path.Combine(LocalStore.Root, "Orders", order.Id + ".xml"), order);
                     int index = _history.SelectedIndex; _history.Items[index] = order;
-                    _detail.Text = "Order " + order.Id + "\r\n" + order.Status + "\r\n\r\n" + string.Join("\r\n", order.Lines.Select(o => o.ToString()));
+                    _detail.Text = "Order " + order.DisplayNumber + "\r\nRecord " + order.Id + "\r\n" + order.Status + "\r\n\r\n" + string.Join("\r\n", order.Lines.Select(o => o.ToString()));
                 }
                 catch (Exception ex) { order.Status = "Pending counter payment"; MessageBox.Show("Could not save payment status: " + ex.Message); }
             };
@@ -47,7 +47,7 @@ namespace kiosk.UI
             catch (Exception ex) { status.Text = "Unable to load history: " + ex.Message; }
             _history.SelectedIndexChanged += (s, e) => {
                 var order = _history.SelectedItem as SavedOrder;
-                if (order != null) _detail.Text = "Order " + order.Id + "\r\n" + order.Status + "\r\n\r\n" + string.Join("\r\n", order.Lines.Select(o => o.ToString()));
+                if (order != null) _detail.Text = "Order " + order.DisplayNumber + "\r\nRecord " + order.Id + "\r\n" + order.Status + "\r\n\r\n" + string.Join("\r\n", order.Lines.Select(o => o.ToString()));
             };
             var hint = new Label { Text = "Checked items are SOLD OUT. Changes save immediately.", Dock = DockStyle.Top, Height = 48 };
             var items = new CheckedListBox { Dock = DockStyle.Fill, CheckOnClick = true, Font = Hive.Body, IntegralHeight = false };

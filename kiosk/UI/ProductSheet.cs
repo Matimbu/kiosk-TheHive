@@ -222,13 +222,18 @@ namespace kiosk.UI
             if (_sweetness != null) SectionLabel(g, "SWEETNESS LEVEL", _sweetness.Top);
             SectionLabel(g, "QUANTITY", _qty.Top);
 
-            int noteTop = _qty.Bottom + 12;
-            RectangleF note = new RectangleF(left, noteTop, width, 64);
-            Hive.Fill(g, note, 12, Hive.HoneyWash);
-            Hive.Text(g, GuestText.T("CAFFEINE") + "  " + GuestText.T(_product.DisplayCaffeineNote), Hive.Caption,
-                      new Rectangle(left + 12, noteTop + 7, width - 24, 22), Hive.Ink, Hive.LeftMid);
-            Hive.Text(g, GuestText.T("ALLERGENS") + "  " + GuestText.T(_product.DisplayAllergenNote), Hive.Caption,
-                      new Rectangle(left + 12, noteTop + 34, width - 24, 22), Hive.Ink, Hive.LeftMid);
+            int noteTop = _qty.Bottom + 16;
+            int detailLeft = left + 100;
+            using (Pen p = new Pen(Hive.LineSoft, 1))
+                g.DrawLine(p, left, noteTop, left + width, noteTop);
+            Hive.TextTracked(g, GuestText.T("CAFFEINE"), Hive.Overline,
+                             new Rectangle(left, noteTop + 9, 92, 20), Hive.Muted, 0.7f, false);
+            Hive.Text(g, GuestText.T(_product.DisplayCaffeineNote), Hive.Caption,
+                      new Rectangle(detailLeft, noteTop + 9, width - 100, 20), Hive.InkSoft, Hive.LeftMid);
+            Hive.TextTracked(g, GuestText.T("ALLERGENS"), Hive.Overline,
+                             new Rectangle(left, noteTop + 35, 92, 20), Hive.Muted, 0.7f, false);
+            Hive.Text(g, GuestText.T(_product.DisplayAllergenNote), Hive.Caption,
+                      new Rectangle(detailLeft, noteTop + 35, width - 100, 20), Hive.InkSoft, Hive.LeftMid);
 
             int footerTop = _add.Top - 18;
             using (Pen p = new Pen(Hive.Line, 1))

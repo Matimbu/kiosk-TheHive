@@ -147,7 +147,6 @@ namespace kiosk.UI
 
             OrderStorage.ClearOrders();
             GuestText.SetFilipino(false);
-            GuestText.SetLargeText(false);
             Reveal(Active);
         }
 

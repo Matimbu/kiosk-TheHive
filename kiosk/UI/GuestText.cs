@@ -6,10 +6,8 @@ namespace kiosk.UI
     public static class GuestText
     {
         public static bool Filipino { get; private set; }
-        public static bool LargeText { get; private set; }
 
         public static void SetFilipino(bool value) { Filipino = value; }
-        public static void SetLargeText(bool value) { LargeText = value; }
 
         private static readonly Dictionary<string, string> FilipinoText = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -31,8 +29,14 @@ namespace kiosk.UI
             { "View order", "Tingnan ang order" }, { "Your order", "Ang order mo" },
             { "Your order is empty", "Wala pang order" },
             { "Clear", "Burahin" }, { "Add more", "Dagdagan" }, { "Checkout", "Magbayad" },
+            { "Clear order", "Burahin ang order" }, { "Keep order", "Ituloy ang order" },
+            { "Clear your order?", "Burahin ang order?" },
+            { "This removes every item from your order.", "Mawawala ang lahat ng item sa order mo." },
+            { "You can add items again from the menu.", "Puwede kang pumili muli sa menu." },
+            { "CHOOSE AN OPTION BELOW", "PUMILI SA IBABA" },
             { "Total to pay", "Kabuuang bayad" }, { "Total", "Kabuuan" },
             { "Nothing here yet", "Wala pa rito" },
+            { "Tap an item to edit", "Pindutin ang item para baguhin" },
             { "Add something from the menu and it will show up right here.", "Pumili ng pagkain o inumin sa menu." },
             { "No available items", "Walang available" },
             { "Try another category. Sold-out items are hidden.", "Pumili ng ibang kategorya. Nakatago ang ubos na produkto." },
@@ -47,7 +51,7 @@ namespace kiosk.UI
             { "Contains caffeine (tea)", "May caffeine (tsaa)" },
             { "Contains caffeine (matcha)", "May caffeine (matcha)" },
             { "Ask staff about caffeine", "Itanong sa staff ang caffeine" },
-            { "Ingredients unverified — ask staff", "Sangkap di beripikado — magtanong sa staff" },
+            { "Ingredients unverified — ask staff", "Di beripikado; itanong sa staff" },
             { "Add to order", "Idagdag sa order" },
             { "EDIT ITEM", "BAGUHIN ANG ITEM" },
             { "Line total", "Kabuuan ng item" },
@@ -84,6 +88,9 @@ namespace kiosk.UI
             { "Thank you, see you again!", "Salamat, balik po kayo!" },
             { "THIS IS NOT AN OFFICIAL RECEIPT", "HINDI ITO OPISYAL NA RESIBO" },
             { "ORDER NUMBER", "NUMERO NG ORDER" },
+            { "Show this code at the counter", "Ipakita ang code sa counter" },
+            { "Keep this code for reference", "Itabi ang code bilang sanggunian" },
+            { "SWIPE UP FOR MORE", "I-SWIPE PATAAS PARA SA IBA PA" },
             { "Date", "Petsa" }, { "Terminal", "Terminal" }, { "Payment", "Bayad" },
             { "Status", "Status" }, { "ITEM", "ITEM" }, { "AMOUNT", "HALAGA" },
             { "Done", "Tapos" }, { "Regular", "Regular" }

@@ -11,6 +11,12 @@ namespace kiosk
 {
     public partial class viewOrder : Form, IPage
     {
+        private readonly HiveButton _clear = new HiveButton
+        {
+            Text = "Clear", Width = 96, Height = 52,
+            Style = HiveStyle.Ghost, TextColor = Color.White
+        };
+
         public viewOrder()
         {
             InitializeComponent();
@@ -21,13 +27,9 @@ namespace kiosk
             ShowInTaskbar = false;
 
             header.ShowBack((s, e) => Nav.Back());
-            var clear = new HiveButton { Text = "Clear", Width = 88, Height = 44,
-                Style = HiveStyle.Ghost, TextColor = Color.White };
-            header.SetAccessory(clear);
-            clear.Click += (s, e) => {
-                if (OrderStorage.Orders.Count > 0 && MessageBox.Show(GuestText.Filipino ? "Alisin ang lahat ng item sa order?" : "Remove every item from your order?",
-                    GuestText.Filipino ? "Burahin ang order" : "Clear order", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    OrderStorage.ClearOrders();
+            header.SetAccessory(_clear);
+            _clear.Click += (s, e) => {
+                if (OrderStorage.Orders.Count > 0) Nav.Go(new ClearOrderForm());
             };
             footer.Paint += PaintSummary;
 
@@ -60,7 +62,18 @@ namespace kiosk
             }
             else
             {
-                int top = 8;
+                Label editHint = new Label
+                {
+                    Text = GuestText.T("Tap an item to edit"),
+                    Font = Hive.Caption,
+                    ForeColor = Hive.Muted,
+                    BackColor = Hive.Canvas,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Bounds = new Rectangle(Hive.Gutter + 4, 7, list.Width - Hive.Gutter * 2 - 8, 22)
+                };
+                list.Content.Controls.Add(editHint);
+
+                int top = 34;
                 foreach (Order order in orders)
                 {
                     OrderRow row = new OrderRow(order);
@@ -74,6 +87,7 @@ namespace kiosk
 
             list.Measure(Hive.Gap);
             btn_paymentMethod.Enabled = orders.Count > 0;
+            _clear.Enabled = orders.Count > 0;
             footer.Invalidate();
         }
 

@@ -40,6 +40,8 @@ class SmokeTests
             Fails(() => LocalStore.Submit("Cash"), "sold-out cart cannot submit");
             LocalStore.SetSoldOut("Americano", false);
             var saved = LocalStore.Submit("Cash");
+            Check(saved.DisplayNumber.Length == 7 && saved.Id.EndsWith(saved.DisplayNumber.Substring(1), StringComparison.OrdinalIgnoreCase),
+                "guest order code is short and maps to the saved record");
             OrderStorage.Orders[0].Quantity = 1;
             Check(saved.Total == 120 && saved.Lines[1].Sweetness == "50%", "saved snapshot retains sweetness independently of cart");
             int unreadable; var history = LocalStore.History(out unreadable);
@@ -62,34 +64,45 @@ class SmokeTests
             Shot(new Form1(), "welcome", args[0]);
             Shot(new menuPage(), "menu", args[0]);
             Shot(new ProductSheet(MenuCatalog.Find("Americano")), "product", args[0]);
+            Shot(new ProductSheet(MenuCatalog.Find("Traditional Matcha")), "product-matcha", args[0]);
             Shot(new EditOrderForm(lessSweet), "edit", args[0]);
             Shot(new viewOrder(), "cart", args[0]);
+            Shot(new ClearOrderForm(), "clear-confirm", args[0]);
             Shot(new StaffPage(), "staff", args[0]);
             Shot(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotal()), "payment", args[0]);
             Shot(new CardPaymentForm(), "card", args[0]);
             Shot(new EWalletPaymentForm(OrderStorage.GetOrders()), "wallet", args[0]);
             using (var preferences = new Form1()) {
                 var language = (HiveButton)typeof(Form1).GetField("_languageButton", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(preferences);
-                var textSize = (HiveButton)typeof(Form1).GetField("_textSizeButton", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(preferences);
-                language.PerformClick(); textSize.PerformClick();
-                Check(GuestText.Filipino && GuestText.LargeText && GuestText.T("Your order") == "Ang order mo", "language and larger-text controls change the customer view");
+                language.PerformClick();
+                Check(GuestText.Filipino && GuestText.T("Your order") == "Ang order mo", "language choice changes the customer view");
                 Check(OrderText.Describe(lessSweet).Contains("50% asukal"), "Filipino cart keeps customization details readable");
             }
-            Shot(new Form1(), "welcome-fil-large", args[0]);
-            Shot(new menuPage(), "menu-fil-large", args[0]);
-            Shot(new ProductSheet(MenuCatalog.Find("Americano")), "product-fil-large", args[0]);
-            Shot(new EditOrderForm(lessSweet), "edit-fil-large", args[0]);
-            Shot(new viewOrder(), "cart-fil-large", args[0]);
-            Shot(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotal()), "payment-fil-large", args[0]);
-            Shot(new CashPaymentForm(), "cash-fil-large", args[0]);
-            Shot(new CardPaymentForm(), "card-fil-large", args[0]);
-            Shot(new EWalletPaymentForm(OrderStorage.GetOrders()), "wallet-fil-large", args[0]);
+            Shot(new Form1(), "welcome-fil", args[0]);
+            Shot(new menuPage(), "menu-fil", args[0]);
+            Shot(new ProductSheet(MenuCatalog.Find("Americano")), "product-fil", args[0]);
+            Shot(new ProductSheet(MenuCatalog.Find("Traditional Matcha")), "product-matcha-fil", args[0]);
+            Shot(new EditOrderForm(lessSweet), "edit-fil", args[0]);
+            Shot(new viewOrder(), "cart-fil", args[0]);
+            Shot(new ClearOrderForm(), "clear-confirm-fil", args[0]);
+            Shot(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotal()), "payment-fil", args[0]);
+            Shot(new CashPaymentForm(), "cash-fil", args[0]);
+            Shot(new CardPaymentForm(), "card-fil", args[0]);
+            Shot(new EWalletPaymentForm(OrderStorage.GetOrders()), "wallet-fil", args[0]);
             var filipinoOrder = LocalStore.Submit("Cash");
             var receiptType = typeof(ReceiptForm);
             var receiptCtor = receiptType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(SavedOrder) }, null);
-            Shot((Form)receiptCtor.Invoke(new object[] { filipinoOrder }), "receipt-fil-large", args[0]);
-            Check(Directory.GetFiles(LocalStore.ReceiptFolder, "*.txt").Any(file => File.ReadAllText(file).Contains("ORDER BLG.")), "Filipino receipt copy uses translated order labels");
-            GuestText.SetFilipino(false); GuestText.SetLargeText(false);
+            using (var scrollableReceipt = (Form)receiptCtor.Invoke(new object[] { filipinoOrder })) {
+                scrollableReceipt.Show(); Application.DoEvents();
+                var scroll = (ScrollHost)receiptType.GetField("_scroll", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(scrollableReceipt);
+                var cue = (Label)receiptType.GetField("_scrollCue", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(scrollableReceipt);
+                Check(cue.Visible, "long receipt shows a scroll cue");
+                typeof(ScrollHost).GetMethod("SetTop", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(scroll, new object[] { -10000 });
+                Check(!cue.Visible, "scroll cue clears at the end of the receipt");
+            }
+            Shot((Form)receiptCtor.Invoke(new object[] { filipinoOrder }), "receipt-fil", args[0]);
+            Check(Directory.GetFiles(LocalStore.ReceiptFolder, "*.txt").Any(file => File.ReadAllText(file).Contains("ORDER BLG. " + filipinoOrder.DisplayNumber) && File.ReadAllText(file).Contains("Ipakita ang code sa counter")), "Filipino receipt copy shows the short code and counter instruction");
+            GuestText.SetFilipino(false);
             using (var shell = new Shell()) {
                 shell.Show(); Application.DoEvents();
                 var stack = (System.Collections.IList)typeof(Shell).GetField("_stack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(shell);
@@ -103,6 +116,21 @@ class SmokeTests
                 typeof(Timer).GetMethod("OnTick", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(startTimer, new object[] { EventArgs.Empty });
                 Check(stack.Count == 2 && stack[1] is menuPage, "repeated start taps open one menu");
                 OrderStorage.AddOrder(Coffee());
+                shell.Go(new viewOrder()); Application.DoEvents();
+                var cart = (viewOrder)stack[2];
+                var clear = (HiveButton)typeof(viewOrder).GetField("_clear", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cart);
+                clear.PerformClick();
+                Check(stack.Count == 4 && stack[3] is ClearOrderForm && OrderStorage.Orders.Count > 0,
+                    "clear opens a kiosk confirmation without changing the cart");
+                var confirmation = (ClearOrderForm)stack[3];
+                ((HiveButton)typeof(ClearOrderForm).GetField("_keep", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(confirmation)).PerformClick();
+                Check(stack.Count == 3 && OrderStorage.Orders.Count > 0, "keeping the order preserves every item");
+                clear.PerformClick();
+                confirmation = (ClearOrderForm)stack[3];
+                ((HiveButton)typeof(ClearOrderForm).GetField("_confirm", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(confirmation)).PerformClick();
+                Check(stack.Count == 3 && OrderStorage.Orders.Count == 0, "confirmed clear empties the cart");
+                shell.Back();
+                OrderStorage.AddOrder(Coffee());
                 ReceiptForm.Submit("Cash"); Application.DoEvents();
                 Check(OrderStorage.Orders.Count == 0, "successful submission clears cart");
                 Check(stack.Count == 2 && stack[1] is ReceiptForm, "completion removes previous checkout pages");
@@ -110,12 +138,12 @@ class SmokeTests
                 shell.Back(); Check(stack.Count == 1 && stack[0] is Form1, "back after checkout returns to welcome");
                 Check(start.Text == "Start your order", "welcome resets after checkout");
                 shell.Go(new menuPage()); OrderStorage.AddOrder(Coffee());
-                GuestText.SetFilipino(true); GuestText.SetLargeText(true);
+                GuestText.SetFilipino(true);
                 typeof(Shell).GetField("_lastInput",BindingFlags.NonPublic|BindingFlags.Instance).SetValue(shell,DateTime.UtcNow.AddSeconds(-125));
                 var timer = (Timer)typeof(Shell).GetField("_idle",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(shell);
                 typeof(Timer).GetMethod("OnTick",BindingFlags.NonPublic|BindingFlags.Instance).Invoke(timer,new object[]{EventArgs.Empty});
-                Check(stack.Count == 1 && OrderStorage.Orders.Count == 0 && !GuestText.Filipino && !GuestText.LargeText,
-                    "idle timeout clears cart and restores default customer preferences");
+                Check(stack.Count == 1 && OrderStorage.Orders.Count == 0 && !GuestText.Filipino,
+                    "idle timeout clears cart and restores default language");
             }
             Console.WriteLine("All smoke tests passed."); return 0;
         } catch(Exception ex) { Console.Error.WriteLine(ex); return 1; }

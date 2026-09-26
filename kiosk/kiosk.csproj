@@ -56,7 +56,7 @@
     <Compile Include="OrderForms\EditOrderForm.Designer.cs">
       <DependentUpon>EditOrderForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="OrderForms\Order.cs" /><Compile Include="OrderForms\LocalStore.cs" /><Compile Include="UI\StaffPage.cs" /><Compile Include="UI\GuestText.cs" /><Compile Include="UI\ProgressGuide.cs" />
+    <Compile Include="OrderForms\Order.cs" /><Compile Include="OrderForms\LocalStore.cs" /><Compile Include="OrderForms\ClearOrderForm.cs" /><Compile Include="UI\StaffPage.cs" /><Compile Include="UI\GuestText.cs" /><Compile Include="UI\ProgressGuide.cs" />
     <Compile Include="OrderForms\OrderStorage.cs" />
     <Compile Include="Payments\CardPaymentForm.cs">
       <SubType>Form</SubType>

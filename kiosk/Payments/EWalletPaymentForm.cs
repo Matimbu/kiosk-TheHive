@@ -71,14 +71,14 @@ namespace kiosk.Payments
             ProgressGuide.Draw(g, new Rectangle(Hive.Gutter, ClientSize.Height - 130, Width - Hive.Gutter * 2, 36), 3);
 
             RectangleF card = new RectangleF(Hive.Gutter, BandH + 22, Width - Hive.Gutter * 2, 318);
-            Hive.Shadow(g, card, 20, 4, 44);
-            Hive.Fill(g, card, 20, Hive.Surface);
+            Hive.Shadow(g, card, Hive.RadiusCard, 4, 44);
+            Hive.Fill(g, card, Hive.RadiusCard, Hive.Surface);
 
             Hive.Text(g, "E-WALLET DEMO", Hive.Overline,
                       new Rectangle((int)card.X, (int)card.Y + 20, (int)card.Width, 18), Hive.Muted, Hive.Centered);
 
             RectangleF qr = new RectangleF(card.X + (card.Width - 208) / 2f, card.Y + 48, 208, 208);
-            Hive.Fill(g, RectangleF.Inflate(qr, 10, 10), 16, Hive.Canvas);
+            Hive.Fill(g, RectangleF.Inflate(qr, 10, 10), Hive.RadiusCard, Hive.Canvas);
 
             Image code = null;
             if (code != null)

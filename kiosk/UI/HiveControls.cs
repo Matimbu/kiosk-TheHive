@@ -319,8 +319,8 @@ namespace kiosk.UI
             g.Clear(Hive.Surface);
             Color ink = _selected ? Color.White : Hive.InkSoft;
             RectangleF surface = new RectangleF(2, 3, Width - 4, Height - 8);
-            if (_selected) Hive.Fill(g, surface, 17, Hive.Teal);
-            else if (_hover.Value > 0.01f) Hive.Fill(g, surface, 17, Hive.SurfaceAlt);
+            if (_selected) Hive.Fill(g, surface, Hive.RadiusButton, Hive.Teal);
+            else if (_hover.Value > 0.01f) Hive.Fill(g, surface, Hive.RadiusButton, Hive.SurfaceAlt);
             CategoryIcons.Draw(g, Text, new RectangleF((Width - 24) / 2f, 10, 24, 24),
                 _selected ? Hive.HoneyLight : ink);
             Hive.Text(g, Text, Hive.BodyBold, new Rectangle(8, 39, Width - 16, 22), ink, Hive.Centered);

@@ -19,10 +19,12 @@ namespace kiosk.Payments
         private readonly List<Order> _orders;
         private readonly string _paymentMethod;
         private readonly string _orderNumber;
+        private readonly string _displayNumber;
         private readonly DateTime _issued = DateTime.Now;
         private readonly decimal _total;
 
         private readonly ScrollHost _scroll = new ScrollHost();
+        private readonly Label _scrollCue = new Label();
         private string _saveError;
         private readonly int _errorHeight;
 
@@ -46,6 +48,7 @@ namespace kiosk.Payments
             _paymentMethod = saved.Method;
             _total = saved.Total;
             _orderNumber = saved.Id;
+            _displayNumber = saved.DisplayNumber;
             _issued = saved.Created;
             InitializeComponent();
 
@@ -67,7 +70,7 @@ namespace kiosk.Payments
             _errorHeight = _saveError == null ? 0 : 34;
 
             _scroll.Bounds = new Rectangle(0, BandH, ClientSize.Width,
-                                           done.Top - 14 - _errorHeight - BandH);
+                                           done.Top - 38 - _errorHeight - BandH);
             Controls.Add(_scroll);
 
             ReceiptPaper paper = new ReceiptPaper(this);
@@ -79,16 +82,34 @@ namespace kiosk.Payments
             _scroll.Content.Controls.Add(paper);
             _scroll.Measure(16);
 
+            _scrollCue.Text = GuestText.T("SWIPE UP FOR MORE");
+            _scrollCue.Font = Hive.Overline;
+            _scrollCue.ForeColor = Hive.Muted;
+            _scrollCue.BackColor = Hive.Canvas;
+            _scrollCue.TextAlign = ContentAlignment.MiddleCenter;
+            _scrollCue.Bounds = new Rectangle(0, _scroll.Bottom + 4, ClientSize.Width, 24);
+            _scrollCue.Visible = false;
+            Controls.Add(_scrollCue);
+            _scrollCue.BringToFront();
+            _scroll.PositionChanged += (s, e) => UpdateScrollCue();
+            UpdateScrollCue();
+
             Load += (s, e) => ActiveControl = done;
         }
 
         internal List<Order> Lines { get { return _orders; } }
         internal string OrderNumber { get { return _orderNumber; } }
+        internal string DisplayNumber { get { return _displayNumber; } }
         internal DateTime Issued { get { return _issued; } }
         internal decimal Total { get { return _total; } }
         internal string PaymentMethod { get { return _paymentMethod; } }
 
         internal string CardLine { get { return null; } }
+
+        private void UpdateScrollCue()
+        {
+            _scrollCue.Visible = _scroll.Content.Bottom > _scroll.Height + 2;
+        }
 
         private string BuildText()
         {
@@ -109,7 +130,8 @@ namespace kiosk.Payments
             if (!string.IsNullOrEmpty(CafeInfo.TaxId)) center("TIN " + CafeInfo.TaxId);
             r.AppendLine();
 
-            center((GuestText.Filipino ? "ORDER BLG. " : "ORDER No. ") + _orderNumber);
+            center((GuestText.Filipino ? "ORDER BLG. " : "ORDER No. ") + _displayNumber);
+            center(_paymentMethod == "Cash" ? "Show this code at the counter" : "Keep this code for reference");
             center(_paymentMethod == "Cash" ? "PENDING COUNTER PAYMENT" : "DEMO - NO PAYMENT TAKEN");
             rule();
             row("Date", _issued.ToString("dd MMM yyyy HH:mm"));
@@ -185,6 +207,7 @@ namespace kiosk.Payments
                 Hive.Text(g, _saveError, Hive.Caption,
                           new Rectangle(Hive.Gutter, Height - 78 - _errorHeight - 8, Width - Hive.Gutter * 2, 32),
                           Hive.Danger, TextFormatFlags.HorizontalCenter | TextFormatFlags.WordBreak);
+
         }
     }
 
@@ -224,7 +247,7 @@ namespace kiosk.Payments
             int left = Pad;
             int right = Width - Pad;
             int w = right - left;
-            int y = 4 + Pad;
+            int y = Pad - 4;
 
             if (g != null)
             {
@@ -242,34 +265,35 @@ namespace kiosk.Payments
                     }
                 }
             }
-            y += 42 + 8;
+            y += 42;
 
             if (g != null)
                 Hive.TextTracked(g, CafeInfo.Name, Hive.Sized(Hive.Overline, 10.5f),
                                  new Rectangle(left, y, w, 20), Hive.Ink, 2.6f, true);
             y += 20;
 
-            y = CenterLine(g, CafeInfo.Branch, Hive.Caption, Hive.InkSoft, left, y, w, 15);
-            y = CenterLine(g, CafeInfo.Address, Hive.Caption, Hive.Muted, left, y, w, 15);
-            y = CenterLine(g, CafeInfo.Contact, Hive.Caption, Hive.Muted, left, y, w, 15);
+            y = CenterLine(g, CafeInfo.Branch, Hive.Caption, Hive.InkSoft, left, y, w, 14);
+            y = CenterLine(g, CafeInfo.Address, Hive.Caption, Hive.Muted, left, y, w, 14);
+            y = CenterLine(g, CafeInfo.Contact, Hive.Caption, Hive.Muted, left, y, w, 14);
             if (!string.IsNullOrEmpty(CafeInfo.TaxId))
                 y = CenterLine(g, "TIN " + CafeInfo.TaxId, Hive.Caption, Hive.Muted, left, y, w, 15);
 
-            y += 10;
-            y = Dashes(g, left, y, w);
-            y += 12;
+            y += 4;
+            y = Hairline(g, left, y, w);
+            y += 6;
 
             if (g != null)
             {
                 Hive.TextTracked(g, "ORDER NUMBER", Hive.Overline,
-                                 new Rectangle(left, y, w, 16), Hive.Muted, 2f, true);
-                using (Font big = Hive.Sized(Hive.PriceBig, 14f))
-                    Hive.Text(g, _receipt.OrderNumber, big,
-                              new Rectangle(left, y + 16, w, 42), Hive.Teal, Hive.Centered);
+                                 new Rectangle(left, y, w, 18), Hive.Muted, 1.3f, true);
+                Hive.Text(g, _receipt.DisplayNumber, Hive.PriceBig,
+                          new Rectangle(left, y + 17, w, 40), Hive.Teal, Hive.Centered);
+                Hive.Text(g, _receipt.PaymentMethod == "Cash" ? "Show this code at the counter" : "Keep this code for reference",
+                          Hive.Caption, new Rectangle(left, y + 55, w, 20), Hive.Muted, Hive.Centered);
             }
-            y += 16 + 42 + 8;
+            y += 17 + 40 + 20 + 4;
 
-            y = Dashes(g, left, y, w);
+            y = Hairline(g, left, y, w);
             y += 10;
 
             y = Row(g, "Date", _receipt.Issued.ToString("dd MMM yyyy, HH:mm"), left, y, w);

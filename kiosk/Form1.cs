@@ -10,7 +10,6 @@ namespace kiosk
     {
         private readonly Timer _startDelay = new Timer { Interval = 180 };
         private readonly HiveButton _languageButton = new HiveButton();
-        private readonly HiveButton _textSizeButton = new HiveButton();
         private bool _starting;
 
         public Form1()
@@ -19,16 +18,6 @@ namespace kiosk
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             BackColor = Hive.TealDeep;
-
-            _textSizeButton.Bounds = new Rectangle(18, 18, 96, 48);
-            _textSizeButton.Style = HiveStyle.Light;
-            _textSizeButton.Tracked = false;
-            _textSizeButton.AccessibleName = "Toggle larger text";
-            _textSizeButton.Click += (s, e) => {
-                GuestText.SetLargeText(!GuestText.LargeText);
-                UpdatePreferences();
-            };
-            Controls.Add(_textSizeButton);
 
             _languageButton.Bounds = new Rectangle(342, 18, 120, 48);
             _languageButton.Style = HiveStyle.Light;
@@ -69,8 +58,6 @@ namespace kiosk
 
         private void UpdatePreferences()
         {
-            _textSizeButton.Text = GuestText.LargeText ? "A+  ON" : "A+";
-            _textSizeButton.Style = GuestText.LargeText ? HiveStyle.Accent : HiveStyle.Light;
             _languageButton.Text = GuestText.Filipino ? "FILIPINO" : "ENGLISH";
             Invalidate(true);
         }
@@ -84,8 +71,6 @@ namespace kiosk
                 g.FillRectangle(b, ClientRectangle);
             DrawHoneycomb(g);
 
-            Hive.Text(g, GuestText.Filipino ? "LAKI NG TEKSTO" : "TEXT SIZE", Hive.Overline,
-                new Rectangle(18, 70, 115, 18), Color.FromArgb(190, 255, 255, 255), Hive.LeftMid);
             Hive.Text(g, GuestText.Filipino ? "WIKA" : "LANGUAGE", Hive.Overline,
                 new Rectangle(342, 70, 120, 18), Color.FromArgb(190, 255, 255, 255), Hive.Centered);
 

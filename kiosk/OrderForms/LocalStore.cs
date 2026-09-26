@@ -14,7 +14,17 @@ namespace kiosk
         public string Status { get; set; }
         public List<Order> Lines { get; set; }
         public decimal Total { get { return Lines.Sum(o => o.Total); } }
-        public override string ToString() { return Created.ToString("MM/dd HH:mm") + "  " + Method + "  " + Total.ToString("N2") + "  " + Status; }
+        public string DisplayNumber
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Id)) return "—";
+                int separator = Id.LastIndexOf('-');
+                string code = separator >= 0 ? Id.Substring(separator + 1) : Id;
+                return "#" + code.ToUpperInvariant();
+            }
+        }
+        public override string ToString() { return DisplayNumber + "  " + Created.ToString("MM/dd HH:mm") + "  " + Method + "  " + Total.ToString("N2") + "  " + Status; }
     }
 
     public static class LocalStore

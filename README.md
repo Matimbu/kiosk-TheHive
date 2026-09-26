@@ -1,6 +1,6 @@
 # The Hive Cafe — Self-Order Kiosk
 
-**Version 2.0** · [Patch notes](docs/patch-notes/v2.0.md) · [Download the Windows release](https://github.com/Matimbu/kiosk-TheHive/releases/tag/v2.0.0)
+**Version 2.1** · [Patch notes](docs/patch-notes/v2.1.md) · [Earlier releases](docs/patch-notes/)
 
 A C# WinForms touchscreen kiosk with a hand-painted GDI+ interface, menu browsing, customization, cart editing, and saved orders.
 
@@ -21,8 +21,8 @@ After building, you can also open `kiosk/bin/Release/kiosk.exe` directly without
 ## Customer guidance and accessibility
 
 - The bottom of the menu, order review, and payment screens shows **Menu → Order → Pay** with the current step highlighted.
-- On the welcome screen, tap **A+** for larger text and tap **English / Filipino** to switch languages before starting. The choice applies through the customer flow, including product descriptions and the receipt copy.
-- After an order is finished or the kiosk times out, both choices reset for the next customer. Product names remain as printed on the cafe menu.
+- On the welcome screen, tap **English / Filipino** to switch languages before starting. The choice applies through the customer flow, including product descriptions and the receipt copy.
+- After an order is finished or the kiosk times out, the language resets for the next customer. Product names remain as printed on the cafe menu.
 
 ## Ordering
 
@@ -36,7 +36,7 @@ After building, you can also open `kiosk/bin/Release/kiosk.exe` directly without
 
 **There is no connected payment processor.**
 
-- **Cash:** saves an order as **Pending counter payment**. The guest takes the order number to the cashier. Staff can record cash received in the staff screen.
+- **Cash:** saves an order as **Pending counter payment**. The receipt shows a short guest code such as `#637E93` with **Show this code at the counter**; the guest reads that code to the cashier. Staff can record cash received in the staff screen.
 - **Card and e-wallet:** create explicitly labeled demonstration orders. They do not charge money, collect card details, or display a live payment QR.
 - Submitted orders are saved before the cart clears. A storage failure keeps the cart available to retry. Back/Escape after submission returns to welcome, so the old checkout cannot be resubmitted.
 - The kiosk saves a text receipt copy; it does not automatically send it to a physical printer. Receipts are not official tax receipts.

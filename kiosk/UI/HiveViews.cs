@@ -155,9 +155,9 @@ namespace kiosk.UI
             Hive.Smooth(g);
             g.Clear(Hive.Canvas);
             RectangleF tray = new RectangleF(7, 6, Width - 14, Height - 12);
-            Hive.Shadow(g, tray, 25, 2, 15);
-            Hive.Fill(g, tray, 25, Hive.Surface);
-            Hive.Stroke(g, tray, 25, Hive.LineSoft, 1);
+            Hive.Shadow(g, tray, Hive.RadiusLarge, 2, 15);
+            Hive.Fill(g, tray, Hive.RadiusLarge, Hive.Surface);
+            Hive.Stroke(g, tray, Hive.RadiusLarge, Hive.LineSoft, 1);
 
             string label = _count == 0 ? "Your order is empty"
                          : _count == 1 ? "1 item"
@@ -350,6 +350,8 @@ namespace kiosk.UI
         private int _originY;
         private int _contentTop;
 
+        public event EventHandler PositionChanged;
+
         public ScrollHost()
         {
             SetStyle(ControlStyles.UserPaint
@@ -408,8 +410,12 @@ namespace kiosk.UI
         private void SetTop(int top)
         {
             int min = Math.Min(0, Height - _content.Height);
-            _content.Top = Math.Max(min, Math.Min(0, top));
+            int clamped = Math.Max(min, Math.Min(0, top));
+            if (_content.Top == clamped) return;
+            _content.Top = clamped;
             Invalidate();
+            EventHandler changed = PositionChanged;
+            if (changed != null) changed(this, EventArgs.Empty);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -538,6 +544,8 @@ namespace kiosk.UI
 
             Hive.Text(g, Hive.Money(_order.Total), Hive.Price,
                       new Rectangle(Width - 96, 0, 84, Height - 8), Hive.Ink, Hive.RightMid);
+            Marks.Draw(g, Mark.Chevron,
+                       new RectangleF(card.Right - 29, card.Bottom - 25, 13, 13), Hive.Muted, 1.4f);
         }
 
         protected override void Dispose(bool disposing)
