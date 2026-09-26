@@ -181,7 +181,7 @@ namespace kiosk
             };
 
             try { OrderStorage.Validate(UpdatedOrder); }
-            catch (InvalidOperationException ex) { MessageBox.Show(ex.Message); return; }
+            catch (InvalidOperationException ex) { NoticeForm.Say("Cannot save that change", ex.Message); return; }
             Commit();
         }
 

@@ -177,6 +177,24 @@ class SmokeTests
                 confirmation = (ClearOrderForm)stack[3];
                 ((HiveButton)typeof(ClearOrderForm).GetField("_confirm", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(confirmation)).PerformClick();
                 Check(stack.Count == 3 && OrderStorage.Orders.Count == 0, "confirmed clear empties the cart");
+
+                // a blocked checkout must open a kiosk notice, not a Windows dialog
+                shell.Go(new viewOrder()); Application.DoEvents();
+                var blockedCart = (viewOrder)stack[stack.Count - 1];
+                OrderStorage.AddOrder(Coffee());
+                LocalStore.SetSoldOut("Americano", true);
+                var payBtn = (HiveButton)typeof(viewOrder)
+                    .GetField("btn_paymentMethod", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(blockedCart);
+                int before = stack.Count;
+                payBtn.PerformClick(); Application.DoEvents();
+                Check(stack.Count == before + 1 && stack[stack.Count - 1] is NoticeForm,
+                    "a blocked checkout opens a kiosk notice");
+                Check(OrderStorage.Orders.Count > 0, "a blocked checkout leaves the order alone");
+                shell.Back(); shell.Back();
+                LocalStore.SetSoldOut("Americano", false);
+                OrderStorage.ClearOrders();
+
                 shell.Back();
                 OrderStorage.AddOrder(Coffee());
                 ReceiptForm.Submit("Cash"); Application.DoEvents();

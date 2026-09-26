@@ -38,7 +38,9 @@ namespace kiosk.Payments
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Order could not be completed. Your cart is still available.\n" + ex.Message, "Please try again");
+                NoticeForm.Problem("Order not completed",
+                                   "Your order is still here, so you can try again.",
+                                   ex.Message);
             }
         }
 

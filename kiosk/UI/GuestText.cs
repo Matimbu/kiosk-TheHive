@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace kiosk.UI
@@ -19,6 +19,15 @@ namespace kiosk.UI
             { "Best Sellers", "Sikat" }, { "Coffee", "Kape" }, { "Non-Coffee", "Iba pa" },
             { "Best seller", "Sikat" },
             { "SOLD OUT", "UBOS NA" },
+            { "Just so you know", "Paalala lang" }, { "Something went wrong", "May problema" },
+            { "Got it", "Sige" },
+            { "Cannot add that item", "Hindi maidagdag" },
+            { "Cannot save that change", "Hindi ma-save ang pagbabago" },
+            { "Check your order", "Suriin ang order" },
+            { "Something needs a change", "May kailangang baguhin" },
+            { "Tap the item in your order to edit or remove it.", "Pindutin ang item sa order para baguhin o alisin." },
+            { "Order not completed", "Hindi natuloy ang order" },
+            { "Your order is still here, so you can try again.", "Nandiyan pa ang order mo, subukan ulit." },
             { "{0} added", "Naidagdag ang {0}" },
             { "Classics", "Klasiko" }, { "Cheesecake", "Keso" }, { "GentleTea", "Fruit tea" },
             { "Rice Meals", "Kanin" },

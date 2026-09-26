@@ -111,7 +111,13 @@ namespace kiosk
         {
             if (OrderStorage.Orders.Count == 0) return;
 
-            try { OrderStorage.ValidateCart(); } catch (InvalidOperationException ex) { MessageBox.Show(ex.Message); return; }
+            try { OrderStorage.ValidateCart(); }
+            catch (InvalidOperationException ex)
+            {
+                Nav.Go(new NoticeForm("Check your order", "Something needs a change", ex.Message,
+                                      "Tap the item in your order to edit or remove it.", false));
+                return;
+            }
             Nav.Go(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotalPrice()));
         }
 

@@ -164,7 +164,7 @@ namespace kiosk.UI
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(ex.Message);
+                NoticeForm.Say("Cannot add that item", ex.Message);
             }
         }
 
