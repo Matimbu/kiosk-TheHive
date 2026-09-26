@@ -7,6 +7,8 @@ namespace kiosk
 {
     public partial class menuPage : Form, IPage
     {
+        private readonly Toast _added = new Toast();
+
         public menuPage()
         {
             InitializeComponent();
@@ -20,6 +22,9 @@ namespace kiosk
             grid.ProductChosen += (s, e) => OpenProduct(e.Item);
             cartBar.Action.Click += (s, e) => OpenOrder();
 
+            Controls.Add(_added);
+            _added.Anchor = AnchorStyles.Bottom;
+
             OrderStorage.OrdersUpdated += RefreshOrderTotals;
             Disposed += (s, e) => OrderStorage.OrdersUpdated -= RefreshOrderTotals;
 
@@ -27,6 +32,7 @@ namespace kiosk
             {
                 rail.Select(0);
                 RefreshOrderTotals();
+                PlaceToast();
             };
         }
 
@@ -51,6 +57,8 @@ namespace kiosk
         public void OnRevealed()
         {
             RefreshOrderTotals();
+            PlaceToast();
+            ConfirmLastAdd();
         }
 
         private void RefreshOrderTotals()
@@ -59,6 +67,23 @@ namespace kiosk
             foreach (Order order in OrderStorage.Orders) count += order.Quantity;
 
             cartBar.Update(count, OrderStorage.GetTotal());
+        }
+
+        // floats just above the cart bar, clear of the tray
+        private void PlaceToast()
+        {
+            _added.Left = (ClientSize.Width - _added.Width) / 2;
+            _added.Top  = cartBar.Top - _added.Height;
+            _added.BringToFront();
+        }
+
+        private void ConfirmLastAdd()
+        {
+            string item = OrderStorage.LastAdded;
+            if (string.IsNullOrEmpty(item)) return;
+            OrderStorage.LastAdded = null;
+            _added.Say(string.Format(GuestText.T("{0} added"), item));
+            PlaceToast();
         }
     }
 }

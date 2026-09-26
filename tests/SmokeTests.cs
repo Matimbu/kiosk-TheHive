@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -115,6 +115,19 @@ class SmokeTests
                 var startTimer = (Timer)typeof(Form1).GetField("_startDelay", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(welcome);
                 typeof(Timer).GetMethod("OnTick", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(startTimer, new object[] { EventArgs.Empty });
                 Check(stack.Count == 2 && stack[1] is menuPage, "repeated start taps open one menu");
+
+                // the add confirmation: recorded on add, spoken by the menu, then cleared
+                var menu = (menuPage)stack[1];
+                OrderStorage.AddOrder(Coffee());
+                Check(OrderStorage.LastAdded != null && OrderStorage.LastAdded.Contains("Americano"),
+                    "adding an item records it for the confirmation");
+                menu.OnRevealed(); Application.DoEvents();
+                var toast = (Toast)typeof(menuPage).GetField("_added", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(menu);
+                Check(toast.Visible && OrderStorage.LastAdded == null,
+                    "the menu shows the add confirmation once and clears it");
+                OrderStorage.ClearOrders();
+                Check(OrderStorage.LastAdded == null, "clearing the cart drops a pending confirmation");
+
                 OrderStorage.AddOrder(Coffee());
                 shell.Go(new viewOrder()); Application.DoEvents();
                 var cart = (viewOrder)stack[2];

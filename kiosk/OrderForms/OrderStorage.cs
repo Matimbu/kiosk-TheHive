@@ -27,6 +27,9 @@ namespace kiosk
             if (Orders.Count == 0) throw new InvalidOperationException(GuestText.T("Add an item before checking out."));
             foreach (var order in Orders) Validate(order);
         }
+        // set by AddOrder, read and cleared by the menu when it comes back into view
+        public static string LastAdded;
+
         public static void AddOrder(Order order)
         {
             Validate(order);
@@ -39,8 +42,9 @@ namespace kiosk
                 same.Quantity += order.Quantity;
             }
             else Orders.Add(order);
+            LastAdded = (order.Quantity > 1 ? order.Quantity + " x " : "") + order.Product;
             Notify();
         }
-        public static void ClearOrders() { Orders.Clear(); Notify(); }
+        public static void ClearOrders() { Orders.Clear(); LastAdded = null; Notify(); }
     }
 }

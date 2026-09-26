@@ -175,6 +175,88 @@ namespace kiosk.UI
         }
     }
 
+
+    // Brief confirmation that a tap landed. Sits above the cart bar, says its
+    // piece and leaves. Sizes itself to the message so it only covers its own
+    // footprint, opaque on Canvas so the pill reads as floating without
+    // WinForms alpha, and Enabled=false so it can never swallow a tap.
+    public class Toast : HiveControl
+    {
+        private const int PillH = 38;
+        private const int Pad = 7;          // room for the shadow
+
+        private readonly Anim _fade;
+        private readonly Timer _hold = new Timer { Interval = 1400 };
+        private string _message;
+
+        public Toast()
+        {
+            _fade = new Anim(this, 0.2f);
+            _hold.Tick += (s, e) => { _hold.Stop(); _fade.To(0f); };
+            Size = new Size(200, PillH + Pad * 2);
+            Enabled = false;
+            Visible = false;
+            BackColor = Hive.Canvas;
+            Font = Hive.Subhead;
+        }
+
+        public void Say(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return;
+            _message = message;
+
+            using (Graphics g = CreateGraphics())
+            {
+                Size text = TextRenderer.MeasureText(g, _message, Font, Size.Empty, TextFormatFlags.NoPadding);
+                int w = Math.Min(Parent != null ? Parent.ClientSize.Width - Hive.Gutter * 2 : 400,
+                                 text.Width + 74);
+                Size = new Size(w + Pad * 2, PillH + Pad * 2);
+            }
+
+            Visible = true;
+            BringToFront();
+            _hold.Stop();
+            _hold.Start();
+            _fade.To(1f);
+            Invalidate();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            Hive.Smooth(g);
+            g.Clear(Hive.Canvas);
+
+            float v = _fade.Value;
+            if (v <= 0.01f)
+            {
+                if (!_hold.Enabled) Visible = false;
+                return;
+            }
+
+            float lift = (1f - v) * 8f;
+            RectangleF pill = new RectangleF(Pad, Pad + lift, Width - Pad * 2, PillH);
+
+            // fade by blending toward the page, since the control has no real alpha
+            float t = 1f - v;
+            Hive.Shadow(g, pill, Hive.RadiusLarge, 2, (int)(18 * v));
+            Hive.Fill(g, pill, Hive.RadiusLarge, Hive.Mix(Hive.TealDeep, Hive.Canvas, t));
+
+            RectangleF tick = new RectangleF(pill.X + 16, pill.Y + (PillH - 14) / 2f, 14, 14);
+            Marks.Draw(g, Mark.Check, tick, Hive.Mix(Hive.HoneyLight, Hive.Canvas, t), 2f);
+
+            Hive.Text(g, _message, Font,
+                      new Rectangle((int)tick.Right + 10, (int)pill.Y,
+                                    (int)(pill.Right - tick.Right - 22), PillH),
+                      Hive.Mix(Color.White, Hive.Canvas, t), Hive.LeftMid);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) { _fade.Dispose(); _hold.Dispose(); }
+            base.Dispose(disposing);
+        }
+    }
     public class CartPill : HiveControl
     {
         private readonly Anim _hover;

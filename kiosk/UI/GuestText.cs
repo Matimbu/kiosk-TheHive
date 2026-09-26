@@ -18,6 +18,7 @@ namespace kiosk.UI
             { "CASH AT COUNTER  ·  PAYMENT DEMOS", "CASH SA COUNTER  ·  DEMO NG BAYAD" },
             { "Best Sellers", "Sikat" }, { "Coffee", "Kape" }, { "Non-Coffee", "Iba pa" },
             { "Best seller", "Sikat" },
+            { "{0} added", "Naidagdag ang {0}" },
             { "Classics", "Klasiko" }, { "Cheesecake", "Keso" }, { "GentleTea", "Fruit tea" },
             { "Rice Meals", "Kanin" },
             { "What everyone orders", "Mga paborito" }, { "Pulled fresh all day", "Bagong timpla" },

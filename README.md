@@ -1,6 +1,6 @@
 # The Hive Cafe — Self-Order Kiosk
 
-**Version 2.1** · [Patch notes](docs/patch-notes/v2.1.md) · [Earlier releases](docs/patch-notes/)
+**Version 2.2** · [Patch notes](docs/patch-notes/v2.2.md) · [Release history](docs/patch-notes/README.md)
 
 A C# WinForms touchscreen kiosk with a hand-painted GDI+ interface, menu browsing, customization, cart editing, and saved orders.
 
