@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -111,6 +111,20 @@ namespace kiosk.Payments
             _scrollCue.Visible = _scroll.Content.Bottom > _scroll.Height + 2;
         }
 
+        // Breaks a line to the slip width, preferring a space, and indents the
+        // continuation so it still reads as part of the item above it.
+        private static IEnumerable<string> Fold(string line, int cols)
+        {
+            while (line.Length > cols)
+            {
+                int cut = line.LastIndexOf(' ', cols - 1);
+                if (cut <= 4) cut = cols - 1;        // nothing sensible to break on
+                yield return line.Substring(0, cut);
+                line = "     " + line.Substring(cut).TrimStart();
+            }
+            yield return line;
+        }
+
         private string BuildText()
         {
             const int cols = 40;
@@ -139,7 +153,7 @@ namespace kiosk.Payments
             row("Payment", _paymentMethod);
             if (CardLine != null) row("Card", CardLine);
             rule();
-            row("ITEM", "AMOUNT");
+            row("ITEM", GuestText.T("AMOUNT"));
             rule();
 
             foreach (Order o in _orders)
@@ -150,7 +164,25 @@ namespace kiosk.Payments
 
                 string detail = OrderText.Describe(o);
                 string qty = "  " + o.Quantity + " x " + o.Price.ToString("N2");
-                r.AppendLine(detail == "Regular" ? qty : qty + "  (" + detail + ")");
+
+                if (detail == "Regular")
+                {
+                    r.AppendLine(qty);
+                }
+                else
+                {
+                    // Filipino customizations run longer than the English ones and a
+                    // 40-column slip has none to spare. Drop the whole customization
+                    // to its own line rather than splitting the phrase across two.
+                    string full = qty + "  (" + detail + ")";
+                    if (full.Length <= cols) r.AppendLine(full);
+                    else
+                    {
+                        r.AppendLine(qty);
+                        foreach (string part in Fold("     (" + detail + ")", cols))
+                            r.AppendLine(part);
+                    }
+                }
             }
 
             rule();

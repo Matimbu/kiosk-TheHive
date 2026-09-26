@@ -124,6 +124,19 @@ class SmokeTests
             }
             Shot((Form)receiptCtor.Invoke(new object[] { filipinoOrder }), "receipt-fil", args[0]);
             Check(Directory.GetFiles(LocalStore.ReceiptFolder, "*.txt").Any(file => File.ReadAllText(file).Contains("ORDER BLG. " + filipinoOrder.DisplayNumber) && File.ReadAllText(file).Contains("Ipakita ang code sa counter")), "Filipino receipt copy shows the short code and counter instruction");
+
+            // the printed slip is 40 columns; Filipino customizations are longer
+            // than the English ones and used to run past the edge
+            var filipinoSlip = Directory.GetFiles(LocalStore.ReceiptFolder, "*.txt")
+                .OrderByDescending(File.GetLastWriteTimeUtc).First();
+            var slipLines = File.ReadAllLines(filipinoSlip);
+            Check(slipLines.All(l => l.Length <= 40),
+                "every line of the Filipino receipt fits the 40-column slip");
+            Check(slipLines.Any(l => l.Contains("HALAGA")),
+                "the Filipino receipt translates the amount column");
+            Check(!slipLines.Any(l => l.TrimEnd().EndsWith("50%")),
+                "a long customization is not split mid-phrase");
+
             GuestText.SetFilipino(false);
             using (var shell = new Shell()) {
                 shell.Show(); Application.DoEvents();
