@@ -1,6 +1,6 @@
 # The Hive Cafe — Self-Order Kiosk
 
-**Version 2.2** · [Patch notes](docs/patch-notes/v2.2.md) · [Release history](docs/patch-notes/README.md)
+**Version 2.3** · [Patch notes](docs/patch-notes/v2.3.md) · [Release history](docs/patch-notes/README.md)
 
 A C# WinForms touchscreen kiosk with a hand-painted GDI+ interface, menu browsing, customization, cart editing, and saved orders.
 
@@ -27,7 +27,7 @@ After building, you can also open `kiosk/bin/Release/kiosk.exe` directly without
 ## Ordering
 
 - Browse the menu using seven icon-labeled category tabs; swipe the tabs sideways for more categories.
-- Sold-out items are hidden. Availability and prices are checked again at checkout.
+- Sold-out items stay on the menu, dimmed and marked **Sold out**, and settle to the end of their category. A guest can see the item is off today instead of wondering whether it was dropped. They cannot be tapped or added, and availability and prices are checked again at checkout.
 - Choose size, hot/iced preparation, sweetness where supported, and quantity. Drinks with a temperature choice start iced; guests can switch to hot. Product details show caffeine guidance and flag unverified allergen information before adding an item. Identical customizations merge into one cart line, with a maximum of 99 per combination.
 - Tap a cart item to edit its options or remove it. Clear empties the cart after confirmation.
 - After 90 seconds without keyboard, click, wheel, or touch input, a 30-second warning appears. Interaction dismisses it; at two minutes the session returns to welcome and clears the cart.

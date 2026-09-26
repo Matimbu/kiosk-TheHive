@@ -38,6 +38,28 @@ class SmokeTests
             LocalStore.SoldOut.Clear(); LocalStore.LoadAvailability();
             Check(LocalStore.SoldOut.Contains("Americano"), "availability survives reload");
             Fails(() => LocalStore.Submit("Cash"), "sold-out cart cannot submit");
+
+            // sold out is shown, not hidden: the tile stays on the menu, dimmed,
+            // sorted to the end, and refuses to open the product page
+            using (var grid = new CategoryView())
+            {
+                grid.Size = new Size(480, 520);
+                grid.Load("Best Sellers");
+                var tiles = grid.Content.Controls.OfType<ProductTile>().ToList();
+                Check(tiles.Any(t => t.Item.Name == "Americano"),
+                    "a sold-out item stays on the menu");
+                Check(tiles.Single(t => t.Item.Name == "Americano").SoldOut,
+                    "the sold-out tile is marked");
+                Check(tiles.FindIndex(t => t.SoldOut) >= tiles.Count(t => !t.SoldOut),
+                    "sold-out items settle to the end of the category");
+                bool opened = false;
+                var soldTile = tiles.Single(t => t.Item.Name == "Americano");
+                soldTile.Chosen += (s, e) => opened = true;
+                typeof(ProductTile).GetMethod("OnClick", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .Invoke(soldTile, new object[] { EventArgs.Empty });
+                Check(!opened, "tapping a sold-out tile opens nothing");
+            }
+
             LocalStore.SetSoldOut("Americano", false);
             var saved = LocalStore.Submit("Cash");
             Check(saved.DisplayNumber.Length == 7 && saved.Id.EndsWith(saved.DisplayNumber.Substring(1), StringComparison.OrdinalIgnoreCase),

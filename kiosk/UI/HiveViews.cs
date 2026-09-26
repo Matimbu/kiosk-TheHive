@@ -301,6 +301,7 @@ namespace kiosk.UI
         private MenuProduct _item;
         private Point _pressedAt;
         private bool _moved;
+        private bool _soldOut;
 
         public event EventHandler<ProductEventArgs> Chosen;
 
@@ -315,7 +316,20 @@ namespace kiosk.UI
 
         public MenuProduct Item { get { return _item; } }
 
-        protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hover.To(1f); }
+        // Shown, not hidden: a guest looking for their usual drink should see it
+        // is off today rather than wonder whether the kiosk is broken.
+        public bool SoldOut
+        {
+            get { return _soldOut; }
+            set
+            {
+                _soldOut = value;
+                Cursor = value ? Cursors.Default : Cursors.Hand;
+                Invalidate();
+            }
+        }
+
+        protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); if (!_soldOut) _hover.To(1f); }
         protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hover.To(0f); }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -335,6 +349,7 @@ namespace kiosk.UI
         {
             base.OnClick(e);
             if (_moved) return;   // the guest was scrolling, not choosing
+            if (_soldOut) return;
             EventHandler<ProductEventArgs> handler = Chosen;
             if (handler != null) handler(this, new ProductEventArgs(_item));
         }
@@ -344,12 +359,12 @@ namespace kiosk.UI
             Graphics g = e.Graphics;
             Hive.Smooth(g);
 
-            float lift = _hover.Value;
+            float lift = _soldOut ? 0f : _hover.Value;
             float cardY = 3f - lift * 1.5f;
             RectangleF card = new RectangleF(3, cardY, Width - 7, Height - 8);
 
             // Floating ambient shadow that deepens on hover
-            Hive.Shadow(g, card, Hive.RadiusCard, 2, 13 + (int)(10 * lift));
+            Hive.Shadow(g, card, Hive.RadiusCard, 2, _soldOut ? 7 : 13 + (int)(10 * lift));
             Hive.Fill(g, card, Hive.RadiusCard, Hive.Surface);
 
             RectangleF photo = new RectangleF(card.X, card.Y, card.Width, 120);
@@ -373,9 +388,26 @@ namespace kiosk.UI
                     Hive.ImageCover(g, img, photo, clip);
                 }
 
+                // a wash over the photo rather than a stamp across it
+                if (_soldOut)
+                {
+                    Region saved = g.Clip;
+                    g.SetClip(clip, CombineMode.Intersect);
+                    using (SolidBrush veil = new SolidBrush(Color.FromArgb(170, Hive.Canvas)))
+                        g.FillRectangle(veil, photo);
+                    g.Clip = saved;
+                }
             }
 
-            if (_item.Badge != null)
+            if (_soldOut)
+            {
+                string label = GuestText.T("SOLD OUT");
+                Size size = TextRenderer.MeasureText(label, Hive.Overline);
+                RectangleF badge = new RectangleF(card.X + 8, card.Y + 8, size.Width + 18, 22);
+                Hive.Fill(g, badge, 11, Hive.Mix(Hive.Muted, Hive.Ink, 0.2f));
+                Hive.TextTracked(g, label, Hive.Overline, Rectangle.Round(badge), Color.White, 1.1f, true);
+            }
+            else if (_item.Badge != null)
             {
                 string badgeText = _item.Badge.ToUpperInvariant();
                 Size size = TextRenderer.MeasureText(badgeText, Hive.Overline);
@@ -385,20 +417,26 @@ namespace kiosk.UI
             }
 
             Rectangle name = new Rectangle((int)card.X + 12, (int)photo.Bottom + 10, (int)card.Width - 24, 38);
-            Hive.Text(g, _item.Name, Hive.Serif, name, Hive.Ink,
+            Hive.Text(g, _item.Name, Hive.Serif, name, _soldOut ? Hive.Muted : Hive.Ink,
                       TextFormatFlags.WordBreak | TextFormatFlags.Top | TextFormatFlags.EndEllipsis);
 
             using (Pen p = new Pen(Hive.LineSoft, 1))
                 g.DrawLine(p, card.X + 12, card.Bottom - 38, card.Right - 12, card.Bottom - 38);
 
             Rectangle price = new Rectangle((int)card.X + 12, (int)card.Bottom - 35, (int)card.Width - 58, 28);
-            Hive.Text(g, _item.PriceLabel, Hive.Price, price, Hive.TealDeep, Hive.LeftMid);
+            Hive.Text(g, _item.PriceLabel, Hive.Price, price, _soldOut ? Hive.Muted : Hive.TealDeep, Hive.LeftMid);
 
-            RectangleF plusBox = new RectangleF(card.Right - 43, card.Bottom - 41, 34, 34);
-            Hive.Fill(g, plusBox, 17, Hive.Teal);
-            Marks.Draw(g, Mark.Plus, plusBox, Color.White, 2.0f);
+            // no add button when there is nothing to add
+            if (!_soldOut)
+            {
+                RectangleF plusBox = new RectangleF(card.Right - 43, card.Bottom - 41, 34, 34);
+                Hive.Fill(g, plusBox, 17, Hive.Teal);
+                Marks.Draw(g, Mark.Plus, plusBox, Color.White, 2.0f);
+            }
 
-            Hive.Stroke(g, card, Hive.RadiusCard, Hive.Mix(Hive.Line, Hive.TealLight, lift * 0.8f), lift > 0.05f ? 1.4f : 1.0f);
+            Hive.Stroke(g, card, Hive.RadiusCard,
+                        _soldOut ? Hive.LineSoft : Hive.Mix(Hive.Line, Hive.TealLight, lift * 0.8f),
+                        lift > 0.05f ? 1.4f : 1.0f);
         }
 
         protected override void Dispose(bool disposing)

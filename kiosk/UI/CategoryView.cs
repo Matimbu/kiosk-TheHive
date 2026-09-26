@@ -62,13 +62,18 @@ namespace kiosk.UI
                 c.Dispose();
             }
 
-            List<MenuProduct> items = MenuCatalog.InCategory(category).Where(p => !LocalStore.SoldOut.Contains(p.Name)).ToList();
+            // Sold-out items stay on the menu, dimmed, and settle to the end of the
+            // category. InCategory already sorted photographed items first and
+            // OrderBy is stable, so that order survives inside each group.
+            List<MenuProduct> items = MenuCatalog.InCategory(category)
+                .OrderBy(p => LocalStore.SoldOut.Contains(p.Name) ? 1 : 0)
+                .ToList();
 
             if (items.Count == 0)
             {
                 EmptyState empty = new EmptyState(
-                    "No available items",
-                    "Try another category. Sold-out items are hidden.");
+                    "Nothing here yet",
+                    "Try another category.");
                 empty.Size = new Size(Width, Math.Max(300, Height - 20));
                 empty.Location = Point.Empty;
                 Content.Controls.Add(empty);
@@ -84,6 +89,7 @@ namespace kiosk.UI
                 int row = i / 2;
 
                 ProductTile tile = new ProductTile(items[i]);
+                tile.SoldOut = LocalStore.SoldOut.Contains(items[i].Name);
                 tile.Size = new Size(TileW, TileH);
                 tile.Location = new Point(12 + col * (TileW + ColGap), top + row * (TileH + ColGap));
                 tile.Chosen += (s, e) =>
