@@ -19,6 +19,8 @@ namespace kiosk.UI
             { "Best Sellers", "Sikat" }, { "Coffee", "Kape" }, { "Non-Coffee", "Iba pa" },
             { "Best seller", "Sikat" },
             { "SOLD OUT", "UBOS NA" },
+            { "Still there? Tap to continue.", "Nandiyan ka pa ba? Pindutin para magpatuloy." },
+            { "Reset in", "Mare-reset sa" },
             { "Just so you know", "Paalala lang" }, { "Something went wrong", "May problema" },
             { "Got it", "Sige" },
             { "Cannot add that item", "Hindi maidagdag" },
@@ -180,6 +182,12 @@ namespace kiosk.UI
             if (english == "You can order up to 99 of this combination.") return "Hanggang 99 lang sa kombinasyong ito.";
             if (english == "1 item") return "1 item";
             if (english.EndsWith(" items", StringComparison.OrdinalIgnoreCase)) return english.Substring(0, english.Length - 6) + " item";
+            // Composed at the call site, so the whole line misses the lookup above.
+            // The leading part is already Filipino; only the tail needs handling.
+            if (english.EndsWith(" each", StringComparison.OrdinalIgnoreCase))
+                return english.Substring(0, english.Length - 5) + " bawat isa";
+            if (english.StartsWith("QTY ", StringComparison.OrdinalIgnoreCase))
+                return "DAMI " + english.Substring(4);
             return english;
         }
     }

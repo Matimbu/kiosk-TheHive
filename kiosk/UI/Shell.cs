@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -79,7 +79,7 @@ namespace kiosk.UI
                 if (_stack.Count <= 1) return;
                 double elapsed = (DateTime.UtcNow - _lastInput).TotalSeconds;
                 if (elapsed >= 120) { Home(); _idleNotice.Visible = false; }
-                else if (elapsed >= 90) { _idleNotice.Text = "Still there? Tap to continue. Reset in " + (120 - (int)elapsed) + "s"; _idleNotice.Visible = true; _idleNotice.BringToFront(); }
+                else if (elapsed >= 90) { _idleNotice.Text = GuestText.T("Still there? Tap to continue.") + " " + GuestText.T("Reset in") + " " + (120 - (int)elapsed) + "s"; _idleNotice.Visible = true; _idleNotice.BringToFront(); }
             };
             _idle.Start();
             Disposed += (s, e) => { _idle.Dispose(); Application.RemoveMessageFilter(this); Current = null; };

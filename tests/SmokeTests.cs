@@ -210,6 +210,7 @@ class SmokeTests
                 typeof(Timer).GetMethod("OnTick",BindingFlags.NonPublic|BindingFlags.Instance).Invoke(timer,new object[]{EventArgs.Empty});
                 Check(stack.Count == 1 && OrderStorage.Orders.Count == 0 && !GuestText.Filipino,
                     "idle timeout clears cart and restores default language");
+
             }
             Console.WriteLine("All smoke tests passed."); return 0;
         } catch(Exception ex) { Console.Error.WriteLine(ex); return 1; }
