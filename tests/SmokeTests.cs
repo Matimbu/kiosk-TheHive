@@ -18,9 +18,48 @@ class SmokeTests
         using (form) {
             form.ClientSize = new Size(480, 720);
             form.Show(); Application.DoEvents();
+            AuditTaps(form, name);
             using (var bitmap = new Bitmap(480, 720)) { form.DrawToBitmap(bitmap, new Rectangle(0, 0, 480, 720)); bitmap.Save(Path.Combine(folder, name + ".png")); }
         }
     }
+    static readonly System.Collections.Generic.List<string> TapProblems = new System.Collections.Generic.List<string>();
+
+    // Every guest tap zone at least 48x48 and no button label cut off with an
+    // ellipsis. Runs on every screen Shot renders, so a new screen is audited
+    // without anyone remembering to add it. Selectors and steppers are one
+    // control each but several tap zones, so they are measured per zone.
+    static void AuditTaps(Control root, string screen)
+    {
+        if (screen.StartsWith("staff")) return;   // staff screen is out of scope
+        using (var scratch = new Bitmap(1, 1))
+        using (var g = Graphics.FromImage(scratch))
+            AuditTaps(root, screen, g);
+    }
+
+    static void AuditTaps(Control parent, string screen, Graphics g)
+    {
+        foreach (Control c in parent.Controls)
+        {
+            if (!c.Visible) continue;
+            Size zone = Size.Empty;
+            var button = c as HiveButton;
+            var picker = c as Segmented;
+            if (button != null)
+            {
+                zone = button.Size;
+                if (!button.LabelFits(g))
+                    TapProblems.Add(screen + ": '" + button.Text + "' is cut off at " + button.Width + "px");
+            }
+            else if (picker != null && picker.Options.Length > 0) zone = new Size(picker.Width / picker.Options.Length, picker.Height);
+            else if (c is Stepper) zone = new Size(c.Height, c.Height);
+            else if (c is HiveChip || c is ProductTile || c is OrderRow || c is MethodTile) zone = c.Size;
+
+            if (!zone.IsEmpty && (zone.Width < 48 || zone.Height < 48))
+                TapProblems.Add(screen + ": " + c.GetType().Name + " '" + c.Text + "' is " + zone.Width + "x" + zone.Height);
+            AuditTaps(c, screen, g);
+        }
+    }
+
     [STAThread] static int Main(string[] args)
     {
         try {
@@ -90,6 +129,7 @@ class SmokeTests
             Shot(new EditOrderForm(lessSweet), "edit", args[0]);
             Shot(new viewOrder(), "cart", args[0]);
             Shot(new ClearOrderForm(), "clear-confirm", args[0]);
+            Shot(new NoticeForm("Check your order", "Something needs a change", "Cafe Latte is unavailable. Please remove it from your order.", "Tap the item in your order to edit or remove it.", false), "notice", args[0]);
             Shot(new StaffPage(), "staff", args[0]);
             Shot(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotal()), "payment", args[0]);
             Shot(new CardPaymentForm(), "card", args[0]);
@@ -107,6 +147,7 @@ class SmokeTests
             Shot(new EditOrderForm(lessSweet), "edit-fil", args[0]);
             Shot(new viewOrder(), "cart-fil", args[0]);
             Shot(new ClearOrderForm(), "clear-confirm-fil", args[0]);
+            Shot(new NoticeForm("Check your order", "Something needs a change", "Cafe Latte is unavailable. Please remove it from your order.", "Tap the item in your order to edit or remove it.", false), "notice-fil", args[0]);
             Shot(new PaymentSelectionForm(OrderStorage.GetOrders(), OrderStorage.GetTotal()), "payment-fil", args[0]);
             Shot(new CashPaymentForm(), "cash-fil", args[0]);
             Shot(new CardPaymentForm(), "card-fil", args[0]);
@@ -222,6 +263,8 @@ class SmokeTests
                 GuestText.SetFilipino(false);
 
             }
+            Check(TapProblems.Count == 0, "every guest tap target is at least 48px and no label is cut off"
+                + (TapProblems.Count == 0 ? "" : ": " + string.Join("; ", TapProblems.ToArray())));
             Console.WriteLine("All smoke tests passed."); return 0;
         } catch(Exception ex) { Console.Error.WriteLine(ex); return 1; }
     }

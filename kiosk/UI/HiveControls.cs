@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -195,8 +195,7 @@ namespace kiosk.UI
                 return;
             }
 
-            int pad = Math.Min(12, Math.Max(2, Width / 8));
-            Rectangle inner = new Rectangle(pad, 0, Width - pad * 2, Height);
+            Rectangle inner = Inner();
 
             if (!string.IsNullOrEmpty(_caption))
             {
@@ -215,6 +214,40 @@ namespace kiosk.UI
             }
         }
 
+        // the label area, shared by paint and LabelFits so they cannot disagree
+        private Rectangle Inner()
+        {
+            int pad = Math.Min(12, Math.Max(2, Width / 8));
+            return new Rectangle(pad, 0, Width - pad * 2, Height);
+        }
+
+        // Widens the button until its label fits, for buttons whose text changes
+        // with the language. Measures off-screen, so it works before the button
+        // has a parent.
+        public void FitToLabel(int minWidth)
+        {
+            string label = Text ?? string.Empty;
+            using (Bitmap scratch = new Bitmap(1, 1))
+            using (Graphics g = Graphics.FromImage(scratch))
+            {
+                float need = _tracked && string.IsNullOrEmpty(_caption)
+                    ? Hive.TrackedWidth(g, Hive.TrackedLabel(label.ToUpperInvariant()), Font, 1.1f)
+                    : TextRenderer.MeasureText(g, GuestText.T(label), Font).Width;
+                // Inner() pads 12px a side once the button is 96 or wider
+                Width = Math.Max(minWidth, (int)Math.Ceiling(need) + 24 + 2);
+            }
+        }
+        // False when the label would be cut off with an ellipsis. Tracked labels
+        // are measured exactly as TextTracked draws them, caps and all.
+        public bool LabelFits(Graphics g)
+        {
+            string label = Text ?? string.Empty;
+            if (label.Length == 0) return true;
+            int room = Inner().Width;
+            if (_tracked && string.IsNullOrEmpty(_caption))
+                return Hive.TrackedWidth(g, Hive.TrackedLabel(label.ToUpperInvariant()), Font, 1.1f) <= room;
+            return TextRenderer.MeasureText(g, GuestText.T(label), Font).Width <= room;
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing) { _hover.Dispose(); _press.Dispose(); }
@@ -318,12 +351,13 @@ namespace kiosk.UI
 
             g.Clear(Hive.Surface);
             Color ink = _selected ? Color.White : Hive.InkSoft;
-            RectangleF surface = new RectangleF(2, 3, Width - 4, Height - 8);
+            // Equal margins top and bottom, with the icon and label centred inside.
+            RectangleF surface = new RectangleF(2, 4, Width - 4, Height - 8);
             if (_selected) Hive.Fill(g, surface, Hive.RadiusButton, Hive.Teal);
             else if (_hover.Value > 0.01f) Hive.Fill(g, surface, Hive.RadiusButton, Hive.SurfaceAlt);
-            CategoryIcons.Draw(g, Text, new RectangleF((Width - 24) / 2f, 10, 24, 24),
+            CategoryIcons.Draw(g, Text, new RectangleF((Width - 24) / 2f, 12, 24, 24),
                 _selected ? Hive.HoneyLight : ink);
-            Hive.Text(g, Text, Hive.BodyBold, new Rectangle(8, 39, Width - 16, 22), ink, Hive.Centered);
+            Hive.Text(g, Text, Hive.BodyBold, new Rectangle(4, 41, Width - 8, 22), ink, Hive.Centered);
         }
 
         protected override void Dispose(bool disposing)
@@ -344,6 +378,12 @@ namespace kiosk.UI
 
         public event EventHandler<ChipEventArgs> ChipSelected;
 
+        // Tuned so four English categories fit and the fifth is cut by the screen
+        // edge - the only sign a guest gets that the rail scrolls.
+        private const int ChipPadX = 15;
+        private const int ChipGap = 6;
+        private const int ChipMinWidth = 56;   // a floor for touch, not for looks
+
         public ChipRail()
         {
             SetStyle(ControlStyles.UserPaint
@@ -354,7 +394,7 @@ namespace kiosk.UI
             Height = 74;
 
             _strip = new Panel();
-            _strip.Location = new Point(Hive.Gutter, 0);
+            _strip.Location = new Point(Hive.Gutter, 2);   // centres the chips above the hairline
             _strip.BackColor = Color.Transparent;
             _strip.Height = 70;
             Controls.Add(_strip);
@@ -407,9 +447,14 @@ namespace kiosk.UI
             chip.AccessibleName = label;
             chip.AccessibleRole = AccessibleRole.PageTab;
 
-            chip.Width = Math.Max(108, TextRenderer.MeasureText(label, Hive.BodyBold).Width + 32);
+            // Each chip is its own label plus the same padding, so the gap between
+            // labels - which is what reads as the spacing - is constant all along.
+            // A fixed minimum width padded short labels out and made it uneven.
+            // Measure the translated label, since that is what the chip draws.
+            int textW = TextRenderer.MeasureText(GuestText.T(label), Hive.BodyBold).Width;
+            chip.Width = Math.Max(ChipMinWidth, textW + ChipPadX * 2);
 
-            chip.Left = _strip.Controls.Count == 0 ? 0 : LastRight() + 6;
+            chip.Left = _strip.Controls.Count == 0 ? 0 : LastRight() + ChipGap;
             chip.Click += (s, e) => { if (!_dragMoved) Select(chip); };
             AttachDrag(chip);
             _strip.Controls.Add(chip);

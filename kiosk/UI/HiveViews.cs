@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -37,8 +37,8 @@ namespace kiosk.UI
                 _back.Icon = Mark.ArrowLeft;
                 _back.Style = HiveStyle.Ghost;
                 _back.TextColor = Color.White;
-                _back.Size = new Size(42, 42);
-                _back.Location = new Point(Hive.Gutter - 6, 25);
+                _back.Size = new Size(48, 48);
+                _back.Location = new Point(Hive.Gutter - 9, (Height - 48) / 2);   // same centre as the old 42px button
                 Controls.Add(_back);
             }
             _back.Click += onBack;
@@ -70,7 +70,7 @@ namespace kiosk.UI
 
             if (_back != null)
             {
-                left = _back.Right + 6;
+                left = _back.Right + 3;   // the button grew 3px each side; keep the title where it was
             }
             else if (_mark != null)
             {

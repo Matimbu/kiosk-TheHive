@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -27,6 +27,7 @@ namespace kiosk
             ShowInTaskbar = false;
 
             header.ShowBack((s, e) => Nav.Back());
+            _clear.FitToLabel(96);   // "Burahin" in caps does not fit the English width
             header.SetAccessory(_clear);
             _clear.Click += (s, e) => {
                 if (OrderStorage.Orders.Count > 0) Nav.Go(new ClearOrderForm());

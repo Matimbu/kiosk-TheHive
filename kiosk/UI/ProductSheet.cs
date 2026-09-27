@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -55,43 +55,49 @@ namespace kiosk.UI
 
             int left = Hive.Gutter + 4;
             int width = SheetW - left * 2;
+            // Every option row is a 48px touch target. The extra height is taken
+            // back from the label strip and the gap between rows, so the options
+            // block is the same total height it was and the notes still clear the
+            // footer.
+            const int Row = 48, LabelH = 18, RowGap = 10;
+
             int y = _heroHeight + 66;
 
             if (_product.HasSizes)
             {
-                y += 20;
+                y += LabelH;
                 _size = new Segmented();
                 _size.Options = Array.ConvertAll(_product.Sizes, s => s.Label + " (" + Hive.MoneyShort(s.Price) + ")");
-                _size.Bounds = new Rectangle(left, y, width, 44);
+                _size.Bounds = new Rectangle(left, y, width, Row);
                 _size.SelectionChanged += (s, e) => Refresh();
                 Controls.Add(_size);
-                y += 44 + 14;
+                y += Row + RowGap;
             }
 
             if (_product.HasTemperature)
             {
-                y += 20;
+                y += LabelH;
                 _temp = new Segmented();
                 _temp.Options = new[] { "Hot", "Iced" };
-                _temp.Bounds = new Rectangle(left, y, width, 44);
+                _temp.Bounds = new Rectangle(left, y, width, Row);
                 Controls.Add(_temp);
-                y += 44 + 14;
+                y += Row + RowGap;
             }
 
             if (isBeverage)
             {
-                y += 20;
+                y += LabelH;
                 _sweetness = new Segmented();
                 _sweetness.Options = new[] { "100%", "75%", "50%", "25%", "0%" };
-                _sweetness.Bounds = new Rectangle(left, y, width, 40);
+                _sweetness.Bounds = new Rectangle(left, y, width, Row);
                 _sweetness.SelectedIndex = 0;
                 Controls.Add(_sweetness);
-                y += 40 + 14;
+                y += Row + RowGap;
             }
 
-            y += 20;
+            y += LabelH;
             _qty = new Stepper();
-            _qty.Bounds = new Rectangle(left, y, 150, 44);
+            _qty.Bounds = new Rectangle(left, y, 150, Row);
             _qty.ValueChanged += (s, e) => Refresh();
             Controls.Add(_qty);
 
@@ -107,8 +113,8 @@ namespace kiosk.UI
             _close = new HiveButton();
             _close.Icon = Mark.Cross;
             _close.Style = HiveStyle.Light;
-            _close.Size = new Size(42, 42);
-            _close.Location = new Point(SheetW - 42 - 14, 14);
+            _close.Size = new Size(48, 48);
+            _close.Location = new Point(SheetW - 48 - 11, 11);   // same centre as before
             _close.Click += (s, e) => Nav.Back();
             Controls.Add(_close);
 

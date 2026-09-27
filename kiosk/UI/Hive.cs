@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -343,17 +343,12 @@ namespace kiosk.UI
                                        Color color, float tracking, bool center)
         {
             if (string.IsNullOrEmpty(text)) return;
-            text = GuestText.T(text);
+            text = TrackedLabel(text);
 
             const TextFormatFlags flags = TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
 
-            float total = 0;
-            float[] widths = new float[text.Length];
-            for (int i = 0; i < text.Length; i++)
-            {
-                widths[i] = TextRenderer.MeasureText(g, text[i].ToString(), font, Size.Empty, flags).Width;
-                total += widths[i] + (i < text.Length - 1 ? tracking : 0);
-            }
+            float[] widths;
+            float total = TrackedWidth(g, text, font, tracking, out widths);
 
             if (total > bounds.Width)
             {
@@ -372,6 +367,38 @@ namespace kiosk.UI
                                       new Point((int)Math.Round(x), y), color, flags);
                 x += widths[i] + tracking;
             }
+        }
+        // Callers pass tracked labels in caps, but the dictionary matches without
+        // regard to case and hands back the Filipino in mixed case. Letter-spaced
+        // lowercase looks broken ("Mga p a borito"), so keep the caps the caller
+        // asked for.
+        public static string TrackedLabel(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            bool caps = text == text.ToUpperInvariant();
+            text = GuestText.T(text);
+            return caps ? text.ToUpperInvariant() : text;
+        }
+
+        // The width TextTracked will actually use. Shared so anything checking
+        // whether a label fits measures it the same way it gets drawn.
+        public static float TrackedWidth(Graphics g, string label, Font font, float tracking)
+        {
+            float[] unused;
+            return TrackedWidth(g, label, font, tracking, out unused);
+        }
+
+        private static float TrackedWidth(Graphics g, string label, Font font, float tracking, out float[] widths)
+        {
+            const TextFormatFlags flags = TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
+            float total = 0;
+            widths = new float[label.Length];
+            for (int i = 0; i < label.Length; i++)
+            {
+                widths[i] = TextRenderer.MeasureText(g, label[i].ToString(), font, Size.Empty, flags).Width;
+                total += widths[i] + (i < label.Length - 1 ? tracking : 0);
+            }
+            return total;
         }
 
         public const TextFormatFlags Centered =

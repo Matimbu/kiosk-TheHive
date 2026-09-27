@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -69,9 +69,9 @@ namespace kiosk
             {
                 y += 22;
                 _sweetness = new Segmented { Options = new[] { "100%", "75%", "50%", "25%", "0%" } };
-                _sweetness.Bounds = new Rectangle(left, y, width, 44);
+                _sweetness.Bounds = new Rectangle(left, y, width, Hive.TapTarget);   // same as its neighbours
                 Controls.Add(_sweetness);
-                y += 58;
+                y += Hive.TapTarget + 14;
             }
 
             y += 22;
@@ -89,7 +89,7 @@ namespace kiosk
             _remove.Text = "Remove item";
             _remove.Style = HiveStyle.Ghost;
             _remove.TextColor = Hive.Danger;
-            _remove.Bounds = new Rectangle(left, footerTop - 60, width, 44);
+            _remove.Bounds = new Rectangle(left, footerTop - 64, width, 48);
             _remove.Click += RemoveClicked;
             Controls.Add(_remove);
 
