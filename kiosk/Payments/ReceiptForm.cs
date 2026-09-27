@@ -14,7 +14,12 @@ namespace kiosk.Payments
 {
     public partial class ReceiptForm : Form
     {
-        private const int BandH = 120;
+        private const int BandH = 162;
+
+        // The one thing the guest has to carry to the counter, so it is the
+        // biggest text on the screen and sits in the band, which stays put
+        // while the receipt below scrolls.
+        internal static readonly Font NumberFont = Hive.Sized(Hive.PriceBig, 40f);
 
         private readonly List<Order> _orders;
         private readonly string _paymentMethod;
@@ -228,14 +233,26 @@ namespace kiosk.Payments
             using (SolidBrush rule = new SolidBrush(Hive.Honey))
                 g.FillRectangle(rule, 0, band.Height - 3, Width, 3);
 
-            RectangleF hex = new RectangleF(Width / 2f - 23, 12, 46, 46);
+            // check and title share one line, centred as a pair
+            string title = GuestText.T(_paymentMethod == "Cash" ? "Order placed" : "Demo order created");
+            int titleW = TextRenderer.MeasureText(g, title, Hive.Title).Width;   // with the padding DrawText adds
+            float pairX = (Width - (30 + 6 + titleW)) / 2f;
+            RectangleF hex = new RectangleF(pairX, 13, 30, 30);
             Hive.FillHex(g, hex, Color.FromArgb(48, 255, 255, 255));
-            Marks.Draw(g, Mark.Check, RectangleF.Inflate(hex, -13, -13), Color.White, 2.2f);
+            Marks.Draw(g, Mark.Check, RectangleF.Inflate(hex, -8.5f, -8.5f), Color.White, 2f);
+            Hive.Text(g, title, Hive.Title,
+                      new Rectangle((int)hex.Right + 6, 9, titleW + 4, 38), Color.White, Hive.LeftMid);
 
-            Hive.Text(g, _paymentMethod == "Cash" ? "Order placed" : "Demo order created", Hive.Title,
-                      new Rectangle(0, 60, Width, 32), Color.White, Hive.Centered);
-            Hive.Text(g, _paymentMethod == "Cash" ? "Please pay " + Hive.Money(_total) + " at the counter" : "No payment taken — " + _paymentMethod, Hive.Caption,
-                      new Rectangle(0, 92, Width, 20), Color.FromArgb(190, 255, 255, 255), Hive.Centered);
+            Hive.TextTracked(g, "ORDER NUMBER", Hive.Overline, new Rectangle(0, 52, Width, 16),
+                             Color.FromArgb(190, 255, 255, 255), 1.6f, true);
+            Hive.Text(g, _displayNumber, NumberFont,
+                      new Rectangle(0, 62, Width, 62), Color.White, Hive.Centered);
+
+            string next = _paymentMethod == "Cash"
+                ? string.Format(GuestText.T("Show this number and pay {0} at the counter"), Hive.Money(_total))
+                : "No payment taken — " + _paymentMethod;
+            Hive.Text(g, next, Hive.Caption,
+                      new Rectangle(0, 125, Width, 20), Color.FromArgb(215, 255, 255, 255), Hive.Centered);
 
             if (!string.IsNullOrEmpty(_saveError))
                 Hive.Text(g, _saveError, Hive.Caption,

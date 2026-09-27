@@ -123,6 +123,7 @@ namespace kiosk.UI
             { "THIS IS NOT AN OFFICIAL RECEIPT", "HINDI ITO OPISYAL NA RESIBO" },
             { "ORDER NUMBER", "NUMERO NG ORDER" },
             { "Show this number at the counter", "Ipakita ang numerong ito sa counter" },
+            { "Show this number and pay {0} at the counter", "Ipakita ang numerong ito at magbayad ng {0} sa counter" },
             { "Keep this number for reference", "Itabi ang numerong ito bilang sanggunian" },
             { "SWIPE UP FOR MORE", "I-SWIPE PATAAS PARA SA IBA PA" },
             { "Date", "Petsa" }, { "Terminal", "Terminal" }, { "Payment", "Bayad" },

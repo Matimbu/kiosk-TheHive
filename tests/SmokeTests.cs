@@ -141,6 +141,9 @@ class SmokeTests
             Check(LocalStore.History(out unreadable).Count == 1 && unreadable == 1, "damaged record does not hide valid history");
             var demo = LocalStore.Submit("Card"); Check(demo.Status == "Demo - no payment taken", "card demo never marked paid");
             Check(demo.DisplayNumber == "002", "order numbers count up through the day");
+            var numberFont = (Font)typeof(ReceiptForm).GetField("NumberFont", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            Check(numberFont.Size > Hive.PriceBig.Size && numberFont.Size > Hive.Display.Size,
+                "the order number is the largest text on the receipt screen");
             string ordersDir = Path.Combine(LocalStore.Root, "Orders");
             var yesterday = new SavedOrder { Id = DateTime.Now.AddDays(-1).ToString("yyyyMMdd") + "-235900-abc123", Number = 41,
                 Created = DateTime.Now.AddDays(-1), Method = "Cash", Status = "Pending counter payment", Lines = new System.Collections.Generic.List<Order>() };
