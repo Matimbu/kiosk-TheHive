@@ -183,49 +183,100 @@ namespace kiosk.UI
     public class Toast : HiveControl
     {
         private const int PillH = 38;
-        private const int Pad = 7;          // room for the shadow
+        private const int ActionPillH = 48; // with an action, the whole height is its tap zone
 
         private readonly Anim _fade;
         private readonly Timer _hold = new Timer { Interval = 1400 };
         private string _message;
+        private string _action;
+        private Rectangle _actionZone;
+        private bool _downOnAction;
+
+        // Raised when the guest taps the action ("Undo").
+        public event EventHandler ActionTapped;
+
+        public string ActionLabel { get { return _action; } }
+        public Rectangle ActionZone { get { return _action == null ? Rectangle.Empty : _actionZone; } }
 
         public Toast()
         {
             _fade = new Anim(this, 0.2f);
             _hold.Tick += (s, e) => { _hold.Stop(); _fade.To(0f); };
-            Size = new Size(200, PillH + Pad * 2);
+            Size = new Size(200, PillH);
             Enabled = false;
             Visible = false;
             BackColor = Hive.Canvas;
             Font = Hive.Subhead;
         }
 
-        public void Say(string message)
+        // The control is cut to the pill itself. It floats over the menu tiles,
+        // and a plain rectangle would paint a page-coloured box around the pill
+        // that slices through the tile names behind it.
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            Region old = Region;
+            using (GraphicsPath shape = Hive.Rounded(new RectangleF(0, 0, Width, Height), Hive.RadiusLarge))
+                Region = new Region(shape);
+            if (old != null) old.Dispose();
+        }
+
+        public void Say(string message) { Say(message, null); }
+
+        // With an action the message stays up longer: long enough to read it,
+        // notice the mistake and reach for the button.
+        public void Say(string message, string action)
         {
             if (string.IsNullOrEmpty(message)) return;
             _message = message;
+            _action = string.IsNullOrEmpty(action) ? null : action.ToUpperInvariant();
+            _downOnAction = false;
 
+            int pillH = _action != null ? ActionPillH : PillH;
             using (Graphics g = CreateGraphics())
             {
                 Size text = TextRenderer.MeasureText(g, _message, Font, Size.Empty, TextFormatFlags.NoPadding);
+                int actionW = _action == null ? 0
+                    : Math.Max(76, (int)Math.Ceiling(Hive.TrackedWidth(g, _action, Hive.BodyBold, 1.1f)) + 40);
                 int w = Math.Min(Parent != null ? Parent.ClientSize.Width - Hive.Gutter * 2 : 400,
-                                 text.Width + 74);
-                Size = new Size(w + Pad * 2, PillH + Pad * 2);
+                                 text.Width + 74 + actionW);
+                Size = new Size(w, pillH);
+                _actionZone = new Rectangle(w - actionW, 0, actionW, pillH);
             }
 
+            Enabled = _action != null;   // otherwise taps fall through to the menu
+            _hold.Stop();
+            _hold.Interval = _action != null ? 5000 : 1400;
             Visible = true;
             BringToFront();
-            _hold.Stop();
             _hold.Start();
             _fade.To(1f);
             Invalidate();
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            _downOnAction = _action != null && _actionZone.Contains(e.Location);
+            Invalidate();
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            bool fire = _downOnAction && _actionZone.Contains(e.Location);
+            _downOnAction = false;
+            Invalidate();
+            if (!fire) return;
+            EventHandler handler = ActionTapped;
+            if (handler != null) handler(this, EventArgs.Empty);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             Hive.Smooth(g);
-            g.Clear(Hive.Canvas);
+            g.Clear(Hive.Canvas);   // only the anti-aliased corners ever show it
 
             float v = _fade.Value;
             if (v <= 0.01f)
@@ -234,21 +285,34 @@ namespace kiosk.UI
                 return;
             }
 
-            float lift = (1f - v) * 8f;
-            RectangleF pill = new RectangleF(Pad, Pad + lift, Width - Pad * 2, PillH);
-
             // fade by blending toward the page, since the control has no real alpha
             float t = 1f - v;
-            Hive.Shadow(g, pill, Hive.RadiusLarge, 2, (int)(18 * v));
+            RectangleF pill = new RectangleF(0, 0, Width, Height);
             Hive.Fill(g, pill, Hive.RadiusLarge, Hive.Mix(Hive.TealDeep, Hive.Canvas, t));
 
-            RectangleF tick = new RectangleF(pill.X + 16, pill.Y + (PillH - 14) / 2f, 14, 14);
+            RectangleF tick = new RectangleF(16, (Height - 14) / 2f, 14, 14);
             Marks.Draw(g, Mark.Check, tick, Hive.Mix(Hive.HoneyLight, Hive.Canvas, t), 2f);
 
+            int textRight = _action != null ? _actionZone.X : Width;
             Hive.Text(g, _message, Font,
-                      new Rectangle((int)tick.Right + 10, (int)pill.Y,
-                                    (int)(pill.Right - tick.Right - 22), PillH),
-                      Hive.Mix(Color.White, Hive.Canvas, t), Hive.LeftMid);
+                      new Rectangle((int)tick.Right + 10, 0, textRight - (int)tick.Right - 22, Height),
+                      Hive.Mix(Color.White, Hive.Canvas, t), Hive.LeftMid | TextFormatFlags.EndEllipsis);
+
+            if (_action != null)
+            {
+                if (_downOnAction)
+                {
+                    Region saved = g.Clip;
+                    using (GraphicsPath shape = Hive.Rounded(pill, Hive.RadiusLarge)) g.SetClip(shape, CombineMode.Intersect);
+                    using (SolidBrush pressed = new SolidBrush(Hive.Mix(Hive.Teal, Hive.Canvas, t)))
+                        g.FillRectangle(pressed, _actionZone);
+                    g.Clip = saved;
+                }
+                using (Pen divider = new Pen(Hive.Mix(Hive.Mix(Color.White, Hive.TealDeep, 0.78f), Hive.Canvas, t), 1f))
+                    g.DrawLine(divider, _actionZone.X, 11, _actionZone.X, Height - 11);
+                Hive.TextTracked(g, _action, Hive.BodyBold, _actionZone,
+                                 Hive.Mix(Hive.HoneyLight, Hive.Canvas, t), 1.1f, true);
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -257,7 +321,6 @@ namespace kiosk.UI
             base.Dispose(disposing);
         }
     }
-
     // Shown after 90 idle seconds, before the kiosk resets for the next guest.
     // It takes the whole screen on purpose: the old warning was a thin strip at
     // the top edge, away from where a guest reading the menu is looking, and

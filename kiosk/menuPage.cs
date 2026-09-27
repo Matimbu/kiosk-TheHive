@@ -22,6 +22,7 @@ namespace kiosk
             grid.ProductChosen += (s, e) => OpenProduct(e.Item);
             grid.ProductQuickAdd += (s, e) => QuickAdd(e.Item);
             cartBar.Action.Click += (s, e) => OpenOrder();
+            _added.ActionTapped += (s, e) => UndoLastAdd();
 
             Controls.Add(_added);
             _added.Anchor = AnchorStyles.Bottom;
@@ -99,7 +100,7 @@ namespace kiosk
         private void PlaceToast()
         {
             _added.Left = (ClientSize.Width - _added.Width) / 2;
-            _added.Top  = cartBar.Top - _added.Height;
+            _added.Top  = cartBar.Top - _added.Height - 7;
             _added.BringToFront();
         }
 
@@ -108,7 +109,17 @@ namespace kiosk
             string item = OrderStorage.LastAdded;
             if (string.IsNullOrEmpty(item)) return;
             OrderStorage.LastAdded = null;
-            _added.Say(string.Format(GuestText.T("{0} added"), item));
+            _added.Say(string.Format(GuestText.T("{0} added"), item),
+                       OrderStorage.CanUndo ? GuestText.T("Undo") : null);
+            PlaceToast();
+        }
+
+        // One tap on + adds a meal, so one tap takes it back.
+        private void UndoLastAdd()
+        {
+            string item = OrderStorage.UndoLastAdd();
+            if (item == null) { _added.Visible = false; return; }
+            _added.Say(string.Format(GuestText.T("{0} removed"), item));
             PlaceToast();
         }
     }

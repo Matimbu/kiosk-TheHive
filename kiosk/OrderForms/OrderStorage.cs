@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using kiosk.UI;
@@ -43,8 +43,39 @@ namespace kiosk
             }
             else Orders.Add(order);
             LastAdded = (order.Quantity > 1 ? order.Quantity + " x " : "") + order.Product;
+            _undoLine = same ?? order;
+            _undoQty = order.Quantity;
+            _undoLeaves = _undoLine.Quantity;
+            _undoLabel = LastAdded;
             Notify();
         }
-        public static void ClearOrders() { Orders.Clear(); LastAdded = null; Notify(); }
+
+        // The last add, kept so the menu can offer Undo. It only undoes if that
+        // cart line is exactly as the add left it; once the guest has edited,
+        // removed or re-added it, "undo" would no longer mean what they expect.
+        private static Order _undoLine;
+        private static int _undoQty, _undoLeaves;
+        private static string _undoLabel;
+
+        public static bool CanUndo
+        {
+            get { return _undoLine != null && Orders.Contains(_undoLine) && _undoLine.Quantity == _undoLeaves; }
+        }
+
+        // Takes back the last add and returns what it was ("2 x Cafe Latte"),
+        // or null when there is nothing safe to undo.
+        public static string UndoLastAdd()
+        {
+            if (!CanUndo) { _undoLine = null; return null; }
+            string label = _undoLabel;
+            _undoLine.Quantity -= _undoQty;
+            if (_undoLine.Quantity <= 0) Orders.Remove(_undoLine);
+            _undoLine = null;
+            LastAdded = null;
+            Notify();
+            return label;
+        }
+
+        public static void ClearOrders() { Orders.Clear(); LastAdded = null; _undoLine = null; Notify(); }
     }
 }

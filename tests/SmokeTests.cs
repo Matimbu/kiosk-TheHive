@@ -270,6 +270,43 @@ class SmokeTests
                 Check(tapa.InOrder == 2 && OrderStorage.Orders.Count == 1, "a second quick add raises the tile count, on one cart line");
                 Check(FindAll<ProductTile>(menuGrid).Where(t => t != tapa).All(t => t.InOrder == 0),
                     "only the item that was added carries a count");
+
+                // Undo on the confirmation takes back exactly one add
+                var toastDown = typeof(Toast).GetMethod("OnMouseDown", BindingFlags.NonPublic | BindingFlags.Instance);
+                var toastUp = typeof(Toast).GetMethod("OnMouseUp", BindingFlags.NonPublic | BindingFlags.Instance);
+                Action tapUndo = () =>
+                {
+                    Point at = centre(toast.ActionZone);
+                    toastDown.Invoke(toast, new object[] { new MouseEventArgs(MouseButtons.Left, 1, at.X, at.Y, 0) });
+                    toastUp.Invoke(toast, new object[] { new MouseEventArgs(MouseButtons.Left, 1, at.X, at.Y, 0) });
+                    Application.DoEvents();
+                };
+                Check(toast.Visible && toast.ActionLabel == GuestText.T("Undo").ToUpperInvariant() && toast.Enabled,
+                    "the add confirmation offers Undo");
+                Check(toast.ActionZone.Width >= 48 && toast.ActionZone.Height >= 48,
+                    "Undo is a full 48px tap target (" + toast.ActionZone.Width + "x" + toast.ActionZone.Height + ")");
+                tapUndo();
+                Check(OrderStorage.Orders.Count == 1 && OrderStorage.Orders[0].Quantity == 1 && tapa.InOrder == 1,
+                    "Undo takes back one quick add, not the whole line");
+                Check(toast.Visible && toast.ActionLabel == null && !toast.Enabled,
+                    "after Undo the message confirms the removal, with nothing left to tap");
+                Check(OrderStorage.UndoLastAdd() == null && OrderStorage.Orders[0].Quantity == 1,
+                    "Undo never reaches further back than the last add");
+                tapTile(tapa, centre(tapa.QuickAddZone));
+                OrderStorage.Orders[0].Quantity = 5;                     // the guest changed it in the cart
+                Check(!OrderStorage.CanUndo && OrderStorage.UndoLastAdd() == null && OrderStorage.Orders[0].Quantity == 5,
+                    "once the guest edits that line, Undo no longer touches it");
+                OrderStorage.ClearOrders();
+                tapTile(tapa, centre(tapa.QuickAddZone));
+                tapUndo();
+                Check(OrderStorage.Orders.Count == 0 && tapa.InOrder == 0, "undoing the only add empties that line from the cart");
+                OrderStorage.AddOrder(Coffee(1)); OrderStorage.AddOrder(Coffee(2));
+                Check(OrderStorage.UndoLastAdd() == "2 x Americano" && OrderStorage.Orders.Single().Quantity == 1,
+                    "undoing a merged add removes only what that add put in");
+                OrderStorage.ClearOrders();
+                Check(!OrderStorage.CanUndo, "clearing the cart leaves nothing to undo");
+                tapTile(tapa, centre(tapa.QuickAddZone));
+                tapTile(tapa, centre(tapa.QuickAddZone));
                 bool wasFilipino = GuestText.Filipino;
                 foreach (bool fil in new[] { false, true })
                 {
@@ -402,6 +439,8 @@ class SmokeTests
             var surfaces = new[] { Hive.Canvas, Hive.Surface, Hive.SurfaceAlt, Hive.TealWash, Hive.HoneyWash };
             double worst = textColours.SelectMany(fg => surfaces.Select(bg => Contrast(fg, bg))).Min();
             Check(worst >= 4.5, "every text colour reads at 4.5:1 on every surface (worst " + worst.ToString("0.00") + ")");
+            double undo = Contrast(Hive.HoneyLight, Hive.TealDeep);
+            Check(undo >= 4.5, "the honey Undo on the dark confirmation reads at 4.5:1 (" + undo.ToString("0.00") + ")");
             // No stock Windows font anywhere in the type system: every Font token
             // resolves to Sitka or Bahnschrift on a machine that has them.
             var stock = new[] { "Segoe", "Consolas", "Tahoma", "Microsoft Sans Serif", "Arial", "Calibri" };

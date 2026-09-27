@@ -50,6 +50,8 @@ namespace kiosk.UI
             { "Order not completed", "Hindi natuloy ang order" },
             { "Your order is still here, so you can try again.", "Nandiyan pa ang order mo, subukan ulit." },
             { "{0} added", "Naidagdag ang {0}" },
+            { "{0} removed", "Inalis ang {0}" },
+            { "Undo", "Bawiin" },
             { "Classics", "Klasiko" }, { "Cheesecake", "Keso" }, { "GentleTea", "Fruit tea" },
             { "Rice Meals", "Kanin" },
             { "What everyone orders", "Mga paborito" }, { "Pulled fresh all day", "Bagong timpla" },
