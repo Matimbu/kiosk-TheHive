@@ -106,7 +106,7 @@ namespace kiosk.UI
             { "SWIPE UP FOR MORE", "I-SWIPE PATAAS PARA SA IBA PA" },
             { "Date", "Petsa" }, { "Terminal", "Terminal" }, { "Payment", "Bayad" },
             { "Status", "Status" }, { "ITEM", "ITEM" }, { "AMOUNT", "HALAGA" },
-            { "Done", "Tapos" }, { "Regular", "Regular" }
+            { "Done", "Tapos" }
         };
 
         private static readonly Dictionary<string, string> ProductDescriptions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

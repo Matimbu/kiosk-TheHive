@@ -674,21 +674,29 @@ namespace kiosk.UI
             int left = (int)photo.Right + 12;
             int width = _qty.Left - 12 - left;
 
+            // Three lines when there are options to show; with nothing to choose
+            // (a rice meal) just the name and price, centred in the card.
+            string detail = OrderText.Describe(_order);
+            bool hasDetail = !string.IsNullOrEmpty(detail);
+            int nameY  = (int)card.Y + (hasDetail ? 14 : 20);
+            int totalY = (int)card.Y + (hasDetail ? 55 : 42);
+
             Hive.Text(g, _order.Product, Hive.Serif,
-                      new Rectangle(left, (int)card.Y + 14, width, 20), Hive.Ink,
+                      new Rectangle(left, nameY, width, 20), Hive.Ink,
                       Hive.LeftMid | TextFormatFlags.EndEllipsis);
 
-            Hive.Text(g, OrderText.Describe(_order), Hive.Caption,
-                      new Rectangle(left, (int)card.Y + 35, width, 18), Hive.Muted,
-                      Hive.LeftMid | TextFormatFlags.EndEllipsis);
+            if (hasDetail)
+                Hive.Text(g, detail, Hive.Caption,
+                          new Rectangle(left, (int)card.Y + 35, width, 18), Hive.Muted,
+                          Hive.LeftMid | TextFormatFlags.EndEllipsis);
 
             // line total, and the unit price beside it once there is more than one
             string total = Hive.Money(_order.Total);
             int totalW = TextRenderer.MeasureText(g, total, Hive.Price).Width;   // with padding, as Hive.Text draws it
-            Hive.Text(g, total, Hive.Price, new Rectangle(left - 3, (int)card.Y + 55, totalW, 24), Hive.Ink, Hive.LeftMid);
+            Hive.Text(g, total, Hive.Price, new Rectangle(left - 3, totalY, totalW, 24), Hive.Ink, Hive.LeftMid);
             if (_order.Quantity > 1)
                 Hive.Text(g, Hive.Money(_order.Price) + " each", Hive.Caption,
-                          new Rectangle(left + totalW + 2, (int)card.Y + 55, width - totalW - 2, 24), Hive.Muted,
+                          new Rectangle(left + totalW + 2, totalY, width - totalW - 2, 24), Hive.Muted,
                           Hive.LeftMid | TextFormatFlags.EndEllipsis);
         }
 
@@ -711,7 +719,9 @@ namespace kiosk.UI
             if (!string.IsNullOrWhiteSpace(order.Sweetness) && order.Sweetness != "100%")
                 parts.Add(GuestText.T(order.Sweetness + " sugar"));
 
-            return parts.Count == 0 ? "Regular" : string.Join(" / ", parts.ToArray());
+            // Empty when there is nothing to describe - a rice meal has no size,
+            // temperature or sweetness, and a placeholder word read like a choice.
+            return string.Join(" / ", parts.ToArray());
         }
     }
 

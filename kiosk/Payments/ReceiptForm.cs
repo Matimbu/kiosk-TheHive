@@ -167,7 +167,7 @@ namespace kiosk.Payments
                 string detail = OrderText.Describe(o);
                 string qty = "  " + o.Quantity + " x " + o.Price.ToString("N2");
 
-                if (detail == "Regular")
+                if (string.IsNullOrEmpty(detail))
                 {
                     r.AppendLine(qty);
                 }
@@ -363,7 +363,7 @@ namespace kiosk.Payments
 
                 string detail = OrderText.Describe(o);
                 string sub = o.Quantity + " x " + Hive.Money(o.Price);
-                if (detail != "Regular") sub += "   ·   " + detail;
+                if (!string.IsNullOrEmpty(detail)) sub += "   ·   " + detail;
 
                 if (g != null)
                     Hive.Text(g, sub, Hive.Caption, new Rectangle(left, y, w, 18), Hive.Muted, Hive.LeftMid);

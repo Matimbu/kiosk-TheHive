@@ -94,6 +94,8 @@ class SmokeTests
             OrderStorage.AddOrder(lessSweet);
             Check(OrderStorage.Orders.Count == 2 && OrderStorage.GetTotal() == 120, "different sweetness remains a separate line");
             Check(OrderText.Describe(lessSweet).Contains("50% sugar"), "cart and receipt description show sweetness");
+            Check(OrderText.Describe(new Order { Product = "Beef Tapa", Size = "", Temperature = "", Price = 145, Quantity = 1 }) == "",
+                "a rice meal has no option line, not a placeholder word");
             Fails(() => OrderStorage.AddOrder(Coffee(99)), "quantity overflow rejected");
             LocalStore.SetSoldOut("Americano", true);
             LocalStore.SoldOut.Clear(); LocalStore.LoadAvailability();
