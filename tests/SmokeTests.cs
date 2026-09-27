@@ -201,6 +201,22 @@ class SmokeTests
                 "the Filipino receipt translates the amount column");
             Check(!slipLines.Any(l => l.TrimEnd().EndsWith("50%")),
                 "a long customization is not split mid-phrase");
+            string filMonth = System.Globalization.CultureInfo.GetCultureInfo("fil-PH").DateTimeFormat.AbbreviatedMonthNames[DateTime.Now.Month - 1];
+            Check(slipLines.Any(l => l.StartsWith("Petsa") && l.Contains(" " + filMonth + " ")),
+                "the Filipino receipt is dated in Filipino months");
+
+            // dates follow the guest's language, never the PC's regional setting
+            var machineCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("fil-PH");
+            bool guestWasFilipino = GuestText.Filipino;
+            GuestText.SetFilipino(false);
+            string englishDate = new DateTime(2026, 9, 27).ToString("dd MMM yyyy", GuestText.DateCulture);
+            GuestText.SetFilipino(true);
+            string filipinoDate = new DateTime(2026, 9, 27).ToString("dd MMM yyyy", GuestText.DateCulture);
+            GuestText.SetFilipino(guestWasFilipino);
+            System.Threading.Thread.CurrentThread.CurrentCulture = machineCulture;
+            Check(englishDate == "27 Sep 2026", "English dates stay English on a Filipino-locale PC");
+            Check(filipinoDate == "27 Set 2026", "Filipino dates use Filipino months");
 
             GuestText.SetFilipino(false);
             using (var shell = new Shell()) {

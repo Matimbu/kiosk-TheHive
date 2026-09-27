@@ -9,6 +9,21 @@ namespace kiosk.UI
 
         public static void SetFilipino(bool value) { Filipino = value; }
 
+        // Dates follow the guest's language, not the Windows locale the kiosk
+        // happens to run under: "27 Set 2026" in Filipino, "27 Sep 2026" in English.
+        public static System.Globalization.CultureInfo DateCulture
+        {
+            get { return Filipino && FilipinoDates != null ? FilipinoDates : System.Globalization.CultureInfo.InvariantCulture; }
+        }
+
+        private static readonly System.Globalization.CultureInfo FilipinoDates = LoadFilipinoDates();
+
+        private static System.Globalization.CultureInfo LoadFilipinoDates()
+        {
+            try { return System.Globalization.CultureInfo.GetCultureInfo("fil-PH"); }
+            catch (System.Globalization.CultureNotFoundException) { return null; }   // falls back to English months
+        }
+
         private static readonly Dictionary<string, string> FilipinoText = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "Good day.", "Magandang araw." },

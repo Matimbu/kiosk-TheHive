@@ -150,7 +150,7 @@ namespace kiosk.Payments
             center(_paymentMethod == "Cash" ? "Show this code at the counter" : "Keep this code for reference");
             center(_paymentMethod == "Cash" ? "PENDING COUNTER PAYMENT" : "DEMO - NO PAYMENT TAKEN");
             rule();
-            row("Date", _issued.ToString("dd MMM yyyy HH:mm"));
+            row("Date", _issued.ToString("dd MMM yyyy HH:mm", GuestText.DateCulture));
             row("Terminal", CafeInfo.Terminal);
             row("Payment", _paymentMethod);
             if (CardLine != null) row("Card", CardLine);
@@ -330,7 +330,7 @@ namespace kiosk.Payments
             y = Hairline(g, left, y, w);
             y += 10;
 
-            y = Row(g, "Date", _receipt.Issued.ToString("dd MMM yyyy, HH:mm"), left, y, w);
+            y = Row(g, "Date", _receipt.Issued.ToString("dd MMM yyyy, HH:mm", GuestText.DateCulture), left, y, w);
             y = Row(g, "Terminal", CafeInfo.Terminal, left, y, w);
             y = Row(g, "Status", _receipt.PaymentMethod == "Cash" ? "Pending counter payment" : "Demo — no payment taken", left, y, w);
             y = Row(g, "Payment",
