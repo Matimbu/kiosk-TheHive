@@ -131,8 +131,8 @@ class SmokeTests
 
             LocalStore.SetSoldOut("Americano", false);
             var saved = LocalStore.Submit("Cash");
-            Check(saved.DisplayNumber.Length == 7 && saved.Id.EndsWith(saved.DisplayNumber.Substring(1), StringComparison.OrdinalIgnoreCase),
-                "guest order code is short and maps to the saved record");
+            Check(saved.Number == 1 && saved.DisplayNumber == "001" && File.Exists(Path.Combine(LocalStore.Root, "Orders", saved.Id + ".xml")),
+                "the day's first order is number 001, saved under its full record id");
             OrderStorage.Orders[0].Quantity = 1;
             Check(saved.Total == 120 && saved.Lines[1].Sweetness == "50%", "saved snapshot retains sweetness independently of cart");
             int unreadable; var history = LocalStore.History(out unreadable);
@@ -140,6 +140,18 @@ class SmokeTests
             File.WriteAllText(Path.Combine(LocalStore.Root, "Orders", "broken.xml"), "broken");
             Check(LocalStore.History(out unreadable).Count == 1 && unreadable == 1, "damaged record does not hide valid history");
             var demo = LocalStore.Submit("Card"); Check(demo.Status == "Demo - no payment taken", "card demo never marked paid");
+            Check(demo.DisplayNumber == "002", "order numbers count up through the day");
+            string ordersDir = Path.Combine(LocalStore.Root, "Orders");
+            var yesterday = new SavedOrder { Id = DateTime.Now.AddDays(-1).ToString("yyyyMMdd") + "-235900-abc123", Number = 41,
+                Created = DateTime.Now.AddDays(-1), Method = "Cash", Status = "Pending counter payment", Lines = new System.Collections.Generic.List<Order>() };
+            LocalStore.Write(Path.Combine(ordersDir, yesterday.Id + ".xml"), yesterday);
+            File.WriteAllText(Path.Combine(ordersDir, DateTime.Now.ToString("yyyyMMdd") + "-000000-broken.xml"), "broken");
+            var third = LocalStore.Submit("Card");
+            Check(third.Number == 4, "yesterday's orders don't count, and a damaged record from today keeps its number (got " + third.Number + ")");
+            Check(LocalStore.History(out unreadable).Any(o => o.Id == third.Id && o.DisplayNumber == "004"),
+                "the number is saved with the order, so history reads it back after a restart");
+            Check(new SavedOrder { Id = "20250101-120000-84c0e8" }.DisplayNumber == "#84C0E8",
+                "orders saved before daily numbers keep their old code");
             string root = LocalStore.Root;
             string blocked = Path.Combine(root, "blocked"); File.WriteAllText(blocked, "file"); LocalStore.Root = blocked;
             Fails(() => LocalStore.Submit("Cash"), "storage failure reported");
@@ -194,7 +206,7 @@ class SmokeTests
                 Check(!cue.Visible, "scroll cue clears at the end of the receipt");
             }
             Shot((Form)receiptCtor.Invoke(new object[] { filipinoOrder }), "receipt-fil", args[0]);
-            Check(Directory.GetFiles(LocalStore.ReceiptFolder, "*.txt").Any(file => File.ReadAllText(file).Contains("ORDER BLG. " + filipinoOrder.DisplayNumber) && File.ReadAllText(file).Contains("Ipakita ang code sa counter")), "Filipino receipt copy shows the short code and counter instruction");
+            Check(Directory.GetFiles(LocalStore.ReceiptFolder, "*.txt").Any(file => File.ReadAllText(file).Contains("ORDER BLG. " + filipinoOrder.DisplayNumber) && File.ReadAllText(file).Contains("Ipakita ang numerong ito sa counter")), "Filipino receipt copy shows the order number and counter instruction");
 
             // the printed slip is 40 columns; Filipino customizations are longer
             // than the English ones and used to run past the edge

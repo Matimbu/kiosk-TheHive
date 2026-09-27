@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,10 +14,17 @@ namespace kiosk
         public string Status { get; set; }
         public List<Order> Lines { get; set; }
         public decimal Total { get { return Lines.Sum(o => o.Total); } }
+
+        // Counts up from 1 each day, so the cashier can call "zero four two"
+        // instead of spelling out a hex code where 0/O and 8/B sound alike.
+        // Orders saved before daily numbers existed read 0 and keep their code.
+        public int Number { get; set; }
+
         public string DisplayNumber
         {
             get
             {
+                if (Number > 0) return Number.ToString("000");
                 if (string.IsNullOrEmpty(Id)) return "—";
                 int separator = Id.LastIndexOf('-');
                 string code = separator >= 0 ? Id.Substring(separator + 1) : Id;
@@ -57,9 +64,11 @@ namespace kiosk
         public static SavedOrder Submit(string method)
         {
             OrderStorage.ValidateCart();
+            DateTime now = DateTime.Now;
             var order = new SavedOrder {
-                Id = DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N").Substring(0, 6),
-                Created = DateTime.Now, Method = method,
+                Id = now.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N").Substring(0, 6),
+                Number = NextNumber(now),
+                Created = now, Method = method,
                 Status = method == "Cash" ? "Pending counter payment" : "Demo - no payment taken",
                 Lines = OrderStorage.Orders.Select(o => new Order { Product = o.Product, Size = o.Size,
                     Temperature = o.Temperature, Sweetness = o.Sweetness, Quantity = o.Quantity,
@@ -67,6 +76,24 @@ namespace kiosk
             };
             Write(Path.Combine(Root, "Orders", order.Id + ".xml"), order);
             return order;
+        }
+
+        // Worked out from the day's saved orders rather than kept in a separate
+        // counter, so it survives a restart and cannot drift from the records.
+        // Record ids start with the date, so only today's files are read. One
+        // that cannot be read still counts, so its number is never reused.
+        private static int NextNumber(DateTime now)
+        {
+            string folder = Path.Combine(Root, "Orders");
+            if (!Directory.Exists(folder)) return 1;
+            string[] today = Directory.GetFiles(folder, now.ToString("yyyyMMdd") + "-*.xml");
+            int highest = today.Length;
+            foreach (string file in today)
+            {
+                try { highest = Math.Max(highest, Read<SavedOrder>(file).Number); }
+                catch (Exception ex) when (ex is IOException || ex is InvalidOperationException || ex is UnauthorizedAccessException) { }
+            }
+            return highest + 1;
         }
 
         public static List<SavedOrder> History(out int unreadable)

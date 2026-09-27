@@ -147,7 +147,7 @@ namespace kiosk.Payments
             r.AppendLine();
 
             center((GuestText.Filipino ? "ORDER BLG. " : "ORDER No. ") + _displayNumber);
-            center(_paymentMethod == "Cash" ? "Show this code at the counter" : "Keep this code for reference");
+            center(_paymentMethod == "Cash" ? "Show this number at the counter" : "Keep this number for reference");
             center(_paymentMethod == "Cash" ? "PENDING COUNTER PAYMENT" : "DEMO - NO PAYMENT TAKEN");
             rule();
             row("Date", _issued.ToString("dd MMM yyyy HH:mm", GuestText.DateCulture));
@@ -322,7 +322,7 @@ namespace kiosk.Payments
                                  new Rectangle(left, y, w, 18), Hive.Muted, 1.3f, true);
                 Hive.Text(g, _receipt.DisplayNumber, Hive.PriceBig,
                           new Rectangle(left, y + 17, w, 40), Hive.Teal, Hive.Centered);
-                Hive.Text(g, _receipt.PaymentMethod == "Cash" ? "Show this code at the counter" : "Keep this code for reference",
+                Hive.Text(g, _receipt.PaymentMethod == "Cash" ? "Show this number at the counter" : "Keep this number for reference",
                           Hive.Caption, new Rectangle(left, y + 55, w, 20), Hive.Muted, Hive.Centered);
             }
             y += 17 + 40 + 20 + 4;

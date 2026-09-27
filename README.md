@@ -36,7 +36,7 @@ After building, you can also open `kiosk/bin/Release/kiosk.exe` directly without
 
 **There is no connected payment processor.**
 
-- **Cash:** saves an order as **Pending counter payment**. The receipt shows a short guest code such as `#637E93` with **Show this code at the counter**; the guest reads that code to the cashier. Staff can record cash received in the staff screen.
+- **Cash:** saves an order as **Pending counter payment**. The receipt shows a daily order number such as **042** with **Show this number at the counter**; the guest reads that number to the cashier. Numbers restart at 001 each day and are worked out from that day's saved orders, so they survive a restart. Orders saved before v2.4 keep their old six-character code. Staff can record cash received in the staff screen.
 - **Card and e-wallet:** create explicitly labeled demonstration orders. They do not charge money, collect card details, or display a live payment QR.
 - Submitted orders are saved before the cart clears. A storage failure keeps the cart available to retry. Back/Escape after submission returns to welcome, so the old checkout cannot be resubmitted.
 - The kiosk saves a text receipt copy; it does not automatically send it to a physical printer. Receipts are not official tax receipts.
