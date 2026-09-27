@@ -2,6 +2,11 @@
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| [v2.4.3](v2.4.3.md) | September 2026 | Daily order numbers up top on the receipt, in-order counts on tiles, Undo, EN / FIL switch on the menu |
+| [v2.4.2](v2.4.2.md) | September 2026 | Full-screen idle warning, Bahnschrift for all reading text, receipt dates in the guest's language |
+| [v2.4.1](v2.4.1.md) | September 2026 | One-tap rice meals, quantity on the cart row, 48px tap targets, readable secondary text, Cheesecake tab explained |
+| [v2.4](v2.4.md) | September 2026 | Kiosk notices instead of Windows dialogs, Filipino gaps closed, every corner on the radius scale |
+| [v2.3.1](v2.3.1.md) | September 2026 | The Filipino receipt fits the 40-column printer |
 | [v2.3](v2.3.md) | September 2026 | Sold-out items shown dimmed instead of hidden |
 | [v2.2](v2.2.md) | September 2026 | Item-added confirmation above the cart, release history back to the start |
 | [v2.1](v2.1.md) | September 2026 | Short guest order codes, receipt scroll cue, touchscreen clear confirmation, calmer safety notes, corners pulled back from pills |
@@ -10,8 +15,9 @@
 | [v1.0](v1.0.md) | March 2026 | The first working version — designer-built WinForms, one window per screen |
 
 <p align="center">
-  <img src="../screenshots/v1.0/menu.png" width="190" alt="v1.0 menu">
-  <img src="../screenshots/v1.1/menu.png" width="190" alt="v1.1 menu">
-  <img src="../screenshots/menu.png" width="190" alt="v2.2 menu">
+  <img src="../screenshots/v1.0/menu.png" width="170" alt="v1.0 menu">
+  <img src="../screenshots/v1.1/menu.png" width="170" alt="v1.1 menu">
+  <img src="../screenshots/menu.png" width="170" alt="v2.2 menu">
+  <img src="../screenshots/v2.4.3/menu.png" width="170" alt="v2.4.3 menu">
 </p>
-<p align="center"><em>The same screen at v1.0, v1.1 and v2.2.</em></p>
+<p align="center"><em>The same screen at v1.0, v1.1, v2.2 and v2.4.3.</em></p>

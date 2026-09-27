@@ -1,13 +1,13 @@
 # The Hive Cafe — Self-Order Kiosk
 
-**Version 2.3** · [Patch notes](docs/patch-notes/v2.3.md) · [Release history](docs/patch-notes/README.md)
+**Version 2.4.3** · [Patch notes](docs/patch-notes/v2.4.3.md) · [Release history](docs/patch-notes/README.md)
 
 A C# WinForms touchscreen kiosk with a hand-painted GDI+ interface, menu browsing, customization, cart editing, and saved orders.
 
 <p align="center">
-  <img src="docs/screenshots/welcome.png" width="220" alt="Welcome screen">
-  <img src="docs/screenshots/menu.png" width="220" alt="Menu and category navigation">
-  <img src="docs/screenshots/product.png" width="220" alt="Product customization">
+  <img src="docs/screenshots/v2.4.3/welcome.png" width="220" alt="Welcome screen">
+  <img src="docs/screenshots/v2.4.3/menu.png" width="220" alt="Menu and category navigation">
+  <img src="docs/screenshots/v2.4.3/product.png" width="220" alt="Product customization">
 </p>
 
 ## Run
@@ -21,22 +21,23 @@ After building, you can also open `kiosk/bin/Release/kiosk.exe` directly without
 ## Customer guidance and accessibility
 
 - The bottom of the menu, order review, and payment screens shows **Menu → Order → Pay** with the current step highlighted.
-- On the welcome screen, tap **English / Filipino** to switch languages before starting. The choice applies through the customer flow, including product descriptions and the receipt copy.
+- Tap **English / Filipino** on the welcome screen, or **EN | FIL** in the menu header at any point in the order, to switch languages. Switching on the menu keeps the category and the order. The choice applies through the customer flow, including product descriptions, receipt dates and the receipt copy.
 - After an order is finished or the kiosk times out, the language resets for the next customer. Product names remain as printed on the cafe menu.
 
 ## Ordering
 
 - Browse the menu using seven icon-labeled category tabs; swipe the tabs sideways for more categories.
 - Sold-out items stay on the menu, dimmed and marked **Sold out**, and settle to the end of their category. A guest can see the item is off today instead of wondering whether it was dropped. They cannot be tapped or added, and availability and prices are checked again at checkout.
+- Tap **+** on a rice meal to add it in one tap; drinks open their page. Tiles show how many of each item are already in the order, and the "added" message offers **Undo** for five seconds.
 - Choose size, hot/iced preparation, sweetness where supported, and quantity. Drinks with a temperature choice start iced; guests can switch to hot. Product details show caffeine guidance and flag unverified allergen information before adding an item. Identical customizations merge into one cart line, with a maximum of 99 per combination.
-- Tap a cart item to edit its options or remove it. Clear empties the cart after confirmation.
-- After 90 seconds without keyboard, click, wheel, or touch input, a 30-second warning appears. Interaction dismisses it; at two minutes the session returns to welcome and clears the cart.
+- Change quantity with the stepper on each cart row. Tap a cart item to edit its options or remove it. Clear empties the cart after confirmation.
+- After 90 seconds without keyboard, click, wheel, or touch input, a full-screen 30-second warning appears. Any tap dismisses it without pressing anything underneath; at two minutes the session returns to welcome and clears the cart.
 
 ## Payment behavior
 
 **There is no connected payment processor.**
 
-- **Cash:** saves an order as **Pending counter payment**. The receipt shows a daily order number such as **042** with **Show this number at the counter**; the guest reads that number to the cashier. Numbers restart at 001 each day and are worked out from that day's saved orders, so they survive a restart. Orders saved before v2.4 keep their old six-character code. Staff can record cash received in the staff screen.
+- **Cash:** saves an order as **Pending counter payment**. The receipt screen leads with a daily order number such as **042** and **Show this number and pay at the counter**; the guest reads that number to the cashier. Numbers restart at 001 each day and are worked out from that day's saved orders, so they survive a restart. Orders saved before v2.4 keep their old six-character code. Staff can record cash received in the staff screen.
 - **Card and e-wallet:** create explicitly labeled demonstration orders. They do not charge money, collect card details, or display a live payment QR.
 - Submitted orders are saved before the cart clears. A storage failure keeps the cart available to retry. Back/Escape after submission returns to welcome, so the old checkout cannot be resubmitted.
 - The kiosk saves a text receipt copy; it does not automatically send it to a physical printer. Receipts are not official tax receipts.
