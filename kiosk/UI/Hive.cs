@@ -66,26 +66,29 @@ namespace kiosk.UI
                          : amount.ToString("0.00"));
         }
 
-        // Sitka for the cafe name + food, Bahnschrift for prices and labels,
-        // Segoe for descriptions
+        // Two voices: Sitka, a serif, for the cafe name and the food; Bahnschrift,
+        // a DIN sans, for everything else - prices, labels and all reading text.
+        // No stock system font (Segoe, Consolas) is used on purpose; Segoe UI is
+        // only the last resort on a machine missing Bahnschrift (Windows 10 1709+
+        // ships it). Bahnschrift also carries its own peso sign, which Sitka lacks.
         private static readonly string Banner  = Resolve("Sitka Banner", "Georgia", "Cambria", "Times New Roman");
         private static readonly string SerifUI = Resolve("Sitka Heading", "Sitka Text", "Georgia", "Cambria");
         private static readonly string Grotesk = Resolve("Bahnschrift SemiBold", "Bahnschrift", "Franklin Gothic Medium", "Segoe UI");
-        private static readonly string Plain   = Resolve("Segoe UI", "Tahoma");
+        private static readonly string Reading = Resolve("Bahnschrift SemiLight", "Bahnschrift", "Segoe UI");   // lighter cut for sentences
+        private static readonly string Small   = Resolve("Bahnschrift", "Segoe UI");                          // regular weight holds up at caption size
 
         public static readonly Font Display  = Make(Banner,  27f, FontStyle.Bold);
         public static readonly Font Title    = Make(SerifUI, 16f, FontStyle.Bold);
         public static readonly Font Heading  = Make(SerifUI, 12.5f, FontStyle.Bold);
         public static readonly Font Serif    = Make(SerifUI, 11f, FontStyle.Bold);
         public static readonly Font Subhead  = Make(Grotesk, 11.5f, FontStyle.Regular);
-        public static readonly Font Body     = Make(Plain,   10.5f, FontStyle.Regular);
-        public static readonly Font BodyBold = Make(Plain,   10.5f, FontStyle.Bold);
-        public static readonly Font Caption  = Make(Plain,   9f, FontStyle.Regular);
+        public static readonly Font Body     = Make(Reading, 10.5f, FontStyle.Regular);
+        public static readonly Font BodyBold = Make(Grotesk, 10.5f, FontStyle.Regular);   // the SemiBold cut
+        public static readonly Font Caption  = Make(Small,   9.5f, FontStyle.Regular);
         public static readonly Font Overline = Make(Grotesk, 8.5f, FontStyle.Regular);
         public static readonly Font Tab      = Make(Grotesk, 10f, FontStyle.Regular);
         public static readonly Font Price    = Make(Grotesk, 13.5f, FontStyle.Regular);
         public static readonly Font PriceBig = Make(Grotesk, 21f, FontStyle.Regular);
-        public static readonly Font Mono     = Make("Consolas", 9.5f, FontStyle.Regular);
 
         private static string Resolve(params string[] candidates)
         {
@@ -109,7 +112,7 @@ namespace kiosk.UI
                 {
                     if (f.IsStyleAvailable(FontStyle.Regular)) style = FontStyle.Regular;
                     else if (f.IsStyleAvailable(FontStyle.Bold)) style = FontStyle.Bold;
-                    else return new Font(Plain ?? "Segoe UI", size, FontStyle.Regular);
+                    else return new Font(Small ?? "Segoe UI", size, FontStyle.Regular);
                 }
                 return new Font(f, size, style);
             }

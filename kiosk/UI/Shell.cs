@@ -34,7 +34,7 @@ namespace kiosk.UI
             if (!(Active is Form1)) return;
             string pin = Environment.GetEnvironmentVariable("HIVE_STAFF_PIN");
             if (string.IsNullOrWhiteSpace(pin)) { MessageBox.Show("Set HIVE_STAFF_PIN in Windows and restart the kiosk to enable staff access."); return; }
-            var login = new Form { BackColor = Hive.Canvas };
+            var login = new Form { BackColor = Hive.Canvas, Font = Hive.Body };   // Unlock and Back inherit this
             var label = new Label { Text = "Staff PIN", Bounds = new Rectangle(24, 100, 420, 40), Font = Hive.Title };
             var input = new TextBox { UseSystemPasswordChar = true, Bounds = new Rectangle(24, 160, 420, 40), Font = Hive.Title, MaxLength = 64 };
             var enter = new Button { Text = "Unlock", Bounds = new Rectangle(24, 220, 420, 54) };

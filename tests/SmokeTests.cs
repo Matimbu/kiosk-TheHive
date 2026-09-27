@@ -352,6 +352,17 @@ class SmokeTests
             var surfaces = new[] { Hive.Canvas, Hive.Surface, Hive.SurfaceAlt, Hive.TealWash, Hive.HoneyWash };
             double worst = textColours.SelectMany(fg => surfaces.Select(bg => Contrast(fg, bg))).Min();
             Check(worst >= 4.5, "every text colour reads at 4.5:1 on every surface (worst " + worst.ToString("0.00") + ")");
+            // No stock Windows font anywhere in the type system: every Font token
+            // resolves to Sitka or Bahnschrift on a machine that has them.
+            var stock = new[] { "Segoe", "Consolas", "Tahoma", "Microsoft Sans Serif", "Arial", "Calibri" };
+            var plainFonts = typeof(Hive).GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(f => f.FieldType == typeof(Font))
+                .Select(f => f.Name + " = " + ((Font)f.GetValue(null)).FontFamily.Name)
+                .Where(s => stock.Any(name => s.Split('=')[1].Trim().StartsWith(name)))
+                .ToArray();
+            Check(plainFonts.Length == 0, "no text uses a stock Windows font"
+                + (plainFonts.Length == 0 ? "" : ": " + string.Join(", ", plainFonts)));
+
             Check(Contrast(Hive.InkSoft, Hive.Canvas) - Contrast(Hive.Muted, Hive.Canvas) >= 1.5,
                 "muted text stays clearly quieter than body text");
 
