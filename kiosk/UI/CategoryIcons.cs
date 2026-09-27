@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -43,9 +43,12 @@ namespace kiosk.UI
                         g.DrawEllipse(p, 8, 16, 2, 2); g.DrawEllipse(p, 13, 17, 2, 2); g.DrawEllipse(p, 11, 13, 2, 2);
                         break;
                     case "Cheesecake":
-                        g.DrawPolygon(p, new[] { new PointF(3, 12), new PointF(18, 5), new PointF(21, 12), new PointF(21, 21), new PointF(3, 21) });
-                        g.DrawLine(p, 3, 12, 21, 12); g.DrawLine(p, 3, 17, 21, 17);
-                        g.DrawEllipse(p, 12, 3, 4, 4);
+                        // a malt drink, not a cake: the same cup as the other drinks,
+                        // with the domed cheesecake cream above the rim and its swirl inside
+                        g.DrawLines(p, new[] { new PointF(5, 8), new PointF(7, 22), new PointF(17, 22), new PointF(19, 8), new PointF(5, 8) });
+                        g.DrawArc(p, 7, 3, 10, 10, 180, 180);   // heaped cream, narrower than the rim - a topping, not a lid
+                        g.DrawEllipse(p, 9.6f, 5.3f, 1.3f, 1.3f); g.DrawEllipse(p, 13.1f, 5.7f, 1.3f, 1.3f);   // cocoa on top, so it reads as food, not a handle
+                        g.DrawBezier(p, 6.3f, 15, 9.5f, 12.5f, 13.5f, 17.5f, 17.7f, 14.5f);
                         break;
                     case "GentleTea":
                         g.DrawBezier(p, 4, 20, 0, 6, 13, 3, 21, 3);

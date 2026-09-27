@@ -36,7 +36,7 @@ namespace kiosk.UI
             { "What everyone orders", "Mga paborito" }, { "Pulled fresh all day", "Bagong timpla" },
             { "Easy on the caffeine", "Mas kaunting caffeine" },
             { "Thé Hive milk tea series", "Mga milk tea" },
-            { "Thé Hive cheesecake series", "Mga cheesecake" },
+            { "Malt drinks with cheesecake cream", "Mga malt na may cheesecake cream" },
             { "Thé Hive fruit tea series", "Mga fruit tea" },
             { "Served hot, all day", "Mainit na ihahain" },
             { "View order", "Tingnan ang order" }, { "Your order", "Ang order mo" },

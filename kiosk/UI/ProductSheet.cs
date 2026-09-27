@@ -232,14 +232,19 @@ namespace kiosk.UI
             int detailLeft = left + 100;
             using (Pen p = new Pen(Hive.LineSoft, 1))
                 g.DrawLine(p, left, noteTop, left + width, noteTop);
+            // Labels match every other label on the page (1.4 tracking), and the
+            // values are body size: allergen guidance must not be the smallest
+            // thing a guest has to read.
             Hive.TextTracked(g, GuestText.T("CAFFEINE"), Hive.Overline,
-                             new Rectangle(left, noteTop + 9, 92, 20), Hive.Muted, 0.7f, false);
-            Hive.Text(g, GuestText.T(_product.DisplayCaffeineNote), Hive.Caption,
-                      new Rectangle(detailLeft, noteTop + 9, width - 100, 20), Hive.InkSoft, Hive.LeftMid);
+                             new Rectangle(left, noteTop + 10, 92, 24), Hive.Muted, 1.4f, false);
+            Hive.Text(g, GuestText.T(_product.DisplayCaffeineNote), Hive.Body,
+                      new Rectangle(detailLeft, noteTop + 10, width - 100, 24), Hive.InkSoft,
+                      Hive.LeftMid | TextFormatFlags.EndEllipsis);
             Hive.TextTracked(g, GuestText.T("ALLERGENS"), Hive.Overline,
-                             new Rectangle(left, noteTop + 35, 92, 20), Hive.Muted, 0.7f, false);
-            Hive.Text(g, GuestText.T(_product.DisplayAllergenNote), Hive.Caption,
-                      new Rectangle(detailLeft, noteTop + 35, width - 100, 20), Hive.InkSoft, Hive.LeftMid);
+                             new Rectangle(left, noteTop + 38, 92, 24), Hive.Muted, 1.4f, false);
+            Hive.Text(g, GuestText.T(_product.DisplayAllergenNote), Hive.Body,
+                      new Rectangle(detailLeft, noteTop + 38, width - 100, 24), Hive.InkSoft,
+                      Hive.LeftMid | TextFormatFlags.EndEllipsis);
 
             int footerTop = _add.Top - 18;
             using (Pen p = new Pen(Hive.Line, 1))

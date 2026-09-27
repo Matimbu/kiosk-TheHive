@@ -150,7 +150,7 @@ namespace kiosk.UI
             new MenuCategory("Coffee",       "Pulled fresh all day"),
             new MenuCategory("Non-Coffee",   "Easy on the caffeine"),
             new MenuCategory("Classics",     "Thé Hive milk tea series"),
-            new MenuCategory("Cheesecake",   "Thé Hive cheesecake series"),
+            new MenuCategory("Cheesecake",   "Malt drinks with cheesecake cream"),
             new MenuCategory("GentleTea",    "Thé Hive fruit tea series"),
             new MenuCategory("Rice Meals",   "Served hot, all day")
         };
