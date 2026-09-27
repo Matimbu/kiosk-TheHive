@@ -8,12 +8,15 @@ namespace kiosk
     public partial class menuPage : Form, IPage
     {
         private readonly Toast _added = new Toast();
+        private readonly LanguageToggle _language = new LanguageToggle();
 
         public menuPage()
         {
             InitializeComponent();
 
             header.Logo = MenuCatalog.Logo;
+            header.SetAccessory(_language);
+            _language.Changed += (s, e) => OnLanguageChanged();
 
             foreach (MenuCategory category in MenuCatalog.Categories)
                 rail.Add(category.Name, category.Name);
@@ -80,8 +83,19 @@ namespace kiosk
             Nav.Go(new viewOrder());
         }
 
+        // Everything on the menu translates as it draws, so a repaint is enough,
+        // and the guest keeps their category and scroll position. Only the tabs
+        // need re-measuring, and a confirmation still showing the old language goes.
+        private void OnLanguageChanged()
+        {
+            _added.Visible = false;
+            rail.Relayout();
+            Invalidate(true);
+        }
+
         public void OnRevealed()
         {
+            _language.Sync();
             RefreshOrderTotals();
             PlaceToast();
             ConfirmLastAdd();

@@ -454,14 +454,36 @@ namespace kiosk.UI
             // labels - which is what reads as the spacing - is constant all along.
             // A fixed minimum width padded short labels out and made it uneven.
             // Measure the translated label, since that is what the chip draws.
-            int textW = TextRenderer.MeasureText(GuestText.T(label), Hive.BodyBold).Width;
-            chip.Width = Math.Max(ChipMinWidth, textW + ChipPadX * 2);
+            chip.Width = ChipWidth(label);
 
             chip.Left = _strip.Controls.Count == 0 ? 0 : LastRight() + ChipGap;
             chip.Click += (s, e) => { if (!_dragMoved) Select(chip); };
             AttachDrag(chip);
             _strip.Controls.Add(chip);
             _strip.Width = LastRight() + Hive.Gutter;
+        }
+
+        private static int ChipWidth(string label)
+        {
+            int textW = TextRenderer.MeasureText(GuestText.T(label), Hive.BodyBold).Width;
+            return Math.Max(ChipMinWidth, textW + ChipPadX * 2);
+        }
+
+        // Re-measures every chip in the current language. Needed when the guest
+        // switches language mid-order: "Rice Meals" and "Kanin" are not the same width.
+        public void Relayout()
+        {
+            int left = 0;
+            foreach (Control c in _strip.Controls)
+            {
+                c.Width = ChipWidth(c.Text);
+                c.Left = left;
+                left = c.Right + ChipGap;
+            }
+            _strip.Width = LastRight() + Hive.Gutter;
+            SetLeft(_strip.Left);
+            if (_selected != null) BringIntoView(_selected);
+            Invalidate(true);
         }
 
         private int LastRight()

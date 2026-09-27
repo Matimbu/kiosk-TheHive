@@ -50,7 +50,7 @@ namespace kiosk.UI
             if (_accessory != null) Controls.Remove(_accessory);
             _accessory = control;
             if (control == null) return;
-            control.Location = new Point(Width - control.Width - Hive.Gutter, 25);
+            control.Location = new Point(Width - control.Width - Hive.Gutter, (Height - control.Height) / 2);
             control.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             Controls.Add(control);
         }
@@ -104,6 +104,90 @@ namespace kiosk.UI
             }
 
             base.OnPaint(e);
+        }
+    }
+
+    // EN | FIL switch for the menu header. The welcome screen is the only other
+    // place to change language, and a guest who tapped Start without noticing it
+    // should not have to abandon their order to switch. Both options are always
+    // on show, so the control explains itself; each half is its own tap zone.
+    public class LanguageToggle : HiveControl
+    {
+        private readonly Anim _slide;
+        private int _down = -1;             // 0 = EN, 1 = FIL, while a finger is on it
+
+        public event EventHandler Changed;
+
+        public LanguageToggle()
+        {
+            _slide = new Anim(this, 0.2f);
+            _slide.Set(GuestText.Filipino ? 1f : 0f);
+            Size = new Size(112, 48);
+            AccessibleName = "Change language between English and Filipino";
+            AccessibleRole = AccessibleRole.PushButton;
+        }
+
+        public Rectangle EnglishZone  { get { return new Rectangle(0, 0, Width / 2, Height); } }
+        public Rectangle FilipinoZone { get { return new Rectangle(Width / 2, 0, Width - Width / 2, Height); } }
+
+        // Brings the thumb in line when the language was changed somewhere else.
+        public void Sync() { _slide.Set(GuestText.Filipino ? 1f : 0f); }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            _down = FilipinoZone.Contains(e.Location) ? 1 : 0;
+            Invalidate();
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            int down = _down;
+            _down = -1;
+            Invalidate();
+            if (down < 0 || !(down == 1 ? FilipinoZone : EnglishZone).Contains(e.Location)) return;
+
+            bool filipino = down == 1;
+            if (filipino == GuestText.Filipino) return;
+            GuestText.SetFilipino(filipino);
+            _slide.To(filipino ? 1f : 0f);
+            EventHandler handler = Changed;
+            if (handler != null) handler(this, EventArgs.Empty);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            Hive.Smooth(g);
+
+            // drawn 40 tall inside the 48px tap zone, to sit quietly beside the title
+            RectangleF frame = new RectangleF(0.5f, 4.5f, Width - 1f, Height - 9f);
+            Hive.Stroke(g, frame, Hive.RadiusButton, Color.FromArgb(95, 255, 255, 255), 1f);
+
+            float half = frame.Width / 2f;
+            if (_down >= 0 && (_down == 1) != GuestText.Filipino)
+            {
+                RectangleF pressed = new RectangleF(frame.X + _down * half, frame.Y, half, frame.Height);
+                pressed.Inflate(-3, -3);
+                Hive.Fill(g, pressed, Hive.RadiusButton - 3, Color.FromArgb(40, 255, 255, 255));
+            }
+
+            RectangleF thumb = new RectangleF(frame.X + _slide.Value * half, frame.Y, half, frame.Height);
+            thumb.Inflate(-3, -3);
+            Hive.Fill(g, thumb, Hive.RadiusButton - 3, Color.White);
+
+            bool fil = _slide.Value >= 0.5f;
+            Hive.TextTracked(g, "EN", Hive.BodyBold, EnglishZone,
+                             fil ? Color.FromArgb(225, 255, 255, 255) : Hive.TealDeep, 1.1f, true);
+            Hive.TextTracked(g, "FIL", Hive.BodyBold, FilipinoZone,
+                             fil ? Hive.TealDeep : Color.FromArgb(225, 255, 255, 255), 1.1f, true);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) _slide.Dispose();
+            base.Dispose(disposing);
         }
     }
 

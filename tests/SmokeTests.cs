@@ -54,6 +54,12 @@ class SmokeTests
             else if (c is Stepper) zone = new Size(c.Height, c.Height);
             else if (c is HiveChip || c is ProductTile || c is OrderRow || c is MethodTile) zone = c.Size;
 
+            var language = c as LanguageToggle;
+            if (language != null)
+                foreach (var half in new[] { language.EnglishZone, language.FilipinoZone })
+                    if (half.Width < 48 || half.Height < 48)
+                        TapProblems.Add(screen + ": a language option is " + half.Width + "x" + half.Height);
+
             var quick = c as ProductTile;
             if (quick != null && quick.CanQuickAdd && (quick.QuickAddZone.Width < 48 || quick.QuickAddZone.Height < 48))
                 TapProblems.Add(screen + ": quick-add + on '" + quick.Item.Name + "' is " + quick.QuickAddZone.Width + "x" + quick.QuickAddZone.Height);
@@ -335,6 +341,63 @@ class SmokeTests
                 Check(americanoTile.InOrder == 3, "the tile count adds up every cart line for that item (hot and iced)");
                 OrderStorage.ClearOrders(); Application.DoEvents();
                 Check(americanoTile.InOrder == 0, "clearing the cart clears the tile counts");
+
+                // the menu's own EN | FIL switch
+                bool startedFilipino = GuestText.Filipino;
+                GuestText.SetFilipino(false); menu.OnRevealed(); Application.DoEvents();
+                var toggle = FindAll<LanguageToggle>(menu).Single();
+                var tabs = FindAll<ChipRail>(menu).Single();
+                var langDown = typeof(LanguageToggle).GetMethod("OnMouseDown", BindingFlags.NonPublic | BindingFlags.Instance);
+                var langUp = typeof(LanguageToggle).GetMethod("OnMouseUp", BindingFlags.NonPublic | BindingFlags.Instance);
+                Action<Rectangle> tapLanguage = zone =>
+                {
+                    Point at = centre(zone);
+                    langDown.Invoke(toggle, new object[] { new MouseEventArgs(MouseButtons.Left, 1, at.X, at.Y, 0) });
+                    langUp.Invoke(toggle, new object[] { new MouseEventArgs(MouseButtons.Left, 1, at.X, at.Y, 0) });
+                    Application.DoEvents();
+                };
+                Func<bool> tabsFit = () =>
+                {
+                    var chips = FindAll<HiveChip>(tabs).OrderBy(ch => ch.Left).ToList();
+                    for (int i = 0; i < chips.Count; i++)
+                    {
+                        if (chips[i].Width < TextRenderer.MeasureText(GuestText.T(chips[i].Text), Hive.BodyBold).Width + 30) return false;
+                        if (i > 0 && chips[i].Left < chips[i - 1].Right) return false;
+                    }
+                    return true;
+                };
+                OrderStorage.AddOrder(Coffee());
+                string onCategory = menuGrid.Category;
+                int pages = stack.Count, lines = OrderStorage.Orders.Count;
+                tapLanguage(toggle.FilipinoZone);
+                Check(GuestText.Filipino && stack.Count == pages && menuGrid.Category == onCategory && OrderStorage.Orders.Count == lines,
+                    "FIL in the menu header switches language in place: same page, same category, same order");
+                Check(tabsFit(), "the category tabs re-measure for the Filipino labels");
+                tapLanguage(toggle.FilipinoZone);
+                Check(GuestText.Filipino, "tapping the language already chosen changes nothing");
+                tapLanguage(toggle.EnglishZone);
+                Check(!GuestText.Filipino && tabsFit(), "EN switches back, and the tabs fit their English labels again");
+
+                // every category line still fits beside the switch, in both languages
+                using (var scratch = new Bitmap(1, 1))
+                using (var gfx = Graphics.FromImage(scratch))
+                {
+                    int room = toggle.Left - 10 - (Hive.Gutter + 48 + 12);
+                    var tooLong = new System.Collections.Generic.List<string>();
+                    foreach (bool fil in new[] { false, true })
+                    {
+                        GuestText.SetFilipino(fil);
+                        foreach (var cat in MenuCatalog.Categories.Where(k => !string.IsNullOrEmpty(k.Tagline)))
+                        {
+                            string line = Hive.TrackedLabel(cat.Tagline.ToUpperInvariant());
+                            float w = Hive.TrackedWidth(gfx, line, Hive.Overline, 1.3f);
+                            if (w > room) tooLong.Add(line + " (" + (int)w + " > " + room + ")");
+                        }
+                    }
+                    Check(tooLong.Count == 0, "every category line fits beside the language switch" + (tooLong.Count > 0 ? ": " + string.Join("; ", tooLong) : ""));
+                }
+                GuestText.SetFilipino(startedFilipino);
+                OrderStorage.ClearOrders();
 
                 var malt = MenuCatalog.Find("Choco Malt");
                 Check(malt.IsDrink && malt.HasChoices,
