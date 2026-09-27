@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -28,8 +28,8 @@ namespace kiosk.Payments
 
             int y = BandH + 26;
             y = AddMethod(y, Mark.Cash, "Cash", "Pay our cashier at the counter", PayCash);
-            y = AddMethod(y, Mark.Card, "Card", "Demo only - no terminal connected", PayCard);
-            y = AddMethod(y, Mark.Wallet, "E-wallet", "Demo only - no payment taken", PayEWallet);
+            y = AddMethod(y, Mark.Card, "Card", "Demo only — no terminal connected", PayCard);
+            y = AddMethod(y, Mark.Wallet, "E-wallet", "Demo only — no payment taken", PayEWallet);
 
             HiveButton cancel = new HiveButton();
             cancel.Text = "Not yet, go back";

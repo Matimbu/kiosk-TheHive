@@ -234,7 +234,7 @@ namespace kiosk.Payments
 
             Hive.Text(g, _paymentMethod == "Cash" ? "Order placed" : "Demo order created", Hive.Title,
                       new Rectangle(0, 60, Width, 32), Color.White, Hive.Centered);
-            Hive.Text(g, _paymentMethod == "Cash" ? "Please pay " + Hive.Money(_total) + " at the counter" : "No payment taken - " + _paymentMethod, Hive.Caption,
+            Hive.Text(g, _paymentMethod == "Cash" ? "Please pay " + Hive.Money(_total) + " at the counter" : "No payment taken — " + _paymentMethod, Hive.Caption,
                       new Rectangle(0, 92, Width, 20), Color.FromArgb(190, 255, 255, 255), Hive.Centered);
 
             if (!string.IsNullOrEmpty(_saveError))
@@ -332,7 +332,7 @@ namespace kiosk.Payments
 
             y = Row(g, "Date", _receipt.Issued.ToString("dd MMM yyyy, HH:mm"), left, y, w);
             y = Row(g, "Terminal", CafeInfo.Terminal, left, y, w);
-            y = Row(g, "Status", _receipt.PaymentMethod == "Cash" ? "Pending counter payment" : "Demo - no payment taken", left, y, w);
+            y = Row(g, "Status", _receipt.PaymentMethod == "Cash" ? "Pending counter payment" : "Demo — no payment taken", left, y, w);
             y = Row(g, "Payment",
                     _receipt.CardLine == null ? _receipt.PaymentMethod : _receipt.CardLine,
                     left, y, w);

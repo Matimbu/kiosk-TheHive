@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -88,7 +88,7 @@ namespace kiosk.Payments
             }
             else
             {
-                Hive.Text(g, "Demo - no payment QR", Hive.Body, Rectangle.Round(qr), Hive.Muted, Hive.Centered);
+                Hive.Text(g, "Demo — no payment QR", Hive.Body, Rectangle.Round(qr), Hive.Muted, Hive.Centered);
             }
 
             Hive.Text(g, "No wallet provider is connected. No money will be transferred.", Hive.Caption,

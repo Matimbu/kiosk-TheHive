@@ -64,7 +64,7 @@ namespace kiosk.UI
             { "Contains caffeine (tea)", "May caffeine (tsaa)" },
             { "Contains caffeine (matcha)", "May caffeine (matcha)" },
             { "Ask staff about caffeine", "Itanong sa staff ang caffeine" },
-            { "Ingredients unverified — ask staff", "Di beripikado; itanong sa staff" },
+            { "Ingredients unverified — ask staff", "Di beripikado — itanong sa staff" },
             { "Add to order", "Idagdag sa order" },
             { "EDIT ITEM", "BAGUHIN ANG ITEM" },
             { "Line total", "Kabuuan ng item" },
@@ -74,8 +74,8 @@ namespace kiosk.UI
             { "HOW WOULD YOU LIKE TO PAY?", "PAANO KA MAGBABAYAD?" },
             { "Cash", "Cash" }, { "Card", "Card" }, { "E-wallet", "E-wallet" },
             { "Pay our cashier at the counter", "Magbayad sa cashier sa counter" },
-            { "Demo only - no terminal connected", "Demo lang - walang card terminal" },
-            { "Demo only - no payment taken", "Demo lang - walang bayad" },
+            { "Demo only — no terminal connected", "Demo lang — walang card terminal" },
+            { "Demo only — no payment taken", "Demo lang — walang bayad" },
             { "Not yet, go back", "Bumalik muna" }, { "Back", "Bumalik" },
             { "PAY WITH CASH", "MAGBAYAD NG CASH" },
             { "Please pay at the counter", "Magbayad sa counter" },
@@ -91,13 +91,13 @@ namespace kiosk.UI
             { "Create demo order", "Gumawa ng demo order" },
             { "PAY WITH E-WALLET", "GAMIT ANG E-WALLET" },
             { "E-WALLET DEMO", "DEMO NG E-WALLET" },
-            { "Demo - no payment QR", "Demo - walang QR sa bayad" },
+            { "Demo — no payment QR", "Demo — walang QR sa bayad" },
             { "No wallet provider is connected. No money will be transferred.", "Walang konektadong e-wallet. Walang perang ililipat." },
             { "This creates a demonstration order only.", "Demo order lamang ito." },
             { "Order placed", "Naipadala ang order" },
             { "Demo order created", "Nagawa ang demo order" },
             { "Pending counter payment", "Magbayad sa counter" },
-            { "Demo - no payment taken", "Demo - walang bayad" },
+            { "Demo — no payment taken", "Demo — walang bayad" },
             { "Thank you, see you again!", "Salamat, balik po kayo!" },
             { "THIS IS NOT AN OFFICIAL RECEIPT", "HINDI ITO OPISYAL NA RESIBO" },
             { "ORDER NUMBER", "NUMERO NG ORDER" },
@@ -168,8 +168,8 @@ namespace kiosk.UI
             if (english.StartsWith("from ", StringComparison.OrdinalIgnoreCase)) return "mula " + english.Substring(5);
             if (english.StartsWith("Please pay ", StringComparison.OrdinalIgnoreCase) && english.EndsWith(" at the counter", StringComparison.OrdinalIgnoreCase))
                 return "Magbayad ng " + english.Substring(11, english.Length - 26) + " sa counter";
-            if (english.StartsWith("No payment taken - ", StringComparison.OrdinalIgnoreCase))
-                return "Walang bayad - " + english.Substring(19);
+            if (english.StartsWith("No payment taken — ", StringComparison.OrdinalIgnoreCase))
+                return "Walang bayad — " + english.Substring(19);   // same length as before: the dash is one character
             if (english.EndsWith("% sugar", StringComparison.OrdinalIgnoreCase))
                 return english.Substring(0, english.Length - 6) + " asukal";
             if (english.EndsWith(" is unavailable. Please remove it from your order.", StringComparison.OrdinalIgnoreCase))
