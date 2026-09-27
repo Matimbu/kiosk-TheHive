@@ -78,11 +78,12 @@ namespace kiosk
                 foreach (Order order in orders)
                 {
                     OrderRow row = new OrderRow(order);
-                    row.Bounds = new Rectangle(Hive.Gutter - 4, top, list.Width - (Hive.Gutter - 4) * 2 - 6, 88);
+                    row.Bounds = new Rectangle(Hive.Gutter - 4, top, list.Width - (Hive.Gutter - 4) * 2 - 6, 96);
                     row.Edit += (s, e) => EditLine(e.Order);
+                    row.QuantityChanged += (s, e) => footer.Invalidate();   // just the total, not a rebuild
                     list.Hook(row);
                     list.Content.Controls.Add(row);
-                    top += 92;
+                    top += 100;   // keeps the same 13px between cards
                 }
             }
 

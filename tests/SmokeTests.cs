@@ -60,6 +60,15 @@ class SmokeTests
         }
     }
 
+    static System.Collections.Generic.IEnumerable<T> FindAll<T>(Control root) where T : Control
+    {
+        foreach (Control c in root.Controls)
+        {
+            if (c is T) yield return (T)c;
+            foreach (T inner in FindAll<T>(c)) yield return inner;
+        }
+    }
+
     // WCAG 2 contrast ratio between two opaque colours.
     static double Contrast(Color a, Color b)
     {
@@ -243,6 +252,25 @@ class SmokeTests
                 Check(OrderStorage.Orders.Count > 0, "a blocked checkout leaves the order alone");
                 shell.Back(); shell.Back();
                 LocalStore.SetSoldOut("Americano", false);
+                OrderStorage.ClearOrders();
+
+                // changing how many happens on the cart row, not behind an edit screen
+                OrderStorage.AddOrder(Coffee());
+                shell.Go(new viewOrder()); Application.DoEvents();
+                var cartRow = FindAll<OrderRow>((Control)stack[stack.Count - 1]).First();
+                var rowStepper = cartRow.Controls.OfType<Stepper>().Single();
+                var press = typeof(Stepper).GetMethod("OnMouseDown", BindingFlags.NonPublic | BindingFlags.Instance);
+                Action<int> tapAt = x => press.Invoke(rowStepper, new object[] { new MouseEventArgs(MouseButtons.Left, 1, x, rowStepper.Height / 2, 0) });
+                int depth = stack.Count;
+                tapAt(rowStepper.Width - rowStepper.Height / 2);   // the + knob
+                Check(OrderStorage.Orders[0].Quantity == 2 && OrderStorage.GetTotal() == 40,
+                    "the + on a cart row adds one in place");
+                Check(stack.Count == depth && !cartRow.IsDisposed,
+                    "changing quantity stays on the cart");
+                tapAt(rowStepper.Height / 2); tapAt(rowStepper.Height / 2);   // the - knob, twice
+                Check(OrderStorage.Orders[0].Quantity == 1,
+                    "the - on a cart row stops at one");
+                shell.Back();
                 OrderStorage.ClearOrders();
 
                 shell.Back();

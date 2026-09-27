@@ -555,8 +555,15 @@ namespace kiosk.UI
     {
         private readonly Anim _hover;
         private readonly Order _order;
+        private readonly Stepper _qty = new Stepper();
 
         public event EventHandler<OrderEventArgs> Edit;
+
+        // Changing how many is the commonest cart edit, so it happens right on
+        // the row instead of behind an edit screen and a Save. The row changes
+        // the order in place rather than asking the cart to rebuild, which would
+        // dispose this stepper in the middle of its own tap.
+        public event EventHandler QuantityChanged;
 
         public OrderRow(Order order)
         {
@@ -564,7 +571,27 @@ namespace kiosk.UI
             _order = order;
             Cursor = Cursors.Hand;
             BackColor = Hive.Canvas;
-            Height = 88;
+            Height = 96;
+
+            _qty.Size = new Size(128, 48);
+            _qty.BackColor = Hive.Surface;   // opaque, so the rounded track sits on the white card
+            _qty.Value = order.Quantity;
+            _qty.ValueChanged += (s, e) =>
+            {
+                if (_order.Quantity == _qty.Value) return;
+                _order.Quantity = _qty.Value;
+                Invalidate();
+                EventHandler handler = QuantityChanged;
+                if (handler != null) handler(this, EventArgs.Empty);
+            };
+            Controls.Add(_qty);
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            if (_qty == null) return;   // fires while the constructor is still running
+            _qty.Location = new Point(Width - 1 - 12 - _qty.Width, (Height - 9 - _qty.Height) / 2);
         }
 
         public Order Order { get { return _order; } }
@@ -588,7 +615,7 @@ namespace kiosk.UI
             Hive.Fill(g, card, Hive.RadiusCard, Hive.Mix(Hive.Surface, Hive.HoneyWash, _hover.Value * 0.6f));
             Hive.Stroke(g, card, Hive.RadiusCard, Hive.Mix(Hive.Line, Hive.Teal, _hover.Value * 0.6f), 1.2f);
 
-            RectangleF photo = new RectangleF(card.X + 11, card.Y + 11, 57, 57);
+            RectangleF photo = new RectangleF(card.X + 11, card.Y + (card.Height - 57) / 2f, 57, 57);
             using (GraphicsPath clip = Hive.Rounded(photo, 2))
             {
                 MenuProduct product = MenuCatalog.Find(_order.Product);
@@ -613,22 +640,24 @@ namespace kiosk.UI
             }
 
             int left = (int)photo.Right + 12;
-            int width = Width - left - 96;
+            int width = _qty.Left - 12 - left;
 
             Hive.Text(g, _order.Product, Hive.Serif,
-                      new Rectangle(left, (int)card.Y + 16, width, 20), Hive.Ink, Hive.LeftMid);
+                      new Rectangle(left, (int)card.Y + 14, width, 20), Hive.Ink,
+                      Hive.LeftMid | TextFormatFlags.EndEllipsis);
 
-            Hive.Text(g, OrderText.Describe(_order) + "   ·   " + Hive.Money(_order.Price) + " each", Hive.Caption,
-                      new Rectangle(left, (int)card.Y + 38, width, 18), Hive.Muted, Hive.LeftMid);
+            Hive.Text(g, OrderText.Describe(_order), Hive.Caption,
+                      new Rectangle(left, (int)card.Y + 35, width, 18), Hive.Muted,
+                      Hive.LeftMid | TextFormatFlags.EndEllipsis);
 
-            RectangleF qty = new RectangleF(left, card.Bottom - 27, 54, 20);
-            Hive.Fill(g, qty, 2, Hive.SurfaceAlt);
-            Hive.TextTracked(g, "QTY " + _order.Quantity, Hive.Overline, Rectangle.Round(qty), Hive.InkSoft, 0.9f, true);
-
-            Hive.Text(g, Hive.Money(_order.Total), Hive.Price,
-                      new Rectangle(Width - 96, 0, 84, Height - 8), Hive.Ink, Hive.RightMid);
-            Marks.Draw(g, Mark.Chevron,
-                       new RectangleF(card.Right - 29, card.Bottom - 25, 13, 13), Hive.Muted, 1.4f);
+            // line total, and the unit price beside it once there is more than one
+            string total = Hive.Money(_order.Total);
+            int totalW = TextRenderer.MeasureText(g, total, Hive.Price).Width;   // with padding, as Hive.Text draws it
+            Hive.Text(g, total, Hive.Price, new Rectangle(left - 3, (int)card.Y + 55, totalW, 24), Hive.Ink, Hive.LeftMid);
+            if (_order.Quantity > 1)
+                Hive.Text(g, Hive.Money(_order.Price) + " each", Hive.Caption,
+                          new Rectangle(left + totalW + 2, (int)card.Y + 55, width - totalW - 2, 24), Hive.Muted,
+                          Hive.LeftMid | TextFormatFlags.EndEllipsis);
         }
 
         protected override void Dispose(bool disposing)
