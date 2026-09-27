@@ -45,7 +45,7 @@ namespace kiosk.UI
             Font = Hive.Body;
             ShowInTaskbar = false;
 
-            bool isBeverage = _product.HasTemperature || _product.Category == "Coffee" || _product.Category == "Non-Coffee" || _product.Category == "Classics" || _product.Category == "GentleTea";
+            bool isBeverage = _product.IsDrink;   // one rule, shared with the menu tile
 
             // If not a drink with many options, expand the hero photo
             if (!_product.HasSizes && !_product.HasTemperature)

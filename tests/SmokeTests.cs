@@ -54,6 +54,10 @@ class SmokeTests
             else if (c is Stepper) zone = new Size(c.Height, c.Height);
             else if (c is HiveChip || c is ProductTile || c is OrderRow || c is MethodTile) zone = c.Size;
 
+            var quick = c as ProductTile;
+            if (quick != null && quick.CanQuickAdd && (quick.QuickAddZone.Width < 48 || quick.QuickAddZone.Height < 48))
+                TapProblems.Add(screen + ": quick-add + on '" + quick.Item.Name + "' is " + quick.QuickAddZone.Width + "x" + quick.QuickAddZone.Height);
+
             if (!zone.IsEmpty && (zone.Width < 48 || zone.Height < 48))
                 TapProblems.Add(screen + ": " + c.GetType().Name + " '" + c.Text + "' is " + zone.Width + "x" + zone.Height);
             AuditTaps(c, screen, g);
@@ -221,6 +225,46 @@ class SmokeTests
                     "the menu shows the add confirmation once and clears it");
                 OrderStorage.ClearOrders();
                 Check(OrderStorage.LastAdded == null, "clearing the cart drops a pending confirmation");
+
+                // the + adds a rice meal straight to the cart; drinks still open their page
+                var menuGrid = FindAll<CategoryView>(menu).First();
+                var tileDown = typeof(ProductTile).GetMethod("OnMouseDown", BindingFlags.NonPublic | BindingFlags.Instance);
+                var tileClick = typeof(ProductTile).GetMethod("OnClick", BindingFlags.NonPublic | BindingFlags.Instance);
+                Action<ProductTile, Point> tapTile = (tile, at) =>
+                {
+                    tileDown.Invoke(tile, new object[] { new MouseEventArgs(MouseButtons.Left, 1, at.X, at.Y, 0) });
+                    tileClick.Invoke(tile, new object[] { EventArgs.Empty });
+                    Application.DoEvents();
+                };
+                Func<Rectangle, Point> centre = r => new Point(r.X + r.Width / 2, r.Y + r.Height / 2);
+
+                OrderStorage.ClearOrders();
+                menuGrid.Load("Rice Meals"); Application.DoEvents();
+                var tapa = FindAll<ProductTile>(menuGrid).Single(t => t.Item.Name == "Beef Tapa");
+                int onMenu = stack.Count;
+                toast.Visible = false;
+                tapTile(tapa, centre(tapa.QuickAddZone));
+                Check(OrderStorage.Orders.Count == 1 && OrderStorage.Orders[0].Product == "Beef Tapa" && stack.Count == onMenu,
+                    "the + on a rice meal adds it without leaving the menu");
+                Check(toast.Visible && OrderStorage.LastAdded == null, "a quick add shows the confirmation");
+                tapTile(tapa, new Point(tapa.Width / 2, 40));   // on the photo, not the +
+                Check(stack.Count == onMenu + 1 && stack[stack.Count - 1] is ProductSheet,
+                    "tapping a rice meal anywhere else still opens its page");
+                shell.Back(); Application.DoEvents();
+
+                menuGrid.Load("Coffee"); Application.DoEvents();
+                var americanoTile = FindAll<ProductTile>(menuGrid).First(t => t.Item.Name == "Americano");
+                int inCart = OrderStorage.Orders.Count;
+                tapTile(americanoTile, centre(americanoTile.QuickAddZone));
+                Check(stack[stack.Count - 1] is ProductSheet && OrderStorage.Orders.Count == inCart,
+                    "the + on a drink opens its page instead of guessing size and temperature");
+                shell.Back(); Application.DoEvents();
+
+                var malt = MenuCatalog.Find("Choco Malt");
+                Check(malt.IsDrink && malt.HasChoices,
+                    "the cheesecake malts count as drinks, so they get a sweetness choice");
+                OrderStorage.ClearOrders();
+                menuGrid.Load("Best Sellers"); Application.DoEvents();
 
                 OrderStorage.AddOrder(Coffee());
                 shell.Go(new viewOrder()); Application.DoEvents();

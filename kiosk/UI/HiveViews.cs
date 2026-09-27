@@ -265,8 +265,15 @@ namespace kiosk.UI
         private Point _pressedAt;
         private bool _moved;
         private bool _soldOut;
+        private bool _justAdded;
+        private readonly Timer _addedFlash = new Timer { Interval = 700 };
 
         public event EventHandler<ProductEventArgs> Chosen;
+
+        // For items with nothing to choose, the + adds one straight to the cart
+        // instead of opening the product page. Everywhere else on the tile - and
+        // the + on anything with choices - still opens the page.
+        public event EventHandler<ProductEventArgs> QuickAdd;
 
         public ProductTile(MenuProduct item)
         {
@@ -275,9 +282,19 @@ namespace kiosk.UI
             Cursor = Cursors.Hand;
             BackColor = Hive.Canvas;
             Size = new Size(226, 214);
+            _addedFlash.Tick += (s, e) => { _addedFlash.Stop(); _justAdded = false; Invalidate(); };
         }
 
         public MenuProduct Item { get { return _item; } }
+
+        // The drawn + is a 34px circle; the tap area is a 48px square on the same
+        // centre, so it meets the touch-target minimum without drawing it bigger.
+        public Rectangle QuickAddZone
+        {
+            get { return new Rectangle(Width - 30 - 24, Height - 29 - 24, 48, 48); }
+        }
+
+        public bool CanQuickAdd { get { return !_soldOut && !_item.HasChoices; } }
 
         // Shown, not hidden: a guest looking for their usual drink should see it
         // is off today rather than wonder whether the kiosk is broken.
@@ -313,6 +330,18 @@ namespace kiosk.UI
             base.OnClick(e);
             if (_moved) return;   // the guest was scrolling, not choosing
             if (_soldOut) return;
+
+            if (CanQuickAdd && QuickAddZone.Contains(_pressedAt))
+            {
+                _justAdded = true;          // the + turns to a tick where the finger is
+                _addedFlash.Stop();
+                _addedFlash.Start();
+                Invalidate();
+                EventHandler<ProductEventArgs> add = QuickAdd;
+                if (add != null) add(this, new ProductEventArgs(_item));
+                return;
+            }
+
             EventHandler<ProductEventArgs> handler = Chosen;
             if (handler != null) handler(this, new ProductEventArgs(_item));
         }
@@ -394,7 +423,10 @@ namespace kiosk.UI
             {
                 RectangleF plusBox = new RectangleF(card.Right - 43, card.Bottom - 41, 34, 34);
                 Hive.Fill(g, plusBox, plusBox.Width / 2f, Hive.Teal);   // the one deliberate circle
-                Marks.Draw(g, Mark.Plus, plusBox, Color.White, 2.0f);
+                if (_justAdded)
+                    Marks.Draw(g, Mark.Check, RectangleF.Inflate(plusBox, -1, -1), Hive.HoneyLight, 2.2f);
+                else
+                    Marks.Draw(g, Mark.Plus, plusBox, Color.White, 2.0f);
             }
 
             Hive.Stroke(g, card, Hive.RadiusCard,
@@ -404,7 +436,7 @@ namespace kiosk.UI
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing) _hover.Dispose();
+            if (disposing) { _hover.Dispose(); _addedFlash.Dispose(); }
             base.Dispose(disposing);
         }
     }

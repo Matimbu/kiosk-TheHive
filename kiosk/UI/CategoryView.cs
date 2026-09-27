@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -15,6 +15,7 @@ namespace kiosk.UI
         private string _category;
 
         public event EventHandler<ProductEventArgs> ProductChosen;
+        public event EventHandler<ProductEventArgs> ProductQuickAdd;
 
         public CategoryView()
         {
@@ -95,6 +96,11 @@ namespace kiosk.UI
                 tile.Chosen += (s, e) =>
                 {
                     EventHandler<ProductEventArgs> handler = ProductChosen;
+                    if (handler != null) handler(this, e);
+                };
+                tile.QuickAdd += (s, e) =>
+                {
+                    EventHandler<ProductEventArgs> handler = ProductQuickAdd;
                     if (handler != null) handler(this, e);
                 };
                 Hook(tile);

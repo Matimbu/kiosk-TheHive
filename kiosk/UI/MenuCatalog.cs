@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -59,6 +59,22 @@ namespace kiosk.UI
         public bool HasTemperature { get; set; }
 
         public bool HasSizes { get { return Sizes != null && Sizes.Length > 0; } }
+
+        // Drinks get a sweetness choice even with no sizes or hot/iced. The
+        // Cheesecake series belongs here: they are malt drinks topped with
+        // cheesecake cream, served in Hive cups, not slices of cake.
+        public bool IsDrink
+        {
+            get
+            {
+                return HasTemperature || Category == "Coffee" || Category == "Non-Coffee"
+                    || Category == "Classics" || Category == "GentleTea" || Category == "Cheesecake";
+            }
+        }
+
+        // Nothing to pick on the product page, so a tap on the tile's + can put
+        // one straight in the cart. In practice: the rice meals.
+        public bool HasChoices { get { return HasSizes || HasTemperature || IsDrink; } }
 
         public decimal StartingPrice
         {

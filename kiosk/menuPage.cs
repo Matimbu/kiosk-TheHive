@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
 using kiosk.UI;
@@ -20,6 +20,7 @@ namespace kiosk
 
             rail.ChipSelected += (s, e) => ShowCategory((string)e.Tag);
             grid.ProductChosen += (s, e) => OpenProduct(e.Item);
+            grid.ProductQuickAdd += (s, e) => QuickAdd(e.Item);
             cartBar.Action.Click += (s, e) => OpenOrder();
 
             Controls.Add(_added);
@@ -41,6 +42,30 @@ namespace kiosk
             MenuCategory meta = MenuCatalog.CategoryOf(category);
             header.Subtitle = meta != null ? meta.Tagline : null;
             grid.Load(category);
+        }
+
+        // Only reached for items with nothing to choose, so this is exactly the
+        // order the product page would have built with its defaults.
+        private void QuickAdd(MenuProduct product)
+        {
+            try
+            {
+                OrderStorage.AddOrder(new Order
+                {
+                    Product = product.Name,
+                    Size = "",
+                    Temperature = "",
+                    Quantity = 1,
+                    Price = product.PriceFor(""),
+                    ImagePath = product.ImageKey
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                NoticeForm.Say("Cannot add that item", ex.Message);
+                return;
+            }
+            ConfirmLastAdd();   // the page is already showing, so say it now
         }
 
         private void OpenProduct(MenuProduct product)
