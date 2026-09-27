@@ -574,13 +574,13 @@ namespace kiosk.UI
             Hive.Smooth(g);
 
             RectangleF track = new RectangleF(0, 0, Width - 1, Height - 1);
-            Hive.Fill(g, track, Height / 2f, Hive.SurfaceAlt);
+            Hive.Fill(g, track, Hive.RadiusButton, Hive.SurfaceAlt);
 
             if (_index >= 0)
             {
                 float pos = _from + (_index - _from) * _slide.Value;
                 RectangleF slot = RectangleF.Inflate(SlotOf(pos), -2f, -2f);
-                Hive.Fill(g, slot, slot.Height / 2f, Hive.Teal);
+                Hive.Fill(g, slot, Hive.RadiusButton - 2, Hive.Teal);   // inset 2px, so 2px tighter
             }
 
             for (int i = 0; i < _options.Length; i++)
@@ -659,7 +659,7 @@ namespace kiosk.UI
             Hive.Smooth(g);
 
             RectangleF track = new RectangleF(0, 0, Width - 1, Height - 1);
-            Hive.Fill(g, track, Height / 2f, Hive.SurfaceAlt);
+            Hive.Fill(g, track, Hive.RadiusButton, Hive.SurfaceAlt);
 
             DrawKnob(g, MinusRect, false, _value > _min, _hot == -1);
             DrawKnob(g, PlusRect,  true,  _value < _max, _hot == 1);
@@ -668,13 +668,17 @@ namespace kiosk.UI
             Hive.Text(g, _value.ToString(), Hive.Price, mid, Hive.TealDeep, Hive.Centered);
         }
 
+        // the knob sits 5px inside the track, so its corners run 5px tighter
+        // to stay concentric with the track's
+        private const float KnobRadius = Hive.RadiusButton - 5;
+
         private void DrawKnob(Graphics g, Rectangle bounds, bool plus, bool enabled, bool hot)
         {
-            RectangleF circle = RectangleF.Inflate(bounds, -5, -5);
+            RectangleF knob = RectangleF.Inflate(bounds, -5, -5);
             if (enabled && hot)
-                Hive.Fill(g, circle, circle.Width / 2f, Hive.HoneyWash);
+                Hive.Fill(g, knob, KnobRadius, Hive.HoneyWash);
             else if (enabled)
-                Hive.Fill(g, circle, circle.Width / 2f, Hive.SurfaceAlt);
+                Hive.Fill(g, knob, KnobRadius, Hive.SurfaceAlt);
 
             Color ink = !enabled ? Hive.Mix(Hive.Muted, Color.White, 0.5f)
                       : hot      ? Hive.Honey
@@ -761,8 +765,8 @@ namespace kiosk.UI
                 Hive.Text(g, _label, Hive.Overline, new Rectangle(2, 0, Width, 16), Hive.Muted, Hive.LeftMid);
 
             RectangleF box = new RectangleF(0, 20, Width - 1, Height - 21);
-            Hive.Fill(g, box, 12, Hive.Surface);
-            Hive.Stroke(g, box, 12, _input.Focused ? Hive.Teal : Hive.Line, _input.Focused ? 1.8f : 1.3f);
+            Hive.Fill(g, box, Hive.RadiusButton, Hive.Surface);
+            Hive.Stroke(g, box, Hive.RadiusButton, _input.Focused ? Hive.Teal : Hive.Line, _input.Focused ? 1.8f : 1.3f);
 
             base.OnPaint(e);
         }

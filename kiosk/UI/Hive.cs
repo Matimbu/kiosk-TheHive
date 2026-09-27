@@ -42,6 +42,7 @@ namespace kiosk.UI
         public const int RadiusCard   = 8;
         public const int RadiusButton = 10;
         public const int RadiusLarge  = 12;   // floating panels, e.g. the cart tray
+        public const int RadiusTag    = 4;    // badges - a printed tag, not a pill
         public const int TapTarget    = 52;   // minimum comfortable touch height
         public const float Hairline   = 1f;
 

@@ -83,7 +83,7 @@ namespace kiosk.Payments
             Image code = null;
             if (code != null)
             {
-                using (GraphicsPath clip = Hive.Rounded(qr, 8))
+                using (GraphicsPath clip = Hive.Rounded(qr, Hive.RadiusCard))
                     Hive.ImageCover(g, code, qr, clip);
             }
             else

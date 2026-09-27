@@ -257,43 +257,6 @@ namespace kiosk.UI
             base.Dispose(disposing);
         }
     }
-    public class CartPill : HiveControl
-    {
-        private readonly Anim _hover;
-        private int _count;
-
-        public CartPill()
-        {
-            _hover = new Anim(this, 0.3f);
-            Cursor = Cursors.Hand;
-            Size = new Size(84, 42);
-            Font = Hive.Price;
-        }
-
-        public int Count { get { return _count; } set { _count = value; Invalidate(); } }
-
-        protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hover.To(1f); }
-        protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hover.To(0f); }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            Hive.Smooth(g);
-
-            RectangleF body = new RectangleF(0, 0, Width - 1, Height - 1);
-            Hive.Fill(g, body, Height / 2f, Color.FromArgb(35 + (int)(34 * _hover.Value), 255, 255, 255));
-            Hive.Stroke(g, body, Height / 2f, Color.FromArgb(105, 255, 255, 255), 1.2f);
-
-            Marks.Draw(g, Mark.Bag, new RectangleF(12, Height / 2f - 11, 22, 22), Color.White, 1.6f);
-            Hive.Text(g, _count.ToString(), Font, new Rectangle(38, 0, Width - 48, Height), Color.White, Hive.Centered);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing) _hover.Dispose();
-            base.Dispose(disposing);
-        }
-    }
 
     public class ProductTile : HiveControl
     {
@@ -404,7 +367,7 @@ namespace kiosk.UI
                 string label = GuestText.T("SOLD OUT");
                 Size size = TextRenderer.MeasureText(label, Hive.Overline);
                 RectangleF badge = new RectangleF(card.X + 8, card.Y + 8, size.Width + 18, 22);
-                Hive.Fill(g, badge, 11, Hive.Mix(Hive.Muted, Hive.Ink, 0.2f));
+                Hive.Fill(g, badge, Hive.RadiusTag, Hive.Mix(Hive.Muted, Hive.Ink, 0.2f));
                 Hive.TextTracked(g, label, Hive.Overline, Rectangle.Round(badge), Color.White, 1.1f, true);
             }
             else if (_item.Badge != null)
@@ -412,7 +375,7 @@ namespace kiosk.UI
                 string badgeText = _item.Badge.ToUpperInvariant();
                 Size size = TextRenderer.MeasureText(badgeText, Hive.Overline);
                 RectangleF badge = new RectangleF(card.X + 8, card.Y + 8, size.Width + 18, 22);
-                Hive.Fill(g, badge, 11, Hive.Honey);
+                Hive.Fill(g, badge, Hive.RadiusTag, Hive.Honey);
                 Hive.TextTracked(g, badgeText, Hive.Overline, Rectangle.Round(badge), Color.White, 1.1f, true);
             }
 
@@ -430,7 +393,7 @@ namespace kiosk.UI
             if (!_soldOut)
             {
                 RectangleF plusBox = new RectangleF(card.Right - 43, card.Bottom - 41, 34, 34);
-                Hive.Fill(g, plusBox, 17, Hive.Teal);
+                Hive.Fill(g, plusBox, plusBox.Width / 2f, Hive.Teal);   // the one deliberate circle
                 Marks.Draw(g, Mark.Plus, plusBox, Color.White, 2.0f);
             }
 

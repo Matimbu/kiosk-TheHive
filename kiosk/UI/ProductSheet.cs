@@ -175,7 +175,7 @@ namespace kiosk.UI
             g.Clear(Hive.Surface);
 
             RectangleF hero = new RectangleF(12, 8, Width - 24, _heroHeight - 14);
-            using (GraphicsPath clip = Hive.Rounded(hero, 20))
+            using (GraphicsPath clip = Hive.Rounded(hero, Hive.RadiusLarge))
             {
                 if (_product.Image != null)
                 {
@@ -203,7 +203,7 @@ namespace kiosk.UI
                 string badgeText = _product.Badge.ToUpperInvariant();
                 Size size = TextRenderer.MeasureText(badgeText, Hive.Overline);
                 RectangleF badge = new RectangleF(22, 18, size.Width + 24, 24);
-                Hive.Fill(g, badge, 12, Hive.Honey);
+                Hive.Fill(g, badge, Hive.RadiusTag, Hive.Honey);
                 Hive.TextTracked(g, badgeText, Hive.Overline, Rectangle.Round(badge), Color.White, 1.2f, true);
             }
 
