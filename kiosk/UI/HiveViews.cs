@@ -167,7 +167,7 @@ namespace kiosk.UI
                              new Rectangle(Hive.Gutter, 20, 220, 18), Hive.Muted, 1.2f, false);
             Hive.Text(g, Hive.Money(_total), Hive.PriceBig,
                       new Rectangle(Hive.Gutter, 38, 220, 30),
-                      _count == 0 ? Hive.Muted : Hive.Ink, Hive.LeftMid);
+                      _count == 0 ? Hive.Disabled : Hive.Ink, Hive.LeftMid);
 
             ProgressGuide.Draw(g, new Rectangle(Hive.Gutter, 80, Width - Hive.Gutter * 2, 36), 1);
 
@@ -380,14 +380,14 @@ namespace kiosk.UI
             }
 
             Rectangle name = new Rectangle((int)card.X + 12, (int)photo.Bottom + 10, (int)card.Width - 24, 38);
-            Hive.Text(g, _item.Name, Hive.Serif, name, _soldOut ? Hive.Muted : Hive.Ink,
+            Hive.Text(g, _item.Name, Hive.Serif, name, _soldOut ? Hive.Disabled : Hive.Ink,
                       TextFormatFlags.WordBreak | TextFormatFlags.Top | TextFormatFlags.EndEllipsis);
 
             using (Pen p = new Pen(Hive.LineSoft, 1))
                 g.DrawLine(p, card.X + 12, card.Bottom - 38, card.Right - 12, card.Bottom - 38);
 
             Rectangle price = new Rectangle((int)card.X + 12, (int)card.Bottom - 35, (int)card.Width - 58, 28);
-            Hive.Text(g, _item.PriceLabel, Hive.Price, price, _soldOut ? Hive.Muted : Hive.TealDeep, Hive.LeftMid);
+            Hive.Text(g, _item.PriceLabel, Hive.Price, price, _soldOut ? Hive.Disabled : Hive.TealDeep, Hive.LeftMid);
 
             // no add button when there is nothing to add
             if (!_soldOut)

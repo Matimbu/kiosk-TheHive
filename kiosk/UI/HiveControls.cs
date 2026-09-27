@@ -152,7 +152,7 @@ namespace kiosk.UI
             if (!Enabled)
             {
                 fill = fill.IsEmpty ? Color.Empty : Hive.SurfaceAlt;
-                text = Hive.Muted;
+                text = Hive.Disabled;
                 border = Hive.Line;
             }
             else
@@ -725,7 +725,7 @@ namespace kiosk.UI
             else if (enabled)
                 Hive.Fill(g, knob, KnobRadius, Hive.SurfaceAlt);
 
-            Color ink = !enabled ? Hive.Mix(Hive.Muted, Color.White, 0.5f)
+            Color ink = !enabled ? Hive.Mix(Hive.Disabled, Color.White, 0.5f)
                       : hot      ? Hive.Honey
                                  : Hive.Teal;
 

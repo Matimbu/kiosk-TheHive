@@ -60,6 +60,15 @@ class SmokeTests
         }
     }
 
+    // WCAG 2 contrast ratio between two opaque colours.
+    static double Contrast(Color a, Color b)
+    {
+        Func<double, double> lin = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.Pow((v + 0.055) / 1.055, 2.4); };
+        Func<Color, double> lum = c => 0.2126 * lin(c.R) + 0.7152 * lin(c.G) + 0.0722 * lin(c.B);
+        double x = lum(a), y = lum(b);
+        return (Math.Max(x, y) + 0.05) / (Math.Min(x, y) + 0.05);
+    }
+
     [STAThread] static int Main(string[] args)
     {
         try {
@@ -263,6 +272,15 @@ class SmokeTests
                 GuestText.SetFilipino(false);
 
             }
+            // every text colour must read at 4.5:1 on every light surface. Disabled
+            // is left out on purpose: inactive controls are meant to look faint.
+            var textColours = new[] { Hive.Ink, Hive.InkSoft, Hive.Muted, Hive.Teal, Hive.TealDeep, Hive.TealDarker, Hive.Danger };
+            var surfaces = new[] { Hive.Canvas, Hive.Surface, Hive.SurfaceAlt, Hive.TealWash, Hive.HoneyWash };
+            double worst = textColours.SelectMany(fg => surfaces.Select(bg => Contrast(fg, bg))).Min();
+            Check(worst >= 4.5, "every text colour reads at 4.5:1 on every surface (worst " + worst.ToString("0.00") + ")");
+            Check(Contrast(Hive.InkSoft, Hive.Canvas) - Contrast(Hive.Muted, Hive.Canvas) >= 1.5,
+                "muted text stays clearly quieter than body text");
+
             Check(TapProblems.Count == 0, "every guest tap target is at least 48px and no label is cut off"
                 + (TapProblems.Count == 0 ? "" : ": " + string.Join("; ", TapProblems.ToArray())));
             Console.WriteLine("All smoke tests passed."); return 0;

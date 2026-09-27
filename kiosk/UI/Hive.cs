@@ -12,7 +12,13 @@ namespace kiosk.UI
         // teal off the logo, honey only for the one action that matters
         public static readonly Color Ink        = Color.FromArgb(0x14, 0x21, 0x22);
         public static readonly Color InkSoft    = Color.FromArgb(0x45, 0x55, 0x56);
-        public static readonly Color Muted      = Color.FromArgb(0x8A, 0x93, 0x93);
+        // Muted is secondary text, and text has to be read: 4.5:1 or better on
+        // every surface it sits on (5.0 on Canvas, 4.6 on SurfaceAlt). Disabled
+        // is the old, fainter grey, kept for things meant to look inactive -
+        // disabled buttons, sold-out tiles, placeholders - which WCAG exempts
+        // and which would stop looking inactive if they read as clearly as text.
+        public static readonly Color Muted      = Color.FromArgb(0x63, 0x6C, 0x6C);
+        public static readonly Color Disabled   = Color.FromArgb(0x8A, 0x93, 0x93);
 
         public static readonly Color Teal       = Color.FromArgb(0x0B, 0x54, 0x57);
         public static readonly Color TealDeep   = Color.FromArgb(0x07, 0x38, 0x3B);
@@ -433,12 +439,12 @@ namespace kiosk.UI
             }
 
             using (Font f = Sized(Display, Math.Max(10f, badge.Height * 0.24f)))
-                Text(g, Initials(name), f, Rectangle.Round(badge), Mix(Muted, Line, 0.35f), Centered);
+                Text(g, Initials(name), f, Rectangle.Round(badge), Mix(Disabled, Line, 0.35f), Centered);
 
             if (showCaption)
                 TextTracked(g, caption.ToUpperInvariant(), Overline,
                            new Rectangle((int)r.X, (int)r.Bottom - 20, (int)r.Width, 16),
-                           Mix(Muted, SurfaceAlt, 0.15f), 1.1f, true);
+                           Mix(Disabled, SurfaceAlt, 0.15f), 1.1f, true);
 
             g.Clip = saved;
         }
