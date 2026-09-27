@@ -125,6 +125,9 @@ namespace kiosk.UI
         {
             switch (_style)
             {
+                // White on honey is 3.05:1, under WCAG's 4.5:1. Kept on purpose: the
+                // cafe chose the bright honey look over dark lettering (Sept 2026).
+                // Ask before changing it.
                 case HiveStyle.Accent:  fill = Hive.Honey;   text = Color.White;   border = Color.Empty; break;
                 case HiveStyle.Outline: fill = Color.Empty;  text = Hive.Teal;     border = Hive.Line;   break;
                 case HiveStyle.Ghost:   fill = Color.Empty;  text = Hive.InkSoft;  border = Color.Empty; break;
