@@ -211,6 +211,16 @@ class SmokeTests
                 Check(stack.Count == 1 && OrderStorage.Orders.Count == 0 && !GuestText.Filipino,
                     "idle timeout clears cart and restores default language");
 
+                // the idle warning is a Label, so it never passes through Hive.Text
+                shell.Go(new menuPage()); Application.DoEvents();
+                GuestText.SetFilipino(true);
+                var notice = (Label)typeof(Shell).GetField("_idleNotice", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(shell);
+                typeof(Shell).GetField("_lastInput", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(shell, DateTime.UtcNow.AddSeconds(-95));
+                typeof(Timer).GetMethod("OnTick", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(timer, new object[] { EventArgs.Empty });
+                Check(notice.Text.StartsWith("Nandiyan ka pa ba"),
+                    "the idle warning speaks the guest language");
+                GuestText.SetFilipino(false);
+
             }
             Console.WriteLine("All smoke tests passed."); return 0;
         } catch(Exception ex) { Console.Error.WriteLine(ex); return 1; }
