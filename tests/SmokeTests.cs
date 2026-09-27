@@ -351,15 +351,28 @@ class SmokeTests
                 Check(stack.Count == 1 && OrderStorage.Orders.Count == 0 && !GuestText.Filipino,
                     "idle timeout clears cart and restores default language");
 
-                // the idle warning is a Label, so it never passes through Hive.Text
+                // the idle warning speaks the guest's language and fills the screen
                 shell.Go(new menuPage()); Application.DoEvents();
+                OrderStorage.AddOrder(Coffee());
                 GuestText.SetFilipino(true);
-                var notice = (Label)typeof(Shell).GetField("_idleNotice", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(shell);
+                var notice = (IdleWarning)typeof(Shell).GetField("_idleNotice", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(shell);
                 typeof(Shell).GetField("_lastInput", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(shell, DateTime.UtcNow.AddSeconds(-95));
                 typeof(Timer).GetMethod("OnTick", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(timer, new object[] { EventArgs.Empty });
-                Check(notice.Text.StartsWith("Nandiyan ka pa ba"),
-                    "the idle warning speaks the guest language");
+                Check(notice.Visible && notice.Text.StartsWith("Nandiyan ka pa ba") && notice.Text.Contains("Mabubura ang order mo"),
+                    "the idle warning speaks the guest language and warns about the order");
+                Check(notice.Width >= Hive.ScreenW && notice.Height >= Hive.ScreenH,
+                    "the idle warning covers the whole screen");
                 GuestText.SetFilipino(false);
+
+                // the tap that dismisses it must not also press what is underneath
+                var dismissTap = Message.Create(shell.Handle, 0x201, IntPtr.Zero, IntPtr.Zero);   // WM_LBUTTONDOWN
+                bool swallowed = shell.PreFilterMessage(ref dismissTap);
+                Check(swallowed && !notice.Visible,
+                    "the tap that dismisses the idle warning goes no further");
+                var nextPress = Message.Create(shell.Handle, 0x201, IntPtr.Zero, IntPtr.Zero);
+                Check(!shell.PreFilterMessage(ref nextPress),
+                    "with the warning gone, taps reach the page again");
+                OrderStorage.ClearOrders();
 
             }
             // every text colour must read at 4.5:1 on every light surface. Disabled

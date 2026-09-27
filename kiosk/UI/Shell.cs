@@ -14,15 +14,20 @@ namespace kiosk.UI
     {
                 private readonly Timer _idle = new Timer { Interval = 1000 };
         private DateTime _lastInput = DateTime.UtcNow;
-        private readonly Label _idleNotice = new Label { Bounds = new Rectangle(0, 0, Hive.ScreenW, 44), BackColor = Hive.HoneyWash, TextAlign = ContentAlignment.MiddleCenter, Visible = false };
+        private readonly IdleWarning _idleNotice = new IdleWarning();
         public bool PreFilterMessage(ref Message m)
         {
-            if ((m.Msg >= 0x100 && m.Msg <= 0x109) || (m.Msg >= 0x201 && m.Msg <= 0x20E) || m.Msg == 0x245 || m.Msg == 0x246)
-            {
-                _lastInput = DateTime.UtcNow;
-                _idleNotice.Visible = false;
-            }
-            return false;
+            bool input = (m.Msg >= 0x100 && m.Msg <= 0x109) || (m.Msg >= 0x201 && m.Msg <= 0x20E) || m.Msg == 0x245 || m.Msg == 0x246;
+            if (!input) return false;
+
+            _lastInput = DateTime.UtcNow;
+            if (!_idleNotice.Visible) return false;
+
+            // The warning covers the whole screen, so the tap that dismisses it must
+            // not also press whatever sits underneath - swallow the press itself.
+            _idleNotice.Visible = false;
+            bool press = m.Msg == 0x100 || m.Msg == 0x201 || m.Msg == 0x204 || m.Msg == 0x207 || m.Msg == 0x246;
+            return press;
         }
         public void Complete(Form receipt)
         {
@@ -79,7 +84,7 @@ namespace kiosk.UI
                 if (_stack.Count <= 1) return;
                 double elapsed = (DateTime.UtcNow - _lastInput).TotalSeconds;
                 if (elapsed >= 120) { Home(); _idleNotice.Visible = false; }
-                else if (elapsed >= 90) { _idleNotice.Text = GuestText.T("Still there? Tap to continue.") + " " + GuestText.T("Reset in") + " " + (120 - (int)elapsed) + "s"; _idleNotice.Visible = true; _idleNotice.BringToFront(); }
+                else if (elapsed >= 90) _idleNotice.Show(120 - (int)elapsed, OrderStorage.Orders.Count > 0);
             };
             _idle.Start();
             Disposed += (s, e) => { _idle.Dispose(); Application.RemoveMessageFilter(this); Current = null; };

@@ -258,6 +258,73 @@ namespace kiosk.UI
         }
     }
 
+    // Shown after 90 idle seconds, before the kiosk resets for the next guest.
+    // It takes the whole screen on purpose: the old warning was a thin strip at
+    // the top edge, away from where a guest reading the menu is looking, and
+    // missing it cost them their order. Any tap dismisses it (see Shell).
+    public class IdleWarning : HiveControl
+    {
+        private int _seconds = 30;
+        private bool _hasOrder;
+
+        public IdleWarning()
+        {
+            BackColor = Hive.Canvas;
+            Visible = false;
+            Size = new Size(Hive.ScreenW, Hive.ScreenH);
+        }
+
+        public void Show(int secondsLeft, bool hasOrder)
+        {
+            _seconds = Math.Max(0, secondsLeft);
+            _hasOrder = hasOrder;
+            Text = GuestText.T("Still there?") + " " + Message;
+            Visible = true;
+            BringToFront();
+            Invalidate();
+        }
+
+        private string Message
+        {
+            get
+            {
+                string template = _hasOrder ? "Your order clears in {0} seconds." : "Returning to the start in {0} seconds.";
+                return string.Format(GuestText.T(template), _seconds);
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            Hive.Smooth(g);
+            g.Clear(Hive.Canvas);
+
+            RectangleF card = new RectangleF(Hive.Gutter, 176, Width - Hive.Gutter * 2, 326);
+            Hive.Shadow(g, card, Hive.RadiusCard, 3, 22);
+            Hive.Fill(g, card, Hive.RadiusCard, Hive.Surface);
+            Hive.Stroke(g, card, Hive.RadiusCard, Hive.LineSoft, 1);
+
+            // the countdown sits in the hive's own hexagon
+            RectangleF hex = new RectangleF(Width / 2f - 44, card.Y + 26, 88, 88);
+            Hive.FillHex(g, hex, Hive.HoneyWash);
+            using (Font big = Hive.Sized(Hive.PriceBig, 30f))
+                Hive.Text(g, _seconds.ToString(), big, Rectangle.Round(hex), Hive.TealDeep, Hive.Centered);
+
+            Hive.Text(g, "Still there?", Hive.Title,
+                      new Rectangle((int)card.X + 24, (int)hex.Bottom + 14, (int)card.Width - 48, 38), Hive.Ink, Hive.Centered);
+            Hive.Text(g, Message, Hive.Body,
+                      new Rectangle((int)card.X + 28, (int)hex.Bottom + 54, (int)card.Width - 56, 44), Hive.InkSoft,
+                      TextFormatFlags.HorizontalCenter | TextFormatFlags.WordBreak | TextFormatFlags.Top);
+
+            // drawn, not a real button: the tap is caught before it reaches anything
+            RectangleF button = new RectangleF(card.X + 28, card.Bottom - 86, card.Width - 56, 58);
+            Hive.Fill(g, button, Hive.RadiusButton, Hive.Honey);
+            Hive.TextTracked(g, "I'm still here".ToUpperInvariant(), Hive.Subhead, Rectangle.Round(button), Color.White, 1.1f, true);
+
+            Hive.TextTracked(g, "TAP ANYWHERE TO CONTINUE", Hive.Overline,
+                             new Rectangle(Hive.Gutter, (int)card.Bottom + 20, Width - Hive.Gutter * 2, 18), Hive.Muted, 1.2f, true);
+        }
+    }
     public class ProductTile : HiveControl
     {
         private readonly Anim _hover;
