@@ -265,6 +265,21 @@ class SmokeTests
                 Check(OrderStorage.Orders.Count == 1 && OrderStorage.Orders[0].Product == "Beef Tapa" && stack.Count == onMenu,
                     "the + on a rice meal adds it without leaving the menu");
                 Check(toast.Visible && OrderStorage.LastAdded == null, "a quick add shows the confirmation");
+                Check(tapa.InOrder == 1, "a quick add shows the count on the tile at once");
+                tapTile(tapa, centre(tapa.QuickAddZone));
+                Check(tapa.InOrder == 2 && OrderStorage.Orders.Count == 1, "a second quick add raises the tile count, on one cart line");
+                Check(FindAll<ProductTile>(menuGrid).Where(t => t != tapa).All(t => t.InOrder == 0),
+                    "only the item that was added carries a count");
+                bool wasFilipino = GuestText.Filipino;
+                foreach (bool fil in new[] { false, true })
+                {
+                    GuestText.SetFilipino(fil);
+                    int best = TextRenderer.MeasureText(GuestText.T("Best seller").ToUpperInvariant(), Hive.Overline).Width + 18;
+                    int most = TextRenderer.MeasureText(string.Format(GuestText.T("{0} in order"), 99).ToUpperInvariant(), Hive.Overline).Width + 18;
+                    Check(8 + best + 8 + most + 8 <= tapa.Width - 7,
+                        "the Best Seller tag and a 99 count fit side by side on a tile" + (fil ? " (Filipino)" : ""));
+                }
+                GuestText.SetFilipino(wasFilipino);
                 tapTile(tapa, new Point(tapa.Width / 2, 40));   // on the photo, not the +
                 Check(stack.Count == onMenu + 1 && stack[stack.Count - 1] is ProductSheet,
                     "tapping a rice meal anywhere else still opens its page");
@@ -277,6 +292,12 @@ class SmokeTests
                 Check(stack[stack.Count - 1] is ProductSheet && OrderStorage.Orders.Count == inCart,
                     "the + on a drink opens its page instead of guessing size and temperature");
                 shell.Back(); Application.DoEvents();
+                OrderStorage.AddOrder(Coffee(2));
+                OrderStorage.AddOrder(new Order { Product = "Americano", Size = "16L", Temperature = "Iced", Price = 20, Quantity = 1 });
+                menu.OnRevealed(); Application.DoEvents();
+                Check(americanoTile.InOrder == 3, "the tile count adds up every cart line for that item (hot and iced)");
+                OrderStorage.ClearOrders(); Application.DoEvents();
+                Check(americanoTile.InOrder == 0, "clearing the cart clears the tile counts");
 
                 var malt = MenuCatalog.Find("Choco Malt");
                 Check(malt.IsDrink && malt.HasChoices,

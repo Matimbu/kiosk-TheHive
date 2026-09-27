@@ -108,6 +108,27 @@ namespace kiosk.UI
             }
 
             Measure(Hive.Gap);
+            ShowInOrder();
+        }
+
+        // Keeps each tile's "in order" count in step with the cart. One product
+        // can sit on several cart lines (hot and iced, two sizes), so add them up.
+        public void ShowInOrder()
+        {
+            Dictionary<string, int> counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (Order order in OrderStorage.Orders)
+            {
+                int n;
+                counts.TryGetValue(order.Product, out n);
+                counts[order.Product] = n + order.Quantity;
+            }
+
+            foreach (ProductTile tile in Content.Controls.OfType<ProductTile>())
+            {
+                int n;
+                counts.TryGetValue(tile.Item.Name, out n);
+                tile.InOrder = n;
+            }
         }
     }
 }

@@ -92,6 +92,7 @@ namespace kiosk
             foreach (Order order in OrderStorage.Orders) count += order.Quantity;
 
             cartBar.Update(count, OrderStorage.GetTotal());
+            grid.ShowInOrder();
         }
 
         // floats just above the cart bar, clear of the tray

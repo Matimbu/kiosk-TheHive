@@ -363,6 +363,15 @@ namespace kiosk.UI
 
         public bool CanQuickAdd { get { return !_soldOut && !_item.HasChoices; } }
 
+        // How many of this item are already in the order, shown on the photo so
+        // "did I already add that?" is answered without opening the cart.
+        private int _inOrder;
+        public int InOrder
+        {
+            get { return _inOrder; }
+            set { if (_inOrder == value) return; _inOrder = value; Invalidate(); }
+        }
+
         // Shown, not hidden: a guest looking for their usual drink should see it
         // is off today rather than wonder whether the kiosk is broken.
         public bool SoldOut
@@ -468,11 +477,20 @@ namespace kiosk.UI
             }
             else if (_item.Badge != null)
             {
-                string badgeText = _item.Badge.ToUpperInvariant();
+                string badgeText = GuestText.T(_item.Badge).ToUpperInvariant();
                 Size size = TextRenderer.MeasureText(badgeText, Hive.Overline);
                 RectangleF badge = new RectangleF(card.X + 8, card.Y + 8, size.Width + 18, 22);
                 Hive.Fill(g, badge, Hive.RadiusTag, Hive.Honey);
                 Hive.TextTracked(g, badgeText, Hive.Overline, Rectangle.Round(badge), Color.White, 1.1f, true);
+            }
+
+            if (_inOrder > 0)
+            {
+                string count = string.Format(GuestText.T("{0} in order"), _inOrder).ToUpperInvariant();
+                Size size = TextRenderer.MeasureText(count, Hive.Overline);
+                RectangleF tag = new RectangleF(card.Right - 8 - size.Width - 18, card.Y + 8, size.Width + 18, 22);
+                Hive.Fill(g, tag, Hive.RadiusTag, Hive.Teal);
+                Hive.TextTracked(g, count, Hive.Overline, Rectangle.Round(tag), Color.White, 1.1f, true);
             }
 
             Rectangle name = new Rectangle((int)card.X + 12, (int)photo.Bottom + 10, (int)card.Width - 24, 38);

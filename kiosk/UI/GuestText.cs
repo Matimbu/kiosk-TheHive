@@ -34,6 +34,7 @@ namespace kiosk.UI
             { "Best Sellers", "Sikat" }, { "Coffee", "Kape" }, { "Non-Coffee", "Iba pa" },
             { "Best seller", "Sikat" },
             { "SOLD OUT", "UBOS NA" },
+            { "{0} in order", "{0} sa order" },
             { "Still there?", "Nandiyan ka pa ba?" },
             { "Your order clears in {0} seconds.", "Mabubura ang order mo sa loob ng {0} segundo." },
             { "Returning to the start in {0} seconds.", "Babalik sa simula sa loob ng {0} segundo." },
